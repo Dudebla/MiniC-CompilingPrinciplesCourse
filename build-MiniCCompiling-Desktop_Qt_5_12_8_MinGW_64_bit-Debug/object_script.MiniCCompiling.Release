@@ -1,0 +1,10 @@
+release/main.o
+release/mainwindow.o
+release/ANALYZE.o
+release/CGEN.o
+release/CODE.o
+release/PARSE.o
+release/SCAN.o
+release/SYMTAB.o
+release/UTIL.o
+release/moc_mainwindow.o
