@@ -6,11 +6,6 @@
 #include <QMessageBox>
 #include <QTextStream>
 
-/*
- * default path save new file
-*/
-const QString DEFAULT_PATH = "/home/dude/Desktop";
-// const QString DEFAULT_PATH = "D://...";
 const int STYLE_TREE_LIST = 1;
 const int STYLE_TREE_GRAPH = 0;
 
@@ -98,7 +93,7 @@ void MainWindow::on_saveFile_triggered()
             QMessageBox::warning(this, tr("Warn"), tr("The content should not empty!"), QMessageBox::Ok);
         }else{
             QFileDialog fileDialog;
-            QString str = fileDialog.getSaveFileName(this, tr("Open File"), DEFAULT_PATH, tr("MiniC File(*.*)"));//get new file name
+            QString str = fileDialog.getSaveFileName(this, tr("Open File"), "..", tr("MiniC File(*.*)"));//get new file name
             if(str == ""){
                 return;
             }
@@ -199,7 +194,7 @@ void MainWindow::on_assemblyFile_triggered()
         QMessageBox::warning(this, tr("Error"), tr("Failed creating assemble instruction!"), QMessageBox::Ok);
     }else{
         QFileDialog fileDialog;
-        QString str = fileDialog.getSaveFileName(this, tr("Open File"), DEFAULT_PATH, tr("MiniC File(*.*)"));//get new file name
+        QString str = fileDialog.getSaveFileName(this, tr("Open File"), "..", tr("MiniC File(*.*)"));//get new file name
         if(str == ""){
             return;
         }

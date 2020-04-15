@@ -27,13 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    ANALYZE.C \
-    CGEN.C \
-    CODE.C \
-    PARSE.C \
-    SCAN.C \
-    SYMTAB.C \
-    UTIL.C
+        ANALYZE.C \
+        CGEN.C \
+        CODE.C \
+        PARSE.C \
+        SCAN.C \
+        SYMTAB.C \
+        UTIL.C
 
 HEADERS += \
         mainwindow.h \
