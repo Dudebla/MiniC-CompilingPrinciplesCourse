@@ -7,6 +7,8 @@
 
 #ifndef _PARSE_H_
 #define _PARSE_H_
+#include"GLOBALS.H"
+
 
 /* Function parse returns the newly 
  * constructed syntax tree
