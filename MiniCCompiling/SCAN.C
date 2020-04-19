@@ -36,6 +36,7 @@ static int getNextChar(void)
     if (!(linepos < bufsize))
     {
         lineno++;
+        memset(lineBuf,0,BUFLEN);
         if (fgets(lineBuf, BUFLEN - 1, source))
         {
             if (EchoSource) fprintf(listing, "%4d: %s", lineno, lineBuf);

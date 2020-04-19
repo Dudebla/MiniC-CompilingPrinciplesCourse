@@ -5,9 +5,34 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
+#include<QTextCodec>
+
+#include<string>
+/*
+ * include编译工具文件
+ */
+#include"GLOBALS.H"
+#include"ANALYZE.H"
+#include"CGEN.H"
+#include"CODE.H"
+#include"PARSE.H"
+#include"SCAN.H"
+#include"SYMTAB.H"
+#include"UTIL.H"
+
+using namespace std;
 
 const int STYLE_TREE_LIST = 1;
 const int STYLE_TREE_GRAPH = 0;
+
+//保存生成的语法树
+TreeNode *syntaxTree;
+//保存打开的源文件
+FILE * source;
+int lineno = 0;
+FILE * listing;
+FILE * code;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,7 +69,7 @@ void MainWindow::on_openFile_triggered()
     QString fileName;
 
     fileName = QFileDialog::getOpenFileName(this,tr("Open File"),tr(""),tr("MiniC File (*.*)"));// set type of file
-    if(fileName == "")                  //如果用户直接关闭了文件浏览对话框，那么文件名就为空值，直接返回
+    if(fileName == "") //如果用户直接关闭了文件浏览对话框，那么文件名就为空值，直接返回
     {
         return;
     }
@@ -70,10 +95,41 @@ void MainWindow::on_openFile_triggered()
                    this->sourceTextEdit->setPlainText(textStream.readAll());
                }
                this->sourceTextEdit->show();
+
+               /*
+                ** C语言打开文件并存为FILE类型，保存到source变量中
+               */
+               //可打开含中文路径文件
+               QTextCodec *code = QTextCodec::codecForName("GB2312");
+               std::string name = code->fromUnicode(fileName).data();
+               source=fopen(name.c_str(),"rb");
+
+               //调用生成语法树功能
+               if(!source){
+                   QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                   return;
+               }else{
+                    //生成语法树
+                    syntaxTree = parse();
+                    //打印语法树
+                    string result;//存储打印的语法树
+                    result = printTree(syntaxTree);
+
+                    //显示输出语法树
+                    this->lexicalTextEdit->setPlainText(QString::fromStdString(result) );
+
+               }
+               /*
+                ** END
+               */
+
+
                file.close();
                Flag_isOpen = 1;
                Flag_isNew = 0;
                Last_fileName = fileName;
+
+
            }
        }
     }

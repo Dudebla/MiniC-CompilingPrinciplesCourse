@@ -84,19 +84,19 @@ QMAKE_CXXFLAGS += -Werror=return-type
 QMAKE_CXXFLAGS += -Werror=uninitialized
 QMAKE_CXXFLAGS += -Wunreachable-code
 
-win32 {
-    # additional flags for Windows
-    LIBS += -lDbghelp
-    LIBS += -lbfd
-    LIBS += -limagehlp
-    cache()
-} else {
-    # flags that don't work on Windows MinGW compiler
-    # QMAKE_CXXFLAGS += -Wno-keyword-macro
-    # QMAKE_CXXFLAGS += -Wno-reserved-id-macro
-    QMAKE_CXXFLAGS += -Wno-unused-const-variable
-    LIBS += -ldl
-}
+#win32 {
+#    # additional flags for Windows
+#    LIBS += -lDbghelp
+#    LIBS += -lbfd
+#    LIBS += -limagehlp
+#    cache()
+#} else {
+#    # flags that don't work on Windows MinGW compiler
+#    # QMAKE_CXXFLAGS += -Wno-keyword-macro
+#    # QMAKE_CXXFLAGS += -Wno-reserved-id-macro
+#    QMAKE_CXXFLAGS += -Wno-unused-const-variable
+#    LIBS += -ldl
+#}
 
 # additional flags for Mac OS X
 macx {

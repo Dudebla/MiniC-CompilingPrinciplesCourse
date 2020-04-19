@@ -26,14 +26,14 @@
 #endif
 
 /* allocate global variables */
-int lineno = 0;
-FILE * source;
-FILE * listing;
-FILE * code;
+//int lineno = 0;
+//FILE * source;
+//FILE * listing;
+//FILE * code;
 
 /* allocate and set tracing flags */
-int EchoSource = TRUE;
-int TraceScan = TRUE;
+int EchoSource = FALSE;
+int TraceScan = FALSE;
 int TraceParse = TRUE;
 int TraceAnalyze = TRUE;
 int TraceCode = TRUE;

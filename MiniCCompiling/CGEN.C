@@ -7,7 +7,6 @@
 /* Kenneth C. Louden                                */
 /****************************************************/
 
-#include "GLOBALS.H"
 #include "SYMTAB.H"
 #include "CODE.H"
 #include "CGEN.H"
