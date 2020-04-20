@@ -116,6 +116,18 @@ TypeToken getToken(void)
                 save = FALSE;
                 state = INCOMMENT;
             }
+            else if (c == '/')   //扫描的当前字符为“/”，表示可能为除法也可能为注释的第一个字符
+            {
+                save = FALSE;
+                c = getNextChar(); //获取下一个字符进一步判断
+                if(c == '*'){
+                    state = INCOMMENT;
+                }else if(c == ' '){
+                    ungetNextChar();
+                    state = DONE;
+                    currentToken = OVER;
+                }
+            }
             else
             {
                 state = DONE;
