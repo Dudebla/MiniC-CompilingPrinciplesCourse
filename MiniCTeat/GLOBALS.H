@@ -44,11 +44,11 @@ typedef enum
 {
     ENDFILE, ERRO,
     /* reserved words */
-    ELSE, IF, INT, RETURN, VOID, WHILE,
+    ELSE, IF, RETURN, WHILE,
     /* multicharacter tokens */
     ID, NUM,
-    /* special symbols */
-    ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,ADDITIVE,POWER
+    /* special symbols*//* lparen: '(', lbracket: '[', lbrace: '{' */
+    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRAKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
 } TypeToken;
 /*
  * END

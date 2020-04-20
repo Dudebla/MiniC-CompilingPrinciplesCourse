@@ -44,7 +44,7 @@ static char* syntaxError(char * message)
     Error = TRUE;
 
     char* r = new char[result.size() + 1];
-    strcpy_s(r, result.size() + 1, result.c_str());
+    strcpy(r, result.c_str());
     return r;
 }
 

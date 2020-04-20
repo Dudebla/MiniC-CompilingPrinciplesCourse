@@ -77,7 +77,7 @@ static struct
     char* str;
     TypeToken tok;
 } reservedWords[MAXRESERVED]
-= { { "else",ELSE },{ "if",IF },{ "int",INT },{ "return",RETURN },{ "void",VOID},{ "while" ,WHILE} };
+= { { "else",ELSE },{ "if",IF },{ "return",RETURN },{ "while" ,WHILE} };
 /*
  * END
  */
@@ -158,8 +158,30 @@ TypeToken getToken(void)
                 case '=':
                     currentToken = EQ;
                     break;
+                case '!':
+                    c = getNextChar();
+                    if(c == '='){
+                        currentToken = NEQ;
+                    }else{
+                        currentToken = ERRO;
+                    }
                 case '<':
-                    currentToken = LT;
+                    c = getNextChar();
+                    if(c == '='){ //manage token < and token <=
+                        currentToken = LTEQ;
+                    }else {
+                        ungetNextChar();
+                        currentToken = LT;
+                    }
+                    break;
+                case '>':
+                    c = getNextChar();
+                    if(c == '='){//manage token < and token <=
+                        currentToken = GTEQ;
+                    }else {
+                        ungetNextChar();
+                        currentToken = GT;
+                    }
                     break;
                 case '+':
                     currentToken = PLUS;
@@ -181,6 +203,18 @@ TypeToken getToken(void)
                     break;
                 case ')':
                     currentToken = RPAREN;
+                    break;
+                case '[':
+                    currentToken = LBRACKET;
+                    break;
+                case ']':
+                    currentToken = RBRAKET;
+                    break;
+                case '{':
+                    currentToken = LBRACE;
+                    break;
+                case '}':
+                    currentToken = RBRACE;
                     break;
                 case ';':
                     currentToken = SEMI;
