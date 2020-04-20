@@ -61,14 +61,26 @@ static void ungetNextChar(void)
 }
 
 /* lookup table of reserved words */
+//static struct
+//{
+//    char* str;
+//    TypeToken tok;
+//} reservedWords[MAXRESERVED]
+//= { { "if",IF },{ "then",THEN },{ "else",ELSE },{ "end",END },
+//{ "repeat",REPEAT },{ "until",UNTIL },{ "read",READ },
+//{ "write",WRITE },{ "do" , DO },{"while",WHILE} , {"for",FOR},{"downto",DOWNTO},{"enddo",ENDDO},{"endwhile",ENDWHILE} };
+/*
+ * miniC修改部分
+ */
 static struct
 {
     char* str;
     TypeToken tok;
 } reservedWords[MAXRESERVED]
-= { { "if",IF },{ "then",THEN },{ "else",ELSE },{ "end",END },
-{ "repeat",REPEAT },{ "until",UNTIL },{ "read",READ },
-{ "write",WRITE },{ "do" , DO },{"while",WHILE} , {"for",FOR},{"downto",DOWNTO},{"enddo",ENDDO},{"endwhile",ENDWHILE} };
+= { { "else",ELSE },{ "if",IF },{ "int",INT },{ "return",RETURN },{ "void",VOID},{ "while" ,WHILE} };
+/*
+ * END
+ */
 
 /* lookup an identifier to see if it is a reserved word */
 /* uses linear search */

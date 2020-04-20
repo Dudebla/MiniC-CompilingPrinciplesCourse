@@ -24,17 +24,35 @@
 /* MAXRESERVED = the number of reserved words */
 #define MAXRESERVED 14
 
+//typedef enum
+///* book-keeping tokens */
+//{
+//    ENDFILE, ERRO,
+//    /* reserved words */
+//    IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE, WHILE,DO, ENDWHILE,FOR,TO, DOWNTO, ENDDO,
+//    /* multicharacter tokens */
+//    ID, NUM,
+//    /* special symbols */
+//    ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,ADDITIVE,POWER
+//} TypeToken;
+
+/*
+ * miniC修改部分
+ */
 typedef enum
 /* book-keeping tokens */
 {
     ENDFILE, ERRO,
     /* reserved words */
-    IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE, WHILE,DO, ENDWHILE,FOR,TO, DOWNTO, ENDDO,
+    ELSE, IF, INT, RETURN, VOID, WHILE,
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols */
     ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,ADDITIVE,POWER
 } TypeToken;
+/*
+ * END
+ */
 
 extern FILE* source; /* source code text file */
 extern FILE* listing; /* listing output text file */
