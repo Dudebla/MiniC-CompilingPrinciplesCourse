@@ -116,6 +116,9 @@ TypeToken getToken(void)
                 save = FALSE;
                 state = INCOMMENT;
             }
+            /*
+             * miniC修改部分
+             */
             else if (c == '/')   //扫描的当前字符为“/”，表示可能为除法也可能为注释的第一个字符
             {
                 save = FALSE;
@@ -128,6 +131,9 @@ TypeToken getToken(void)
                     currentToken = OVER;
                 }
             }
+            /*
+             * END
+             */
             else
             {
                 state = DONE;
@@ -173,15 +179,41 @@ TypeToken getToken(void)
                 }
             }
             break;
-        case INCOMMENT:
+//        case INCOMMENT:
+//            save = FALSE;
+//            if (c == EOF)
+//            {
+//                state = DONE;
+//                currentToken = ENDFILE;
+//            }
+//            else if (c == '}') state = START;
+//            break;
+        /*
+         * miniC修改部分
+         */
+        case INCOMMENT: //当前状态为注释内部状态
             save = FALSE;
-            if (c == EOF)
+            if (c == EOF) //是否读到文件末
             {
                 state = DONE;
                 currentToken = ENDFILE;
             }
-            else if (c == '}') state = START;
+            else{        //判读是否为注释结束符号
+                if (c == '*') {
+                    c = getNextChar();   //提前读取下一个字符
+                    if (c == '/') {     //连续两个字符为'*/'，退出注释状态
+                        state = START;
+                    }
+                    else {
+                        ungetNextChar();   //还原预读的字符
+                    }
+
+                }
+            }
             break;
+        /*
+         * END
+         */
         case INASSIGN:
             state = DONE;
             if (c == '=')
