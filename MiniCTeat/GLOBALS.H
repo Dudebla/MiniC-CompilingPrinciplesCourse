@@ -25,7 +25,7 @@
 #define MAXRESERVED 14
 
 //typedef enum
-///* book-keeping tokens */
+// /* book-keeping tokens */
 //{
 //    ENDFILE, ERRO,
 //    /* reserved words */
