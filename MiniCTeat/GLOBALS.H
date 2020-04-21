@@ -44,7 +44,7 @@ typedef enum
 {
     ENDFILE, ERRO,
     /* reserved words */
-    ELSE, IF, RETURN, WHILE,
+    ELSE, IF, RETURN, WHILE, INT, VOID,
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols*//* lparen: '(', lbracket: '[', lbrace: '{' */
