@@ -58,6 +58,93 @@ static void match(TypeToken expected)
     }
 }
 
+/*miniC parse begin */
+TreeNode * declaration_list(void){
+    TreeNode * t = declaration();
+    TreeNode * p = t;
+    while ((token != ENDFILE))
+    {
+        TreeNode * q;
+        q = declaration();
+        if (q != NULL) {
+            if (t == NULL) t = p = q;
+            else /* now p cannot be NULL either */
+            {
+                p->sibling = q;
+                p = q;
+            }
+        }
+    }
+    return t;
+}
+
+TreeNode * declaration(void){
+    TreeNode * t = NULL;
+    TypeToken beforeT;
+    switch (token) {
+    case INT:
+    case VOID:
+        beforeT = token;
+        token = getToken();
+        TreeNode * s = newExpNode(IdK);
+        if ((s != NULL) && (token == ID))
+            s->attr.name = copyString(tokenString);
+        match(ID);
+        token = getToken();
+        switch (token) {
+        case SEMI:
+            t = newStmtNode(VarDclK);
+            t->type = beforeT==INT?Integer:Void;
+            t->sibling = s;
+            break;
+        case LBRACKET:
+            t = newStmtNode(VarDclK);
+            t->type = beforeT==INT?Integer:Void;
+            t->sibling = s;
+            s->type = beforeT==INT?IntList:VoidList;
+            token = getToken();
+            s->attr.val = atoi(tokenString);//length of list
+            match(NUM);
+            token = getToken();
+            match(RBRAKET);
+            token = getToken();
+            match(SEMI);
+            break;
+        case LPAREN:
+            t = newStmtNode(FunDclK);
+            t->type = beforeT==INT?Integer:Void;
+            t->sibling = s;
+            match(LPAREN);
+            s->sibling = params();
+            match(RPAREN);
+            break;
+        }
+        break;
+    case LBRACE: t = compound_stem(); break;
+    default:
+        syntaxError("unexpected token -> ");
+        printToken(token, tokenString);
+        token = getToken();
+        break;
+    }
+    return t;
+}
+
+TreeNode * compound_stem(void){
+    TreeNode * t = newStmtNode(CompndK);
+    match(LBRACE);
+    if(t!=NULL) t->child[0] = local_declarations();
+    if(t!=NULL) t->child[1] = statement_list();
+    match(RBRACE);
+    return t;
+}
+
+treeNode * local_declarations(void){
+    //get current fun struct, manage Vector<VarStuct>
+
+
+}
+
 TreeNode * stmt_sequence(void)
 {
     TreeNode * t = statement();
@@ -81,7 +168,6 @@ TreeNode * stmt_sequence(void)
     }
     return t;
 }
-
 
 //P394
 //lineno: 961
@@ -330,7 +416,8 @@ TreeNode * parse(void)
 {
     TreeNode * t;
     token = getToken();
-    t = stmt_sequence();
+    //t = stmt_sequence();
+    t = declaration_list();
     if (token != ENDFILE)
         syntaxError("Code ends before file\n");
     return t;
