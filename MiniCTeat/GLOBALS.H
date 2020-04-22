@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <vector>
 
 #ifndef FALSE
 #define FALSE 0
@@ -90,6 +91,38 @@ typedef struct treeNode
     } attr;
     ExpType type; /* for type checking of exps */
 } TreeNode;
+
+
+/*
+* miniC存储全局变量结构体
+*/
+typedef struct varStruct
+{
+    ExpType type; //变量类型
+    char * name;      //变量名
+} VarStruct;
+
+/*
+* miniC存储函数结构体
+*/
+typedef struct funStruct
+{
+    ExpType returnType; //函数返回类型
+    char * name;      //函数名
+    std::vector<VarStruct> params;   //函数内部定义的参数及变量
+} FunStruct;
+
+/*
+* miniC存储全局变量及函数的vector容器
+*/
+
+/*
+* miniC修改部分，添加vector容器装载定义的全局变量和函数
+*/
+extern std::vector<VarStruct> VarVector;
+extern std::vector<FunStruct> FunVector;
+
+
 
 /**************************************************/
 /***********   Flags for tracing       ************/
