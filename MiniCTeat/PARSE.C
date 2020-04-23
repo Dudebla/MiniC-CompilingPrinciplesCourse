@@ -111,35 +111,30 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     TreeNode * t = NULL;
     beforeT = token;
     token = getToken();
-    TreeNode * s = newExpNode(IdK);
-    if ((s != NULL) && (token == ID))
-        s->attr.name = copyString(tokenString);
+    t = newStmtNode(VarDclK);
+    if ((t != NULL) && (token == ID))
+        t->attr.name = copyString(tokenString);
     match(ID);
     switch (dclType) {
     case VarFunDcl:{
         switch (token) {
         case SEMI:
-            t = newStmtNode(VarDclK);
-            t->sibling = s;
-            s->type = beforeT==INT?Integer:Void;
+            t->type = beforeT==INT?Integer:Void;
             match(SEMI);
             break;
         case LBRACKET:
-            t = newStmtNode(VarDclK);
-            t->sibling = s;
-            s->type = beforeT==INT?IntList:VoidList;
+            t->type = beforeT==INT?IntList:VoidList;
             match(LBRACE);
-            s->attr.val = atoi(tokenString);//length of list
+            t->attr.val = atoi(tokenString);//length of list
             match(NUM);
             match(RBRAKET);
             match(SEMI);
             break;
         case LPAREN:
-            t = newStmtNode(FunDclK);
-            t->sibling = s;
-            s->type = beforeT==INT?Integer:Void;
+            t->kind.stmt = FunDclK;
+            t->type = beforeT==INT?Integer:Void;
             match(LPAREN);
-            s->sibling = params();
+            t->sibling = params();
             match(RPAREN);
             break;
         default:
@@ -153,17 +148,13 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     case VarDcl:{
         switch (token) {
         case SEMI:
+            t->type = beforeT==INT?Integer:Void;
             match(SEMI);
-            t = newStmtNode(VarDclK);
-            t->sibling = s;
-            s->type = beforeT==INT?Integer:Void;
             break;
         case LBRACKET:
-            t = newStmtNode(VarDclK);
-            t->sibling = s;
-            s->type = beforeT==INT?IntList:VoidList;
+            t->type = beforeT==INT?IntList:VoidList;
             match(LBRACE);
-            s->attr.val = atoi(tokenString);//length of list
+            t->attr.val = atoi(tokenString);//length of list
             match(NUM);
             match(RBRAKET);
             match(SEMI);
@@ -177,11 +168,10 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
         break;
     }
     case FunDcl:{
-        t = newStmtNode(FunDclK);
-        t->sibling = s;
-        s->type = beforeT==INT?Integer:Void;
+        t->kind.stmt = FunDclK;
+        t->type = beforeT==INT?Integer:Void;
         match(LPAREN);
-        s->sibling = params();
+        t->sibling = params();
         match(RPAREN);
         break;
     }
@@ -200,21 +190,22 @@ TreeNode * compound_stem(void){
 
 treeNode * local_declarations(void){
     TreeNode * t = NULL;
-
+    TreeNode * current = t;
+    TreeNode * newT = NULL;
+    while(token==INT || token==VOID){
+        newT = var_fun_declaration(VarDcl);
+        current->sibling = newT;
+        current = newT;
+    }
+    return t;
 }
 
-TreeNode * stmt_sequence(void)
-{
-    TreeNode * t = statement();
+treeNode * statement_list(void){
+    TreeNode * t = NULL;
     TreeNode * p = t;
-    while ((token != ENDFILE) && (token != END) &&
-        (token != ELSE) && (token != UNTIL) && (token != WHILE)&& (token != ENDDO) && (token != ENDWHILE))
-    {
-        TreeNode * q;
-        if (token == SEMI) {
-            match(SEMI);
-        }
-        q = statement();
+    //should manage if token'string is one of the function name
+    while (token==SEMI || token==ID || token==LPAREN || token==NUM || token==LBRACE || token==IF || token==WHILE ||token==RETURN) {
+        TreeNode * q = statement();
         if (q != NULL) {
             if (t == NULL) t = p = q;
             else /* now p cannot be NULL either */
@@ -227,22 +218,43 @@ TreeNode * stmt_sequence(void)
     return t;
 }
 
+
+
+//TreeNode * stmt_sequence(void)
+//{
+//    TreeNode * t = statement();
+//    TreeNode * p = t;
+//    while ((token != ENDFILE) && (token != END) &&
+//        (token != ELSE) && (token != UNTIL) && (token != WHILE)&& (token != ENDDO) && (token != ENDWHILE))
+//    {
+//        TreeNode * q;
+//        if (token == SEMI) {
+//            match(SEMI);
+//        }
+//        q = statement();
+//        if (q != NULL) {
+//            if (t == NULL) t = p = q;
+//            else /* now p cannot be NULL either */
+//            {
+//                p->sibling = q;
+//                p = q;
+//            }
+//        }
+//    }
+//    return t;
+//}
+
 //P394
 //lineno: 961
 TreeNode * statement(void)
 {
     TreeNode * t = NULL;
     switch (token) {
-    case IF: t = if_stmt(); break;
-    case REPEAT: t = repeat_stmt(); break;
-    case ID: t = assign_stmt(); break;
-    case READ: t = read_stmt(); break;
-    case WRITE: t = write_stmt(); break;
-    case WHILE: t = while_stmt(); break;
-    case DO: t = dowhile_stmt(); break;
-    case FOR: t = for_stmt(); break;
-    case ENDDO: break;
-    case ENDWHILE: break;
+    case IF: t = selection_stmt(); break;
+    case ID: t = exp_call_stmt(); break;
+    case WHILE: t = iteration_stmt(); break;
+    case LBRACE: t = compound_stem(); break;
+    case RETURN: t = return_stmt(); break;
     default: syntaxError("unexpected token -> ");
         printToken(token, tokenString);
         token = getToken();
