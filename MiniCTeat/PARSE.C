@@ -32,6 +32,19 @@ static TreeNode * while_stmt(void);
 static TreeNode * dowhile_stmt(void);
 static TreeNode * for_stmt(void);
 
+typedef enum{
+    VarDcl, FunDcl, VarFunDcl
+}VarFunDclType;
+
+/*miniC functions*/
+static TreeNode * declaration_list(void);
+static TreeNode * declaration(void);
+static TreeNode * var_fun_declaration(VarFunDclType dclType);
+static TreeNode * compound_stem(void);
+static TreeNode * params(void);
+static TreeNode * local_declarations(void);
+static TreeNode * statement_list(void);
+
 
 //static void syntaxError(char * message)
 static char* syntaxError(char * message)
@@ -80,52 +93,98 @@ TreeNode * declaration_list(void){
 
 TreeNode * declaration(void){
     TreeNode * t = NULL;
-    TypeToken beforeT;
     switch (token) {
     case INT:
-    case VOID:
-        beforeT = token;
-        token = getToken();
-        TreeNode * s = newExpNode(IdK);
-        if ((s != NULL) && (token == ID))
-            s->attr.name = copyString(tokenString);
-        match(ID);
-        token = getToken();
-        switch (token) {
-        case SEMI:
-            t = newStmtNode(VarDclK);
-            t->type = beforeT==INT?Integer:Void;
-            t->sibling = s;
-            break;
-        case LBRACKET:
-            t = newStmtNode(VarDclK);
-            t->type = beforeT==INT?Integer:Void;
-            t->sibling = s;
-            s->type = beforeT==INT?IntList:VoidList;
-            token = getToken();
-            s->attr.val = atoi(tokenString);//length of list
-            match(NUM);
-            token = getToken();
-            match(RBRAKET);
-            token = getToken();
-            match(SEMI);
-            break;
-        case LPAREN:
-            t = newStmtNode(FunDclK);
-            t->type = beforeT==INT?Integer:Void;
-            t->sibling = s;
-            match(LPAREN);
-            s->sibling = params();
-            match(RPAREN);
-            break;
-        }
-        break;
+    case VOID: t = var_fun_declaration(VarFunDcl); break;
     case LBRACE: t = compound_stem(); break;
     default:
         syntaxError("unexpected token -> ");
         printToken(token, tokenString);
         token = getToken();
         break;
+    }
+    return t;
+}
+
+TreeNode * var_fun_declaration(VarFunDclType dclType){
+    TypeToken beforeT;
+    TreeNode * t = NULL;
+    beforeT = token;
+    token = getToken();
+    TreeNode * s = newExpNode(IdK);
+    if ((s != NULL) && (token == ID))
+        s->attr.name = copyString(tokenString);
+    match(ID);
+    switch (dclType) {
+    case VarFunDcl:{
+        switch (token) {
+        case SEMI:
+            t = newStmtNode(VarDclK);
+            t->sibling = s;
+            s->type = beforeT==INT?Integer:Void;
+            match(SEMI);
+            break;
+        case LBRACKET:
+            t = newStmtNode(VarDclK);
+            t->sibling = s;
+            s->type = beforeT==INT?IntList:VoidList;
+            match(LBRACE);
+            s->attr.val = atoi(tokenString);//length of list
+            match(NUM);
+            match(RBRAKET);
+            match(SEMI);
+            break;
+        case LPAREN:
+            t = newStmtNode(FunDclK);
+            t->sibling = s;
+            s->type = beforeT==INT?Integer:Void;
+            match(LPAREN);
+            s->sibling = params();
+            match(RPAREN);
+            break;
+        default:
+            syntaxError("unexpected token -> ");
+            printToken(token, tokenString);
+            token = getToken();
+            break;
+        }
+        break;
+    }
+    case VarDcl:{
+        switch (token) {
+        case SEMI:
+            match(SEMI);
+            t = newStmtNode(VarDclK);
+            t->sibling = s;
+            s->type = beforeT==INT?Integer:Void;
+            break;
+        case LBRACKET:
+            t = newStmtNode(VarDclK);
+            t->sibling = s;
+            s->type = beforeT==INT?IntList:VoidList;
+            match(LBRACE);
+            s->attr.val = atoi(tokenString);//length of list
+            match(NUM);
+            match(RBRAKET);
+            match(SEMI);
+            break;
+        default:
+            syntaxError("unexpected token -> ");
+            printToken(token, tokenString);
+            token = getToken();
+            break;
+        }
+        break;
+    }
+    case FunDcl:{
+        t = newStmtNode(FunDclK);
+        t->sibling = s;
+        s->type = beforeT==INT?Integer:Void;
+        match(LPAREN);
+        s->sibling = params();
+        match(RPAREN);
+        break;
+    }
     }
     return t;
 }
@@ -140,8 +199,7 @@ TreeNode * compound_stem(void){
 }
 
 treeNode * local_declarations(void){
-    //get current fun struct, manage Vector<VarStuct>
-
+    TreeNode * t = NULL;
 
 }
 
