@@ -49,7 +49,7 @@ typedef enum
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols*//* lparen: '(', lbracket: '[', lbrace: '{' */
-    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRAKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
+    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
 } TypeToken;
 /*
  * END
@@ -68,7 +68,7 @@ extern int lineno; /* source line number for listing */
 typedef enum { StmtK, ExpK } NodeKind;
 //typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK , WhileK, DowhileK, ForIncK, ForDecK, AdditiveK} StmtKind;
 /*miniC*/
-typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, ForIncK, VarDclK, FunDclK, CompndK} StmtKind;
+typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, ForIncK, VarDclK, FunDclK, CompndK, ReturnK, CallK} StmtKind;
 
 typedef enum { OpK, ConstK, IdK } ExpKind;
 

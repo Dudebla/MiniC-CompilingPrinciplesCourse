@@ -156,6 +156,13 @@ TypeToken getToken(void)
                     currentToken = ENDFILE;
                     break;
                 case '=':
+                    c = getNextChar();
+                    if(c == '='){
+                        currentToken = EQ;
+                    }else{
+                        ungetNextChar();
+                        currentToken = ASSIGN;
+                    }
                     currentToken = EQ;
                     break;
                 case '!':
