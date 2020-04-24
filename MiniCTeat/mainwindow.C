@@ -15,8 +15,6 @@
 #include"ANALYZE.H"
 #include"CGEN.H"
 #include"CODE.H"
-#include"PARSE.H"
-#include"SCAN.H"
 #include"SYMTAB.H"
 #include"UTIL.H"
 

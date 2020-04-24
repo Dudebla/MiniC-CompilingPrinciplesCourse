@@ -107,8 +107,8 @@ TreeNode * declaration(void){
     TreeNode * t = NULL;
     switch (token) {
     case INT:
-    case VOID: t = var_fun_declaration(VarFunDcl); break;
-    case LBRACE: t = compound_stmt(); break;
+    case VOID: t = var_fun_declaration(VarFunDcl); break;   //识别结果为变量定义或函数名定义
+    case LBRACE: t = compound_stmt(); break;   //识别到 '{'则为函数体定义
     default:
         syntaxError("unexpected token -> ");
         printToken(token, tokenString);
@@ -122,81 +122,83 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     TypeToken beforeT;
     TreeNode * t = NULL;
     beforeT = token;
-    token = getToken();
-    t = newStmtNode(VarDclK);
+    match(token);
+
+    t = newStmtNode(VarDclK);   //临时定义变量声明类型节点，保存ID名
     if ((t != NULL) && (token == ID))
         t->attr.name = copyString(tokenString);
     match(ID);
+
     switch (dclType) {
-    case VarFunDcl:{
-        switch (token) {
-        case SEMI:
-            t->type = beforeT==INT?Integer:Void;
-            match(SEMI);
+        case VarFunDcl:{
+            switch (token) {
+            case SEMI:   //semi: ';' ， 为int或void变量定义
+                t->type = beforeT==INT?Integer:Void;
+                match(SEMI);
+                break;
+            case LBRACKET:   //lbracket: '['，为int或void数组定义
+                t->type = beforeT==INT?IntList:VoidList;
+                match(LBRACE);
+                t->attr.val = atoi(tokenString);//length of list
+                match(NUM);
+                match(RBRACKET);
+                match(SEMI);
+                break;
+            case LPAREN:  //lparen: '('   ，为函数定义，函数参数左括号
+                t->kind.stmt = FunDclK;   //更改节点类型为函数定义类型
+                t->type = beforeT==INT?Integer:Void;
+                match(LPAREN);
+                t->child[0] = params();
+                match(RPAREN);
+                break;
+            default:
+                syntaxError("unexpected token -> ");
+                printToken(token, tokenString);
+                token = getToken();
+                break;
+            }
             break;
-        case LBRACKET:
-            t->type = beforeT==INT?IntList:VoidList;
-            match(LBRACE);
-            t->attr.val = atoi(tokenString);//length of list
-            match(NUM);
-            match(RBRACKET);
-            match(SEMI);
+        }
+        case VarDcl:{
+            switch (token) {
+                case SEMI:
+                    t->type = beforeT==INT?Integer:Void;
+                    match(SEMI);
+                    break;
+                case LBRACKET:
+                    t->type = beforeT==INT?IntList:VoidList;
+                    match(LBRACE);
+                    t->attr.val = atoi(tokenString);//length of list
+                    match(NUM);
+                    match(RBRACKET);
+                    match(SEMI);
+                    break;
+                default:
+                    syntaxError("unexpected token -> ");
+                    printToken(token, tokenString);
+                    token = getToken();
+                    break;
+            }
             break;
-        case LPAREN:
+        }
+        case FunDcl:{
             t->kind.stmt = FunDclK;
             t->type = beforeT==INT?Integer:Void;
             match(LPAREN);
             t->child[0] = params();
             match(RPAREN);
             break;
-        default:
-            syntaxError("unexpected token -> ");
-            printToken(token, tokenString);
-            token = getToken();
-            break;
         }
-        break;
-    }
-    case VarDcl:{
-        switch (token) {
-        case SEMI:
-            t->type = beforeT==INT?Integer:Void;
-            match(SEMI);
-            break;
-        case LBRACKET:
-            t->type = beforeT==INT?IntList:VoidList;
-            match(LBRACE);
-            t->attr.val = atoi(tokenString);//length of list
-            match(NUM);
-            match(RBRACKET);
-            match(SEMI);
-            break;
-        default:
-            syntaxError("unexpected token -> ");
-            printToken(token, tokenString);
-            token = getToken();
-            break;
-        }
-        break;
-    }
-    case FunDcl:{
-        t->kind.stmt = FunDclK;
-        t->type = beforeT==INT?Integer:Void;
-        match(LPAREN);
-        t->child[0] = params();
-        match(RPAREN);
-        break;
-    }
     }
     return t;
 }
 
 TreeNode * compound_stmt(void){
-    TreeNode * t = newStmtNode(CompndK);
-    match(LBRACE);
+    TreeNode * t = newStmtNode(CompndK);   //函数体定义内容
+    match(LBRACE);   //'{'
     if(t!=NULL) t->child[0] = local_declarations();
     if(t!=NULL) t->child[1] = statement_list();
-    match(RBRACE);
+    match(RBRACE);   //'}'
     return t;
 }
 
@@ -222,7 +224,9 @@ TreeNode * local_declarations(void){
 treeNode * statement_list(void){
     TreeNode * t = NULL;
     TreeNode * p = t;
-    while (token==SEMI || token==ID || token==LPAREN || token==NUM || token==LBRACE || token==IF || token==WHILE ||token==RETURN) {
+    while (token==SEMI || token==ID || token==LPAREN ||
+           token==NUM || token==LBRACE || token==IF ||
+           token==WHILE ||token==RETURN) {   //lparen: '('
         TreeNode * q = statement();
         if (q != NULL) {
             if (t == NULL) t = p = q;
@@ -268,15 +272,15 @@ TreeNode * statement(void)
 {
     TreeNode * t = NULL;
     switch (token) {
-    case IF: t = selection_stmt(); break;
-    case ID: t = expression_stmt(); break;
-    case WHILE: t = iteration_stmt(); break;
-    case LBRACE: t = compound_stmt(); break;
-    case RETURN: t = return_stmt(); break;
-    default: syntaxError("unexpected token -> ");
-        printToken(token, tokenString);
-        token = getToken();
-        break;
+        case IF: t = selection_stmt(); break;
+        case ID: t = expression_stmt(); break;
+        case WHILE: t = iteration_stmt(); break;
+        case LBRACE: t = compound_stmt(); break;
+        case RETURN: t = return_stmt(); break;
+        default: syntaxError("unexpected token -> ");
+            printToken(token, tokenString);
+            token = getToken();
+            break;
     } /* end case */
     return t;
 }
@@ -329,24 +333,30 @@ TreeNode * var(void){
     }
     match(ID);
     if(t!=NULL && token==LBRACKET){
-        match(LBRACKET);
-        t->child[0] = expression();
+        match(LBRACKET);  //'['
+        t->child[0] = expression();   // ####需要判断是否为负数#####
         match(RBRACKET);
     }
     return t;
 }
 
 TreeNode * simple_expression(void){
-    TreeNode * t = addtive_expression();
-    while(token==LT || token==GT || token==EQ || token==NEQ || token==LTEQ || token ==GTEQ){
-        TreeNode * p = newExpNode(OpK);
-        if (p != NULL) {
-            p->child[0] = t;
-            p->attr.op = token;
-            t = p;
+    TreeNode * t = NULL;
+    TreeNode * p = addtive_expression();
+    if(token==LT || token==GT || token==EQ || token==NEQ || token==LTEQ || token ==GTEQ){
+        TreeNode * q = newExpNode(OpK);
+        if (q != NULL) {
+            q->child[0] = p;
+            q->attr.op = token;
+            if(t == NULL){
+                t = q;
+            }
             match(token);
-            t->child[1] = addtive_expression();
+            p->child[1] = addtive_expression();
         }
+    }
+    if(t == NULL){
+        t = p;
     }
     return t;
 }
@@ -365,6 +375,7 @@ TreeNode * addtive_expression(void){
         }
     }
     return t;
+
 }
 
 TreeNode * iteration_stmt(void){
@@ -520,6 +531,7 @@ TreeNode * term(void)
         }
     }
     return t;
+
 }
 
 TreeNode * factor(void)
@@ -555,10 +567,10 @@ TreeNode * var_call(void){
         t->attr.name = copyString(tokenString);
     }
     match(ID);
-    if(t!=NULL && token==LPAREN){
+    if(t!=NULL && token==LPAREN){  //lparen: '(',函数调用情况
         t->child[0] = call();
     }else{
-        t->child[0] = var();
+        t->child[0] = var(); //变量
     }
     return t;
 }
