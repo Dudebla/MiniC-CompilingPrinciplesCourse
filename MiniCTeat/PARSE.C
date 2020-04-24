@@ -646,7 +646,16 @@ TreeNode * call(void){
 }
 
 TreeNode * args(void){
+    TreeNode * t = expression();
+    TreeNode * p = t;
+    while(token == SEMI){
+        match(SEMI);
+        TreeNode * q = expression();
+        p->sibling = q;
+        p = q;
+    }
 
+    return t;
 }
 
 ///*TINY的文法扩充*/
