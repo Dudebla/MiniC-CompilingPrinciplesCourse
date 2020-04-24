@@ -68,7 +68,7 @@ extern int lineno; /* source line number for listing */
 typedef enum { StmtK, ExpK } NodeKind;
 //typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK , WhileK, DowhileK, ForIncK, ForDecK, AdditiveK} StmtKind;
 /*miniC*/
-typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, ForIncK, VarDclK, FunDclK, CompndK, ReturnK, CallK} StmtKind;
+typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, ForIncK, VarDclK, FunDclK, CompndK, ReturnK, CallK , ParamK} StmtKind;
 
 typedef enum { OpK, ConstK, IdK } ExpKind;
 

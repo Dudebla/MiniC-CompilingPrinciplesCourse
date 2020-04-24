@@ -42,6 +42,7 @@ static TreeNode * declaration(void);
 static TreeNode * var_fun_declaration(VarFunDclType dclType);
 static TreeNode * compound_stmt(void);
 static TreeNode * params(void);
+static TreeNode * param(void);
 static TreeNode * local_declarations(void);
 static TreeNode * statement_list(void);
 static TreeNode * statement(void);
@@ -57,6 +58,9 @@ static TreeNode * addtive_expression(void);
 static TreeNode * term(void);
 static TreeNode * factor(void);
 static TreeNode * call(void);
+static TreeNode * args(void);
+
+
 
 //static void syntaxError(char * message)
 static char* syntaxError(char * message)
@@ -203,8 +207,52 @@ TreeNode * compound_stmt(void){
 }
 
 TreeNode * params(void){
+    TreeNode * t = NULL;
+    if(token == INT){ //函数参数非空，第一个参数类型为INT
+        TreeNode * p = param();
+        while (token == SEMI) {  //参数不止一个，将参数链成兄弟结点
+            match(SEMI);
+            TreeNode * q = param();
+            p->sibling = q;
+            if(t == NULL){
+                t = p = q;
+            }else{
+                p = q;
+            }
+        }
+    }
+    if(token == VOID){  //函数参数为空
+        t = newExpNode(IdK);
+        t->type = Void;       //结点类型为Void，name为空
+    }
 
+    return t;
 
+}
+
+TreeNode * param(void){
+
+    TreeNode * t = NULL;
+    TypeToken beforeT;
+
+    beforeT = token; //before存储参数类型
+    match(token); //此时token为ID
+
+    t = newStmtNode(VarDclK);   //临时定义变量声明类型节点，保存ID名
+    if ((t != NULL) && (token == ID)){
+        t->attr.name = copyString(tokenString);
+    }
+    match(ID);
+
+    if(token == LBRACKET){  //lbracket: '[',数组类型参数
+        t->type = beforeT==INT?IntList:VoidList;
+        match(LBRACE);
+        match(RBRACKET);
+    }else{  //int类型参数
+        t->type = beforeT==INT?Integer:Void;
+    }
+
+    return t;
 
 
 }
@@ -576,8 +624,28 @@ TreeNode * var_call(void){
 }
 
 TreeNode * call(void){
+    TreeNode * t = newStmtNode(CallK);
+
+    TreeNode * p = newExpNode(IdK);
+    if(p != NULL && token == ID){
+        p->attr.name = copyString(tokenString);
+    }
+    t->child[0] = p;
+    match(LPAREN);
+
+    if(token == ID || token == LPAREN || token == NUM ){
+        TreeNode * q = args();
+        t->child[1] = q;
+    }
+
+    match(RPAREN);
+
+    return t;
 
 
+}
+
+TreeNode * args(void){
 
 }
 
