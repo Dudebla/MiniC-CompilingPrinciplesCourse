@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <vector>
+#include <map>
 
 #ifndef FALSE
 #define FALSE 0
@@ -49,7 +49,7 @@ typedef enum
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols*//* lparen: '(', lbracket: '[', lbrace: '{' */
-    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRAKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
+    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE, SEMI, COMMA, ADDITIVE,POWER
 } TypeToken;
 /*
  * END
@@ -109,7 +109,7 @@ typedef struct funStruct
 {
     ExpType returnType; //函数返回类型
     char * name;      //函数名
-    std::vector<VarStruct> params;   //函数内部定义的参数及变量
+    std::map<char*, VarStruct> params;   //函数内部定义的参数及变量
 } FunStruct;
 
 /*
@@ -117,10 +117,13 @@ typedef struct funStruct
 */
 
 /*
-* miniC修改部分，添加vector容器装载定义的全局变量和函数
+* miniC修改部分，添加map容器装载定义的全局变量和函数
 */
-extern std::vector<VarStruct> VarVector;
-extern std::vector<FunStruct> FunVector;
+//extern std::vector<VarStruct> VarVector;
+//extern std::vector<FunStruct> FunVector;
+
+extern std::map<char*, VarStruct> VarStructMap;
+extern std::map<char*, FunStruct> FunStructMap;
 
 
 

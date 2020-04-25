@@ -215,7 +215,7 @@ TypeToken getToken(void)
                     currentToken = LBRACKET;
                     break;
                 case ']':
-                    currentToken = RBRAKET;
+                    currentToken = RBRACKET;
                     break;
                 case '{':
                     currentToken = LBRACE;
@@ -225,6 +225,9 @@ TypeToken getToken(void)
                     break;
                 case ';':
                     currentToken = SEMI;
+                    break;
+                case ',':
+                    currentToken = COMMA;
                     break;
                 default:
                     currentToken = ERRO;
