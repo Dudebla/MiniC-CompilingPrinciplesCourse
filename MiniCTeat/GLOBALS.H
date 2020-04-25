@@ -23,7 +23,7 @@
 #define TRUE 1
 #endif
 /* MAXRESERVED = the number of reserved words */
-#define MAXRESERVED 14
+#define MAXRESERVED 6
 
 //typedef enum
 // /* book-keeping tokens */
@@ -49,7 +49,7 @@ typedef enum
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols*//* lparen: '(', lbracket: '[', lbrace: '{' */
-    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
+    ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, LBRACKET, RBRAKET, LBRACE, RBRACE, SEMI,ADDITIVE,POWER
 } TypeToken;
 /*
  * END

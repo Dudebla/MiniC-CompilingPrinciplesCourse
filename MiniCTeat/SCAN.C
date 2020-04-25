@@ -77,7 +77,7 @@ static struct
     char* str;
     TypeToken tok;
 } reservedWords[MAXRESERVED]
-= { { "else",ELSE },{ "if",IF },{ "return",RETURN },{ "while" ,WHILE} };
+= { { "else",ELSE },{ "if",IF },{ "return",RETURN },{ "while" ,WHILE },{"int",INT},{"void", VOID} };
 /*
  * END
  */
