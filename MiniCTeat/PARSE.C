@@ -164,6 +164,9 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             break;
         }
         case VarDcl:{
+            VarStruct v;
+            v.name = t->attr.name;
+
             switch (token) {
                 case SEMI:
                     t->type = beforeT==INT?Integer:Void;
@@ -201,7 +204,13 @@ TreeNode * compound_stmt(void){
     TreeNode * t = newStmtNode(CompndK);   //函数体定义内容
     match(LBRACE);   //'{'
     if(t!=NULL) t->child[0] = local_declarations();
-    if(t!=NULL) t->child[1] = statement_list();
+    if(t!=NULL){
+        if(t->child[0]!=NULL){
+            t->child[1] = statement_list();
+        }else{
+            t->child[0] = statement_list();
+        }
+    }
     match(RBRACE);   //'}'
     return t;
 }
@@ -236,7 +245,7 @@ TreeNode * param(void){
     TypeToken beforeT;
 
     beforeT = token; //before存储参数类型
-    match(token); //此时token为ID
+    match(INT); //此时token为ID
 
     t = newStmtNode(VarDclK);   //临时定义变量声明类型节点，保存ID名
     if ((t != NULL) && (token == ID)){
@@ -245,11 +254,11 @@ TreeNode * param(void){
     match(ID);
 
     if(token == LBRACKET){  //lbracket: '[',数组类型参数
-        t->type = beforeT==INT?IntList:VoidList;
+        t->type = IntList;
         match(LBRACE);
         match(RBRACKET);
     }else{  //int类型参数
-        t->type = beforeT==INT?Integer:Void;
+        t->type = Integer;
     }
 
     return t;
@@ -648,8 +657,8 @@ TreeNode * call(void){
 TreeNode * args(void){
     TreeNode * t = expression();
     TreeNode * p = t;
-    while(token == SEMI){
-        match(SEMI);
+    while(token == COMMA){
+        match(COMMA);
         TreeNode * q = expression();
         p->sibling = q;
         p = q;
