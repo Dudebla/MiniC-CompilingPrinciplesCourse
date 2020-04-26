@@ -112,6 +112,7 @@ TypeToken getToken(void)
     while (state != DONE)
     {
         int c = getNextChar();
+        ++tokenLength;
         save = TRUE;
         switch (state)
         {
@@ -136,10 +137,12 @@ TypeToken getToken(void)
             {
                 save = FALSE;
                 c = getNextChar(); //获取下一个字符进一步判断
+                ++tokenLength;
                 if(c == '*'){
                     state = INCOMMENT;
                 }else if(c == ' '){
                     ungetNextChar();
+                    --tokenLength;
                     state = DONE;
                     currentToken = OVER;
                 }
@@ -158,16 +161,19 @@ TypeToken getToken(void)
                     break;
                 case '=':
                     c = getNextChar();
+                    ++tokenLength;
                     if(c == '='){
                         currentToken = EQ;
                     }else{
                         ungetNextChar();
+                        --tokenLength;
                         currentToken = ASSIGN;
                     }
                     currentToken = EQ;
                     break;
                 case '!':
                     c = getNextChar();
+                    ++tokenLength;
                     if(c == '='){
                         currentToken = NEQ;
                     }else{
@@ -175,19 +181,23 @@ TypeToken getToken(void)
                     }
                 case '<':
                     c = getNextChar();
+                    ++tokenLength;
                     if(c == '='){ //manage token < and token <=
                         currentToken = LTEQ;
                     }else {
                         ungetNextChar();
+                        --tokenLength;
                         currentToken = LT;
                     }
                     break;
                 case '>':
                     c = getNextChar();
+                    ++tokenLength;
                     if(c == '='){//manage token < and token <=
                         currentToken = GTEQ;
                     }else {
                         ungetNextChar();
+                        --tokenLength;
                         currentToken = GT;
                     }
                     break;
@@ -258,11 +268,13 @@ TypeToken getToken(void)
             else{        //判读是否为注释结束符号
                 if (c == '*') {
                     c = getNextChar();   //提前读取下一个字符
+                    ++tokenLength;
                     if (c == '/') {     //连续两个字符为'*/'，退出注释状态
                         state = START;
                     }
                     else {
                         ungetNextChar();   //还原预读的字符
+                        --tokenLength;
                     }
 
                 }
@@ -278,6 +290,7 @@ TypeToken getToken(void)
             else
             { /* backup in the input */
                 ungetNextChar();
+                --tokenLength;
                 save = FALSE;
                 currentToken = ERRO;
             }
@@ -286,6 +299,7 @@ TypeToken getToken(void)
             if (!isdigit(c))
             { /* backup in the input */
                 ungetNextChar();
+                --tokenLength;
                 save = FALSE;
                 state = DONE;
                 currentToken = NUM;
@@ -295,6 +309,7 @@ TypeToken getToken(void)
             if (!isalpha(c))
             { /* backup in the input */
                 ungetNextChar();
+                --tokenLength;
                 save = FALSE;
                 state = DONE;
                 currentToken = ID;
@@ -312,7 +327,6 @@ TypeToken getToken(void)
         if (state == DONE)
         {
             tokenString[tokenStringIndex] = '\0';
-            tokenLength = tokenStringIndex;
             if (currentToken == ID)
                 currentToken = reservedLookup(tokenString);
         }
@@ -327,5 +341,6 @@ TypeToken getToken(void)
 void ungetToken(void) {
     while (tokenLength > 0) {
         ungetNextChar();
+        --tokenLength;
     }
 }
