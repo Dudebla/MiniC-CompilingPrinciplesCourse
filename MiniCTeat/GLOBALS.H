@@ -55,7 +55,7 @@ typedef enum
  * END
  */
 
-extern FILE* source; /* source code text file */
+extern FILE* source; /* source code t ext file */
 extern FILE* listing; /* listing output text file */
 extern FILE* code; /* code text file for TM simulator */
 
