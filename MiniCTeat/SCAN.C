@@ -27,7 +27,7 @@ static char lineBuf[BUFLEN]; /* holds the current line */
 static int linepos = 0; /* current position in LineBuf */
 static int bufsize = 0; /* current size of buffer string */
 static int EOF_flag = FALSE; /* corrects ungetNextChar behavior on EOF */
-static int tokenLenth = 0; //当前token长度，用于ungetToken
+static int tokenLength = 0; //当前token长度，用于ungetToken
 
 /* getNextChar fetches the next non-blank character
 from lineBuf, reading in a new line if lineBuf is
@@ -312,6 +312,7 @@ TypeToken getToken(void)
         if (state == DONE)
         {
             tokenString[tokenStringIndex] = '\0';
+            tokenLength = tokenStringIndex;
             if (currentToken == ID)
                 currentToken = reservedLookup(tokenString);
         }
