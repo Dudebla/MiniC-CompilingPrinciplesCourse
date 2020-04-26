@@ -20,4 +20,8 @@ extern char tokenString[MAXTOKENLEN + 1];
 * next token in source file
 */
 TypeToken getToken(void);
+/* function getToken rock balck
+ * to the last token
+*/
+void ungetToken(void);
 #endif

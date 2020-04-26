@@ -367,17 +367,81 @@ TreeNode * expression_stmt(void){
 
 TreeNode * expression(void){
     TreeNode * t = NULL;
-    if(token==ID){
-        t = newStmtNode(AssignK);
-        if(t!=NULL){
-            t->child[0] = var();
+    if(token==ID){//var=expression or factor's var or factor's call
+//        t = newStmtNode(AssignK);//maybe is exp
+//        if(t!=NULL){
+//            t->attr.name = copyString(tokenString);
+//        }
+        match(ID);
+        switch(token){
+        case LPAREN:{//call, is simple-expression
+            ungetToken();//token is ID, call
+            t = simple_expression();
+            break;
         }
-        match(ASSIGN);
-        t->attr.op = ASSIGN;
-        if(t!=NULL){
-            t->child[1] = expression();
+        case ASSIGN:{//ID = expression
+            ungetToken();
+            t = newStmtNode(AssignK);
+            if(t != NULL) t->type = Integer;
+            if (t != NULL) t->attr.name = copyString(tokenString);
+            match(ID);
+            match(ASSIGN);
+            if (t != NULL) t->child[0] = expression();
+            break;
         }
-    }else{
+        case LBRACKET:{//ID[expression]......
+            t = newExpNode(IdK);//teamplate node, store the ID[expression]
+            if(t!=NULL) t->attr.name = copyString(tokenString);
+            if(t!=NULL) t->type = IntList;
+            match(LBRACKET);
+            if(t!=NULL) t->child[0] = expression();
+            match(RBRACKET);
+            if(token==ASSIGN){//ID[expression]=expression
+                TreeNode * p = newStmtNode(AssignK);
+                p->type = IntList;
+                p->child[0] = t;
+                match(ASSIGN);
+                p->child[1] = expression();
+                t = p;
+            }else{// ID[expression]{mulop factor}{addop addtive_expression}{relop addtive_expression}
+                while ((token == TIMES) || (token == OVER))//match {mulop factor}
+                {
+                    TreeNode * p = newExpNode(OpK);
+                    if (p != NULL) {
+                        p->child[0] = t;
+                        p->attr.op = token;
+                        t = p;
+                        match(token);
+                        p->child[1] = factor();
+                    }
+                }
+                while ((token == PLUS) ||(token == MINUS)) {//match {addop addtive_expression}
+                    TreeNode * p = newExpNode(OpK);
+                    if (p != NULL) {
+                        p->child[0] = t;
+                        p->attr.op = token;
+                        t = p;
+                        match(token);
+                        p->child[1] = addtive_expression();
+                    }
+                }
+                while ((token==LT)||(token==LTEQ)||(token==GT)||(token==GTEQ)||(token==EQ)||(token==NEQ)) {
+                    if(token==LT || token==GT || token==EQ || token==NEQ || token==LTEQ || token ==GTEQ){
+                        TreeNode * p = newExpNode(OpK);
+                        if (p != NULL) {
+                            p->child[0] = t;
+                            p->attr.op = token;
+                            t = p;
+                            match(token);
+                            p->child[1] = addtive_expression();
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        }
+    }else{//factor's (expression) or NUM
         t = simple_expression();
     }
     return t;
