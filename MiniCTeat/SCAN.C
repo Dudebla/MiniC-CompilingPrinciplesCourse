@@ -8,6 +8,9 @@
 #include "GLOBALS.H"
 #include "UTIL.H"
 #include "SCAN.H"
+#include<string>
+
+using namespace std;
 
 /* states in scanner DFA */
 typedef enum
@@ -18,6 +21,8 @@ StateType;
 
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN + 1];
+char *lastTokenString;
+
 
 /* BUFLEN = length of the input buffer for
    source code lines */
@@ -28,6 +33,10 @@ static int linepos = 0; /* current position in LineBuf */
 static int bufsize = 0; /* current size of buffer string */
 static int EOF_flag = FALSE; /* corrects ungetNextChar behavior on EOF */
 static int tokenLength = 0; //当前token长度，用于ungetToken
+static TypeToken lastToken;
+TypeToken currentToken;
+
+
 
 /* getNextChar fetches the next non-blank character
 from lineBuf, reading in a new line if lineBuf is
@@ -101,10 +110,14 @@ static TypeToken reservedLookup(char * s)
 * next token in source file
 */
 TypeToken getToken(void)
-{  /* index for storing into tokenString */
+{
+    //保存上一个token的信息
+    lastToken = currentToken;
+    lastTokenString = copyString(tokenString);
+    /* index for storing into tokenString */
     int tokenStringIndex = 0;
     /* holds current token to be returned */
-    TypeToken currentToken;
+//    TypeToken currentToken;
     /* current state - always begins at START */
     StateType state = START;
     /* flag to indicate save to tokenString */
@@ -331,10 +344,17 @@ TypeToken getToken(void)
                 currentToken = reservedLookup(tokenString);
         }
     }
-    if (TraceScan) {
-        fprintf(listing, "\t%d: ", lineno);
-        printToken(currentToken, tokenString);
-    }
+    if (currentToken == ID) {
+            //fprintf(listing, "\t%d: ", lineno);   //行号
+            char * tokenMessage = printToken(currentToken, tokenString); //token
+            //fprintf(listing, tokenMessage);
+
+            //lexicalMessage.append(to_string(lineno) + ' ' + tokenString + '\n');
+            lexicalMessage += to_string(lineno);
+            lexicalMessage.append(" ");
+            lexicalMessage +=   tokenString ;
+            lexicalMessage.append("\n");
+        }
     return currentToken;
 } /* end getToken */
 
@@ -343,4 +363,6 @@ void ungetToken(void) {
         ungetNextChar();
         --tokenLength;
     }
+    currentToken = lastToken;
+    strcpy_s(tokenString ,sizeof(lastTokenString),lastTokenString);
 }
