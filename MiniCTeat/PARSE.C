@@ -36,6 +36,12 @@ typedef enum{
     VarDcl, FunDcl, VarFunDcl
 }VarFunDclType;
 
+typedef enum{
+    InCompound, InFunDcl, GlobalVarDcl
+}ManageMapState;
+
+ManageMapState manageMapState = GlobalVarDcl;
+
 /*miniC functions*/
 static TreeNode * declaration_list(void);
 static TreeNode * declaration(void);
@@ -59,6 +65,9 @@ static TreeNode * term(void);
 static TreeNode * factor(void);
 static TreeNode * call(void);
 static TreeNode * args(void);
+
+void addToVarMap(VarStruct v);
+void addToFunMap(FunStruct f);
 
 
 
@@ -136,64 +145,94 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     switch (dclType) {
         case VarFunDcl:{
             switch (token) {
-            case SEMI:   //semi: ';' ， 为int或void变量定义
+            case SEMI:{   //semi: ';' ， 为int或void变量定义
                 t->type = beforeT==INT?Integer:Void;
+                VarStruct v;// add v to VarStructMap
+                v.name = t->attr.name;
+                v.type = t->type;
+                addToVarMap(v);
                 match(SEMI);
-                break;
-            case LBRACKET:   //lbracket: '['，为int或void数组定义
+                break;}
+            case LBRACKET:{   //lbracket: '['，为int或void数组定义
                 t->type = beforeT==INT?IntList:VoidList;
                 match(LBRACE);
                 t->attr.val = atoi(tokenString);//length of list
                 match(NUM);
                 match(RBRACKET);
+
+                VarStruct v;// add v to VarStructMap
+                v.name = t->attr.name;
+                v.type = t->type;
+                addToVarMap(v);
+
                 match(SEMI);
-                break;
-            case LPAREN:  //lparen: '('   ，为函数定义，函数参数左括号
+                break;}
+            case LPAREN:{  //lparen: '('   ，为函数定义，函数参数左括号
+                ManageMapState beforeState = manageMapState;
+                manageMapState = InFunDcl;
                 t->kind.stmt = FunDclK;   //更改节点类型为函数定义类型
                 t->type = beforeT==INT?Integer:Void;
+                FunStruct f;
+                f.name = t->attr.name;
+                f.returnType = t->type;
+                addToFunMap(f);
                 match(LPAREN);
                 t->child[0] = params();
                 match(RPAREN);
-                break;
-            default:
+                manageMapState = beforeState;
+                break;}
+            default:{
                 syntaxError("unexpected token -> ");
                 printToken(token, tokenString);
                 token = getToken();
                 break;
             }
+            }
             break;
         }
         case VarDcl:{
-            VarStruct v;
-            v.name = t->attr.name;
-
             switch (token) {
-                case SEMI:
+                case SEMI:{
                     t->type = beforeT==INT?Integer:Void;
+                    VarStruct v;// add v to VarStructMap
+                    v.name = t->attr.name;
+                    v.type = t->type;
+                    addToVarMap(v);
                     match(SEMI);
-                    break;
-                case LBRACKET:
+                    break;}
+                case LBRACKET:{
                     t->type = beforeT==INT?IntList:VoidList;
                     match(LBRACE);
                     t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
+                    VarStruct v;// add v to VarStructMap
+                    v.name = t->attr.name;
+                    v.type = t->type;
+                    addToVarMap(v);
                     match(SEMI);
-                    break;
-                default:
+                    break;}
+            default:{
                     syntaxError("unexpected token -> ");
                     printToken(token, tokenString);
                     token = getToken();
-                    break;
+                    break;}
             }
             break;
         }
         case FunDcl:{
+            ManageMapState beforeState = manageMapState;
+            manageMapState = InFunDcl;
             t->kind.stmt = FunDclK;
             t->type = beforeT==INT?Integer:Void;
+            FunStruct f;
+            f.name = t->attr.name;
+            f.returnType = t->type;
+            addToFunMap(f);
             match(LPAREN);
             t->child[0] = params();
             match(RPAREN);
+            manageMapState = beforeState;
             break;
         }
     }
@@ -203,6 +242,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
 TreeNode * compound_stmt(void){
     TreeNode * t = newStmtNode(CompndK);   //函数体定义内容
     match(LBRACE);   //'{'
+    ManageMapState beforeState = manageMapState;
+    manageMapState = InCompound;
     if(t!=NULL) t->child[0] = local_declarations();
     if(t!=NULL){
         if(t->child[0]!=NULL){
@@ -212,6 +253,7 @@ TreeNode * compound_stmt(void){
         }
     }
     match(RBRACE);   //'}'
+    manageMapState = beforeState;
     return t;
 }
 
@@ -260,6 +302,10 @@ TreeNode * param(void){
     }else{  //int类型参数
         t->type = Integer;
     }
+    VarStruct v;// add to funtion's params
+    v.name = t->attr.name;
+    v.type = t->type;
+    addToVarMap(v);
 
     return t;
 
@@ -380,6 +426,10 @@ TreeNode * expression(void){
         case GTEQ:
         case EQ:
         case NEQ:
+        case PLUS:
+        case MINUS:
+        case TIMES:
+        case OVER:
         case LPAREN://call, is simple-expression
             ungetToken();//token is ID, call
             t = simple_expression();
@@ -433,7 +483,7 @@ TreeNode * expression(void){
                         p->attr.op = token;
                         t = p;
                         match(token);
-                        p->child[1] = addtive_expression();
+                        p->child[1] = term();
                     }
                 }
                 while ((token==LT)||(token==LTEQ)||(token==GT)||(token==GTEQ)||(token==EQ)||(token==NEQ)) {
@@ -463,6 +513,29 @@ TreeNode * var(void){
     if(t!=NULL){
         t->attr.name = copyString(tokenString);
     }
+    //make sure the var is declarated
+    switch (manageMapState) {
+    case InCompound:{
+        if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
+            if(FunStructMap.empty()){
+                map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
+                if(v.find(t->attr.name)==v.end()){// is not funtion's var
+                    syntaxError("unexpected var -> ");
+                    printToken(token, tokenString);
+                }
+            }
+        }
+        break;
+    }
+    case GlobalVarDcl:{
+        if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
+            syntaxError("unexpected var -> ");
+            printToken(token, tokenString);
+        }
+        break;
+    }
+    }
+
     match(ID);
     if(t!=NULL && token==LBRACKET){
         match(LBRACKET);  //'['
@@ -527,8 +600,23 @@ TreeNode * iteration_stmt(void){
 TreeNode * return_stmt(void){
     TreeNode * t = newStmtNode(ReturnK);
     match(RETURN);
+    FunStruct lastFun = (FunStructMap.end()--)->second;
+    TreeNode * p = t;
     if(t!=NULL && token!=SEMI){
         t->child[0] = expression();
+        //compare the return type
+        while (p->child[0]!=NULL) {
+            p = p->child[0];
+        }
+        if(p->type!=lastFun.returnType){
+            syntaxError("unexpected return type ->");
+            printToken(ID, p->type==Integer?"Integer":"IntList");
+        }
+    }else{
+        if(Void!=lastFun.returnType){
+            syntaxError("unexpected return type ->");
+            printToken(ID, "Void");
+        }
     }
     match(SEMI);
     return t;
@@ -696,7 +784,7 @@ TreeNode * factor(void)
 TreeNode * var_call(void){
     TreeNode * t = NULL;
     match(ID);
-    if(t!=NULL && token==LPAREN){  //lparen: '(',函数调用情况
+    if(token==LPAREN){  //lparen: '(',函数调用情况
         ungetToken();
         t = call();
     }else{
@@ -712,6 +800,12 @@ TreeNode * call(void){
     if(p != NULL && token == ID){
         p->attr.name = copyString(tokenString);
     }
+    //make sure declarated function
+    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
+        syntaxError("unexpected call -> ");
+        printToken(token, tokenString);
+    }
+
     match(ID);
     t->child[0] = p;
     match(LPAREN);
@@ -719,6 +813,18 @@ TreeNode * call(void){
     if(token == ID || token == LPAREN || token == NUM ){
         TreeNode * q = args();
         t->child[1] = q;
+    }
+
+    //make sure the number of given args
+    unsigned long argsNum = 0;
+    TreeNode * q =t->child[1];
+    while (q!=NULL) {
+        argsNum++;
+        q = q->sibling;
+    }
+    unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
+    if(expectNum!=argsNum){
+        syntaxError("unexpected number of args");
     }
 
     match(RPAREN);
@@ -790,7 +896,36 @@ TreeNode * args(void){
 //    return t;
 //}
 
-
+/* function manage var map and fun map*/
+void addToVarMap(VarStruct v){
+    switch (manageMapState) {
+    case InCompound:
+    case InFunDcl:{
+        if(!FunStructMap.empty()){
+            FunStruct lastFun = (FunStructMap.end()--)->second;
+            std::map<char*, VarStruct> vMap = lastFun.params;
+            if(vMap.find(v.name)!=vMap.end()){
+                vMap[v.name] = v;
+            }else{
+                syntaxError("Duplicated declaration -> ");
+                printToken(ID, v.name);
+            }
+        }else{
+            syntaxError("Not in function declaration: in manageVarMap(VarStruct v)");
+        }
+        break;
+    }
+    case GlobalVarDcl:{
+        if(VarStructMap.find(v.name)==VarStructMap.end()){
+            VarStructMap[v.name] = v;
+        }else{
+            syntaxError("Duplicated declaration -> ");
+            printToken(ID, v.name);
+        }
+        break;
+    }
+    }
+}
 
 /****************************************/
 /* the primary function of the parser   */
