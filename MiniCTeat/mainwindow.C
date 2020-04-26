@@ -31,6 +31,9 @@ int lineno = 0;
 FILE * listing;
 FILE * code;
 
+string lexicalMessage;
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
