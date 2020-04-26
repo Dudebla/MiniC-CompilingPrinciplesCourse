@@ -374,19 +374,30 @@ TreeNode * expression(void){
 //        }
         match(ID);
         switch(token){
-        case LPAREN:{//call, is simple-expression
+        case LT:
+        case LTEQ:
+        case GT:
+        case GTEQ:
+        case EQ:
+        case NEQ:
+        case LPAREN://call, is simple-expression
             ungetToken();//token is ID, call
             t = simple_expression();
             break;
-        }
         case ASSIGN:{//ID = expression
             ungetToken();
-            t = newStmtNode(AssignK);
+            t = newExpNode(IdK);
             if(t != NULL) t->type = Integer;
             if (t != NULL) t->attr.name = copyString(tokenString);
             match(ID);
             match(ASSIGN);
-            if (t != NULL) t->child[0] = expression();
+            TreeNode * p = newStmtNode(AssignK);
+            if(p!=NULL){
+                p->attr.op = ASSIGN;
+                p->child[0] = t;
+                p->child[1] = expression();
+                t = p;
+            }
             break;
         }
         case LBRACKET:{//ID[expression]......
