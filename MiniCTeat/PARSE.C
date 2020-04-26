@@ -694,26 +694,25 @@ TreeNode * factor(void)
 }
 
 TreeNode * var_call(void){
-    TreeNode * t = newExpNode(ConstK);
-    if(t != NULL){
-        t->attr.name = copyString(tokenString);
-    }
+    TreeNode * t = NULL;
     match(ID);
     if(t!=NULL && token==LPAREN){  //lparen: '(',函数调用情况
-        t->child[0] = call();
+        ungetToken();
+        t = call();
     }else{
-        t->child[0] = var(); //变量
+        ungetToken();
+        t = var(); //变量
     }
     return t;
 }
 
 TreeNode * call(void){
     TreeNode * t = newStmtNode(CallK);
-
     TreeNode * p = newExpNode(IdK);
     if(p != NULL && token == ID){
         p->attr.name = copyString(tokenString);
     }
+    match(ID);
     t->child[0] = p;
     match(LPAREN);
 
