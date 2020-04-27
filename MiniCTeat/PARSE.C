@@ -514,68 +514,71 @@ TreeNode * expression(void){
     return t;
 }
 
-//TreeNode * var(void){
-//    TreeNode * t = newExpNode(IdK);
-//    if(t!=NULL){
-//        t->attr.name = copyString(tokenString);
-//    }
-//    VarStruct tempV;
-//    //make sure the var is declarated
-//    switch (manageMapState) {
-//        case InCompound:{
-//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
-//                if(FunStructMap.empty()){
-//                    map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
-//                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
-//                        syntaxError("unexpected var -> ");
-//                        printToken(token, tokenString);
-//                    }else{
-//                        tempV = v.find(t->attr.name)->second;
-//                    }
-//                }
-//            }else{
-//                tempV = VarStructMap.find(t->attr.name)->second;
-//            }
-//            break;
-//        }
-//        case GlobalVarDcl:{
-//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
-//                syntaxError("unexpected var -> ");
-//                printToken(token, tokenString);
-//            }
-//            break;
-//        }
-//    }
-
-//    match(ID);
-//    if(t!=NULL && token==LBRACKET){
-//        if(tempV.type!=IntList){
-//            syntaxError("unexpected token -> ");
-//            printToken(token, tokenString);
-//        }
-//        t->type = IntList;
-//        match(LBRACKET);  //'['
-//        t->child[0] = expression();   // ####需要判断是否为负数#####
-//        match(RBRACKET);
-//    }else{
-//        t->type = Integer;
-//    }
-//    return t;
-//}
-
-TreeNode * var(void) {
+TreeNode * var(void){
     TreeNode * t = newExpNode(IdK);
-    if (t != NULL) {
+    if(t!=NULL){
         t->attr.name = copyString(tokenString);
     }
+    VarStruct tempV;
+    //make sure the var is declarated
+    switch (manageMapState) {
+        case InCompound:{
+            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
+                if(!FunStructMap.empty()){
+                    map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
+                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
+                        syntaxError("unexpected var -> ");
+                        printToken(token, tokenString);
+                    }else{
+                        tempV = v.find(t->attr.name)->second;
+                    }
+                }else{
+                    syntaxError("unexpected var -> ");
+                    printToken(token, tokenString);
+                }
+            }else{
+                tempV = VarStructMap.find(t->attr.name)->second;
+            }
+            break;
+        }
+        case GlobalVarDcl:{
+            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
+                syntaxError("unexpected var -> ");
+                printToken(token, tokenString);
+            }
+            break;
+        }
+    }
+
     match(ID);
-    if (t != NULL && token == LBRACKET) {
+    if(t!=NULL && token==LBRACKET){
+        if(tempV.type!=IntList){
+            syntaxError("unexpected token -> ");
+            printToken(token, tokenString);
+        }
+        t->type = IntList;
         match(LBRACKET);  //'['
         t->child[0] = expression();   // ####需要判断是否为负数#####
         match(RBRACKET);
+    }else{
+        t->type = Integer;
     }
     return t;
 }
+
+//TreeNode * var(void) {
+//    TreeNode * t = newExpNode(IdK);
+//    if (t != NULL) {
+//        t->attr.name = copyString(tokenString);
+//    }
+//    match(ID);
+//    if (t != NULL && token == LBRACKET) {
+//        match(LBRACKET);  //'['
+//        t->child[0] = expression();   // ####需要判断是否为负数#####
+//        match(RBRACKET);
+//    }
+//    return t;
+//}
 
 TreeNode * simple_expression(void){
     TreeNode * t = NULL;
@@ -629,44 +632,44 @@ TreeNode * iteration_stmt(void){
     return t;
 }
 
-//TreeNode * return_stmt(void){
-//    TreeNode * t = newStmtNode(ReturnK);
-//    match(RETURN);
-//    FunStruct lastFun = (--FunStructMap.end())->second;
-//    char * funName = lastFun.name;
-//    ExpType returnType = lastFun.returnType;
-//    TreeNode * p = t;
-//    if(t!=NULL && token!=SEMI){
-//        t->child[0] = expression();
-//        ExpType tempType = t->child[0]->type;
-//        char *tmpName = t->child[0]->attr.name;
-//        //compare the return type
-//        while (p->child[0]!=NULL) {
-//            p = p->child[0];
-//        }
-//        if(p->type!=lastFun.returnType){
-//            syntaxError("unexpected return type ->");
-//            printToken(ID, p->type==Integer?"Integer":"IntList");
-//        }
-//    }else{
-//        if(Void!=lastFun.returnType){
-//            syntaxError("unexpected return type ->");
-//            printToken(ID, "Void");
-//        }
-//    }
-//    match(SEMI);
-//    return t;
-//}
-
-TreeNode * return_stmt(void) {
+TreeNode * return_stmt(void){
     TreeNode * t = newStmtNode(ReturnK);
     match(RETURN);
-    if (t != NULL && token != SEMI) {
+    FunStruct lastFun = (--FunStructMap.end())->second;
+    char * funName = lastFun.name;
+    ExpType returnType = lastFun.returnType;
+    TreeNode * p = t;
+    if(t!=NULL && token!=SEMI){
         t->child[0] = expression();
+        ExpType tempType = t->child[0]->type;
+        char *tmpName = t->child[0]->attr.name;
+        //compare the return type
+        while (p->child[0]!=NULL) {
+            p = p->child[0];
+        }
+        if(p->type!=lastFun.returnType){
+            syntaxError("unexpected return type ->");
+            printToken(ID, p->type==Integer?"Integer":"IntList");
+        }
+    }else{
+        if(Void!=lastFun.returnType){
+            syntaxError("unexpected return type ->");
+            printToken(ID, "Void");
+        }
     }
     match(SEMI);
     return t;
 }
+
+//TreeNode * return_stmt(void) {
+//    TreeNode * t = newStmtNode(ReturnK);
+//    match(RETURN);
+//    if (t != NULL && token != SEMI) {
+//        t->child[0] = expression();
+//    }
+//    match(SEMI);
+//    return t;
+//}
 
 
 
@@ -728,64 +731,64 @@ TreeNode * var_call(void){
     return t;
 }
 
-//TreeNode * call(void){
-//    TreeNode * t = newStmtNode(CallK);
-//    TreeNode * p = newExpNode(IdK);
-//    if(p != NULL && token == ID){
-//        p->attr.name = copyString(tokenString);
-//    }
-//    //make sure declarated function
-//    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
-//        syntaxError("unexpected call -> ");
-//        printToken(token, tokenString);
-//    }
-
-//    match(ID);
-//    t->child[0] = p;
-//    match(LPAREN);
-
-//    if(token == ID || token == LPAREN || token == NUM ){
-//        TreeNode * q = args();
-//        t->child[1] = q;
-//    }
-
-//    //make sure the number of given args
-//    unsigned long argsNum = 0;
-//    TreeNode * q =t->child[1];
-//    while (q!=NULL) {
-//        argsNum++;
-//        q = q->sibling;
-//    }
-//    unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
-//    if(expectNum!=argsNum){
-//        syntaxError("unexpected number of args");
-//    }
-
-//    match(RPAREN);
-
-//    return t;
-//}
-
-TreeNode * call(void) {
+TreeNode * call(void){
     TreeNode * t = newStmtNode(CallK);
     TreeNode * p = newExpNode(IdK);
-    if (p != NULL && token == ID) {
+    if(p != NULL && token == ID){
         p->attr.name = copyString(tokenString);
     }
+    //make sure declarated function
+    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
+        syntaxError("unexpected call -> ");
+        printToken(token, tokenString);
+    }
+
     match(ID);
     t->child[0] = p;
     match(LPAREN);
 
-    if (token == ID || token == LPAREN || token == NUM) {
+    if(token == ID || token == LPAREN || token == NUM ){
         TreeNode * q = args();
         t->child[1] = q;
+    }
+
+    //make sure the number of given args
+    unsigned long argsNum = 0;
+    TreeNode * q =t->child[1];
+    while (q!=NULL) {
+        argsNum++;
+        q = q->sibling;
+    }
+    unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
+    if(expectNum!=argsNum){
+        syntaxError("unexpected number of args");
     }
 
     match(RPAREN);
 
     return t;
-
 }
+
+//TreeNode * call(void) {
+//    TreeNode * t = newStmtNode(CallK);
+//    TreeNode * p = newExpNode(IdK);
+//    if (p != NULL && token == ID) {
+//        p->attr.name = copyString(tokenString);
+//    }
+//    match(ID);
+//    t->child[0] = p;
+//    match(LPAREN);
+
+//    if (token == ID || token == LPAREN || token == NUM) {
+//        TreeNode * q = args();
+//        t->child[1] = q;
+//    }
+
+//    match(RPAREN);
+
+//    return t;
+
+//}
 
 TreeNode * args(void){
     TreeNode * t = expression();
@@ -810,7 +813,7 @@ void addToVarMap(VarStruct v){
             FunStruct lastFun = (--FunStructMap.end())->second;
             std::map<char*, VarStruct> vMap = lastFun.params;
             if(vMap.find(v.name)==vMap.end()){
-                vMap[v.name] = v;
+                lastFun.params[v.name] = v;
             }else{
                 syntaxError("Duplicated declaration -> ");
                 printToken(ID, v.name);
