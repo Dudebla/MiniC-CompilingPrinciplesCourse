@@ -56,19 +56,19 @@ static void genStmt(TreeNode * tree)
         if (TraceCode)  emitComment("<- if");
         break; /* if_k */
 
-    case RepeatK:
-        if (TraceCode) emitComment("-> repeat");
-        p1 = tree->child[0];
-        p2 = tree->child[1];
-        savedLoc1 = emitSkip(0);
-        emitComment("repeat: jump after body comes back here");
-        /* generate code for body */
-        cGen(p1);
-        /* generate code for test */
-        cGen(p2);
-        emitRM_Abs("JEQ", ac, savedLoc1, "repeat: jmp back to body");
-        if (TraceCode)  emitComment("<- repeat");
-        break; /* repeat */
+//    case RepeatK:
+//        if (TraceCode) emitComment("-> repeat");
+//        p1 = tree->child[0];
+//        p2 = tree->child[1];
+//        savedLoc1 = emitSkip(0);
+//        emitComment("repeat: jump after body comes back here");
+//        /* generate code for body */
+//        cGen(p1);
+//        /* generate code for test */
+//        cGen(p2);
+//        emitRM_Abs("JEQ", ac, savedLoc1, "repeat: jmp back to body");
+//        if (TraceCode)  emitComment("<- repeat");
+//        break; /* repeat */
 
     case AssignK:
         if (TraceCode) emitComment("-> assign");
@@ -80,14 +80,14 @@ static void genStmt(TreeNode * tree)
         if (TraceCode)  emitComment("<- assign");
         break; /* assign_k */
         /*具体的不知道写啥*/
-    case AdditiveK:
-        if (TraceCode)
-            emitComment("-> add and assign");
-        cGen(tree->child[0]);
-        loc = st_lookup(tree->attr.name);
-        emitRM("ST", ac, loc, gp, "add and assign: store value");
-        if (TraceCode)  emitComment("<- add and assign");
-        break;
+//    case AdditiveK:
+//        if (TraceCode)
+//            emitComment("-> add and assign");
+//        cGen(tree->child[0]);
+//        loc = st_lookup(tree->attr.name);
+//        emitRM("ST", ac, loc, gp, "add and assign: store value");
+//        if (TraceCode)  emitComment("<- add and assign");
+//        break;
 
     case ReadK:
         emitRO("IN", ac, 0, 0, "read integer value");
@@ -100,6 +100,19 @@ static void genStmt(TreeNode * tree)
         /* now output it */
         emitRO("OUT", ac, 0, 0, "write ac");
         break;
+    case WhileK:
+        if (TraceCode) emitComment("-> while");
+        p1 = tree->child[0];
+        p2 = tree->child[1];
+        savedLoc1 = emitSkip(1);
+        emitComment("while: jump after body comes back here");
+        /* generate code for test */
+        cGen(p1);
+        /* generate code for body */
+        cGen(p2);
+        emitRM_Abs("JEQ", ac, savedLoc1, "while: jmp back to body");
+        if (TraceCode)  emitComment("<- while");
+        break; /* repeat */
     default:
         break;
     }

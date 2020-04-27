@@ -155,7 +155,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                 break;}
             case LBRACKET:{   //lbracket: '['，为int或void数组定义
                 t->type = beforeT==INT?IntList:VoidList;
-                match(LBRACE);
+                match(LBRACKET);
                 t->attr.val = atoi(tokenString);//length of list
                 match(NUM);
                 match(RBRACKET);
@@ -202,7 +202,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     break;}
                 case LBRACKET:{
                     t->type = beforeT==INT?IntList:VoidList;
-                    match(LBRACE);
+                    match(LBRACKET);
                     t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
