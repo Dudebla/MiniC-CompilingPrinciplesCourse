@@ -228,7 +228,7 @@ static char* printSpaces(void)
    }
 
    char* r = new char[result.size()+1];
-   strcpy_s(r, result.size() + 1, result.c_str());
+   strcpy(r, result.c_str());
    return r;
 }
 
@@ -255,11 +255,11 @@ char* printTree(TreeNode * tree)
                //strcat_s(result, 6,"If\r\n");
                result += "If\r\n";
                break;
-           case RepeatK:
-               //fprintf(listing, "Repeat\n");
-               //strcat_s(result,10, "Repeat\r\n");
-               result += "Repeat\r\n";
-               break;
+//           case RepeatK:
+//               //fprintf(listing, "Repeat\n");
+//               //strcat_s(result,10, "Repeat\r\n");
+//               result += "Repeat\r\n";
+//               break;
            case AssignK:
                //fprintf(listing, "Assign to: %s\n", tree->attr.name);
                /*strcat_s(result,sizeof("Assign to: "), "Assign to: ");
@@ -281,21 +281,42 @@ char* printTree(TreeNode * tree)
                //strcat_s(result,sizeof("Write\r\n"), "Write\r\n");
                result += "Write\r\n";
                break;
-           case ForDecK:
-               result += "for\r\n"  ;
-               break;
-           case ForIncK:
-               result += "for\r\n";
-               break;
-           case DowhileK:
-               result += "do\r\n";
-               break;
+//           case ForDecK:
+//               result += "for\r\n"  ;
+//               break;
+//           case ForIncK:
+//               result += "for\r\n";
+//               break;
+//           case DowhileK:
+//               result += "do\r\n";
+//               break;
+//           case WhileK:
+//               result += "while\r\n";
+//               break;
+//           case AdditiveK:
+//               name = tree->attr.name;
+//               result += "Add and assign to: " + name + "\r\n";
            case WhileK:
                result += "while\r\n";
                break;
-           case AdditiveK:
+           case VarDclK:
                name = tree->attr.name;
-               result += "Add and assign to: " + name + "\r\n";
+               result += "declare var: " + name + "\r\n";
+               break;
+           case FunDclK:
+               name = tree->attr.name;
+               result += "declare fun: " + name + "\r\n";
+               break;
+           case CompndK:
+               result += "function body\r\n";
+               break;
+           case ReturnK:
+               result += "return\r\n";
+               break;
+           case CallK:
+               name = tree->attr.name;
+               result += "call function: " + name + "\r\n";
+               break;
            default:
                //fprintf(listing, "Unknown ExpNode kind\n");
                //strcat_s(result, sizeof("Unknown ExpNode kind\r\n"),"Unknown ExpNode kind\r\n");
@@ -360,7 +381,7 @@ char* printTree(TreeNode * tree)
    }
    UNINDENT;
    char * r = new char[result.size() + 1];
-   strcpy_s(r, result.size() + 1, result.c_str());
+   strcpy(r, result.c_str());
    return r;
 }
 

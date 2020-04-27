@@ -112,7 +112,9 @@ static void genStmt(TreeNode * tree)
         cGen(p2);
         emitRM_Abs("JEQ", ac, savedLoc1, "while: jmp back to body");
         if (TraceCode)  emitComment("<- while");
-        break; /* repeat */
+        break; /* while */
+    case VarDclK:
+
     default:
         break;
     }

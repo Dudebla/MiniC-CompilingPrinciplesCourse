@@ -12,7 +12,7 @@
 #include<string>
 using namespace std;
 
-static TypeToken token; /* holds current token */
+//static TypeToken token; /* holds current token */
 
                         /* function prototypes for recursive calls */
 //static TreeNode * stmt_sequence(void);
@@ -879,6 +879,16 @@ void addToVarMap(VarStruct v){
     }
     }
 }
+
+void addToFunMap(FunStruct f){
+    if(FunStructMap.find(f.name)==FunStructMap.end()){
+        FunStructMap[f.name] = f;
+    }else{
+        syntaxError("Duplicated declaration -> ");
+        printToken(ID, f.name);
+    }
+}
+
 
 /****************************************/
 /* the primary function of the parser   */

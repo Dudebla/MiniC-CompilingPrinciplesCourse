@@ -62,6 +62,8 @@ extern FILE* code; /* code text file for TM simulator */
 extern int lineno; /* source line number for listing */
 extern std::string lexicalMessage;
 
+extern TypeToken token;
+
                    /**************************************************/
                    /***********   Syntax tree for parsing ************/
                    /**************************************************/
@@ -74,7 +76,7 @@ typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, VarDclK, FunDclK, CompndK, 
 typedef enum { OpK, ConstK, IdK } ExpKind;
 
 /* ExpType is used for type checking */
-typedef enum { Void, Integer, IntList, VoidList } ExpType;
+typedef enum { Void, Integer, IntList, VoidList, Boolean } ExpType;
 
 #define MAXCHILDREN 3
 

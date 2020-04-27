@@ -108,12 +108,14 @@ static void checkNode(TreeNode * t)
       switch (t->kind.exp)
       { case OpK:
           if ((t->child[0]->type != Integer) ||
-              (t->child[1]->type != Integer))
+              (t->child[1]->type != Integer) ||
+              (t->child[0]->type != IntList) ||
+              (t->child[1]->type != IntList))
             typeError(t,"Op applied to non-integer");
-          if ((t->attr.op == EQ) || (t->attr.op == LT))
+          if ((t->attr.op == EQ) || (t->attr.op == LT) || (t->attr.op == LTEQ) || (t->attr.op == GT) || (t->attr.op == GTEQ) || (t->attr.op == NEQ))
             t->type = Boolean;
           else
-            t->type = Integer;
+            t->type = t->child[0]->type;
           break;
         case ConstK:
         case IdK:
@@ -126,23 +128,19 @@ static void checkNode(TreeNode * t)
     case StmtK:
       switch (t->kind.stmt)
       { case IfK:
-          if (t->child[0]->type == Integer)
+          if (t->child[0]->type == Integer || t->child[0]->type == IntList)
             typeError(t->child[0],"if test is not Boolean");
           break;
         case AssignK:
-          if (t->child[0]->type != Integer)
+          if (t->child[0]->type != Integer || t->child[0]->type != IntList)
             typeError(t->child[0],"assignment of non-integer value");
           break;
         case WriteK:
-          if (t->child[0]->type != Integer)
+          if (t->child[0]->type != Integer || t->child[0]->type != IntList)
             typeError(t->child[0],"write of non-integer value");
           break;
-        case RepeatK:
-          if (t->child[1]->type == Integer)
-            typeError(t->child[1],"repeat test is not Boolean");
-          break;
         case WhileK:
-          if (t->child[0]->type == Integer)
+          if (t->child[0]->type == Integer || t->child[0]->type == IntList)
             typeError(t->child[0],"while test is not Boolean");
           break;
         default:
