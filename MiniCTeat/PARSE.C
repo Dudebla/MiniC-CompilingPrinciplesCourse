@@ -516,6 +516,7 @@ TreeNode * var(void){
     if(t!=NULL){
         t->attr.name = copyString(tokenString);
     }
+    VarStruct tempV;
     //make sure the var is declarated
     switch (manageMapState) {
         case InCompound:{
@@ -525,8 +526,12 @@ TreeNode * var(void){
                     if(v.find(t->attr.name)==v.end()){// is not funtion's var
                         syntaxError("unexpected var -> ");
                         printToken(token, tokenString);
+                    }else{
+                        tempV = v.find(t->attr.name)->second;
                     }
                 }
+            }else{
+                tempV = VarStructMap.find(t->attr.name)->second;
             }
             break;
         }
@@ -541,9 +546,16 @@ TreeNode * var(void){
 
     match(ID);
     if(t!=NULL && token==LBRACKET){
+        if(tempV.type!=IntList){
+            syntaxError("unexpected token -> ");
+            printToken(token, tokenString);
+        }
+        t->type = IntList;
         match(LBRACKET);  //'['
         t->child[0] = expression();   // ####需要判断是否为负数#####
         match(RBRACKET);
+    }else{
+        t->type = Integer;
     }
     return t;
 }
@@ -604,9 +616,13 @@ TreeNode * return_stmt(void){
     TreeNode * t = newStmtNode(ReturnK);
     match(RETURN);
     FunStruct lastFun = (--FunStructMap.end())->second;
+    char * funName = lastFun.name;
+    ExpType returnType = lastFun.returnType;
     TreeNode * p = t;
     if(t!=NULL && token!=SEMI){
         t->child[0] = expression();
+        ExpType tempType = t->child[0]->type;
+        char *tmpName = t->child[0]->attr.name;
         //compare the return type
         while (p->child[0]!=NULL) {
             p = p->child[0];

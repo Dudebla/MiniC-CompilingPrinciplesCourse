@@ -137,7 +137,7 @@ TypeToken getToken(void)
                 state = INID;
             else if (c == ':')
                 state = INASSIGN;
-            else if ((c == ' ') || (c == '\t') || (c == '\n'))
+            else if ((c == ' ') || (c == '\t') || (c == '\n') || (c == 13))
                 save = FALSE;
             /*
             * miniC修改部分

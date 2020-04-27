@@ -115,6 +115,8 @@ void MainWindow::on_openFile_triggered()
                    QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
                    return;
                }else{
+                    //init Function map
+                    initMap();
                     //生成语法树
                     syntaxTree = parse();
                     //打印语法树
