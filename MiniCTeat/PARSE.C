@@ -275,6 +275,7 @@ TreeNode * params(void){
     if(token == VOID){  //函数参数为空
         t = newExpNode(IdK);
         t->type = Void;       //结点类型为Void，name为空
+        match(VOID);
     }
 
     return t;
@@ -318,8 +319,14 @@ TreeNode * local_declarations(void){
     TreeNode * newT = NULL;
     while(token==INT || token==VOID){
         newT = var_fun_declaration(VarDcl);
-        current->sibling = newT;
-        current = newT;
+        if(newT!=NULL){
+            if(t == NULL){
+                t = current = newT;
+            }else{
+                current->sibling = newT;
+                current = newT;
+            }
+        }
     }
     return t;
 }

@@ -21,20 +21,11 @@ char* printToken(TypeToken token, const char* tokenString)
    switch (token)
    {
    case IF:
-   case THEN:
    case ELSE:
-   case END:
-   case REPEAT:
-   case UNTIL:
-   case READ:
-   case WRITE:
-   case DO:
    case WHILE:
-   case ENDWHILE:
-   case FOR:
-   case TO:
-   case DOWNTO:
-   case ENDDO:
+   case RETURN:
+   case INT:
+   case VOID:
 
        //fprintf(listing,"reserved word: %s\n", tokenString);
        /*strcat_s(result,15, "reserved word: ");
@@ -57,6 +48,12 @@ char* printToken(TypeToken token, const char* tokenString)
        //strcat_s(result,5, "=\r\n");
        result += "=\r\n";
        break;
+   case LTEQ:
+       result += "<=\r\n";
+       break;
+   case GTEQ:
+       result += ">=\r\n";
+       break;
    case LPAREN:
        //fprintf(listing, "(\n");
        //strcat_s(result,5, "(\r\n");
@@ -67,6 +64,20 @@ char* printToken(TypeToken token, const char* tokenString)
        //strcat_s(result, 5,")\r\n");
        result += ")\r\n";
        break;
+   case LBRACKET:
+       result += "[\r\n";
+       break;
+   case RBRACKET:
+       result += "]\r\n";
+       break;
+   case LBRACE:
+       result += "{\r\n";
+       break;
+   case RBRACE:
+       result += "}\r\n";
+       break;
+   case COMMA:
+       result += ",\r\n";
    case SEMI:
        //fprintf(listing, ";\n");
        //strcat_s(result,5, ";\r\n");
@@ -132,7 +143,7 @@ char* printToken(TypeToken token, const char* tokenString)
        //strcat_s(result,4, "\r\n");
    }
    char*r = new char[result.size() + 1];
-   strcpy_s(r, result.size() + 1, result.c_str());
+   strcpy(r, result.c_str());
    return r;
 }
 
@@ -192,7 +203,7 @@ char* copyString(char * s)
    //}
    //else
    //	strcpy_s(t, sizeof(s), s);
-   strcpy_s(t, n, s);
+   strcpy(t, s);
 
    return t;
 }
