@@ -603,7 +603,7 @@ TreeNode * iteration_stmt(void){
 TreeNode * return_stmt(void){
     TreeNode * t = newStmtNode(ReturnK);
     match(RETURN);
-    FunStruct lastFun = (FunStructMap.end()--)->second;
+    FunStruct lastFun = (--FunStructMap.end())->second;
     TreeNode * p = t;
     if(t!=NULL && token!=SEMI){
         t->child[0] = expression();
@@ -855,9 +855,9 @@ void addToVarMap(VarStruct v){
     case InCompound:
     case InFunDcl:{
         if(!FunStructMap.empty()){
-            FunStruct lastFun = (FunStructMap.end()--)->second;
+            FunStruct lastFun = (--FunStructMap.end())->second;
             std::map<char*, VarStruct> vMap = lastFun.params;
-            if(vMap.find(v.name)!=vMap.end()){
+            if(vMap.find(v.name)==vMap.end()){
                 vMap[v.name] = v;
             }else{
                 syntaxError("Duplicated declaration -> ");
