@@ -261,8 +261,8 @@ TreeNode * params(void){
     TreeNode * t = NULL;
     if(token == INT){ //函数参数非空，第一个参数类型为INT
         TreeNode * p = param();
-        while (token == SEMI) {  //参数不止一个，将参数链成兄弟结点
-            match(SEMI);
+        while (token == COMMA) {  //参数不止一个，将参数链成兄弟结点
+            match(COMMA);
             TreeNode * q = param();
             p->sibling = q;
             if(t == NULL){
@@ -420,11 +420,7 @@ TreeNode * expression_stmt(void){
 
 TreeNode * expression(void){
     TreeNode * t = NULL;
-    if(token==ID){//var=expression or factor's var or factor's call
-//        t = newStmtNode(AssignK);//maybe is exp
-//        if(t!=NULL){
-//            t->attr.name = copyString(tokenString);
-//        }
+    if(token==ID){
         match(ID);
         switch(token){
         case LT:
@@ -522,25 +518,25 @@ TreeNode * var(void){
     }
     //make sure the var is declarated
     switch (manageMapState) {
-    case InCompound:{
-        if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
-            if(FunStructMap.empty()){
-                map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
-                if(v.find(t->attr.name)==v.end()){// is not funtion's var
-                    syntaxError("unexpected var -> ");
-                    printToken(token, tokenString);
+        case InCompound:{
+            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
+                if(FunStructMap.empty()){
+                    map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
+                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
+                        syntaxError("unexpected var -> ");
+                        printToken(token, tokenString);
+                    }
                 }
             }
+            break;
         }
-        break;
-    }
-    case GlobalVarDcl:{
-        if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
-            syntaxError("unexpected var -> ");
-            printToken(token, tokenString);
+        case GlobalVarDcl:{
+            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
+                syntaxError("unexpected var -> ");
+                printToken(token, tokenString);
+            }
+            break;
         }
-        break;
-    }
     }
 
     match(ID);
@@ -837,8 +833,6 @@ TreeNode * call(void){
     match(RPAREN);
 
     return t;
-
-
 }
 
 TreeNode * args(void){
@@ -854,54 +848,6 @@ TreeNode * args(void){
     return t;
 }
 
-///*TINY的文法扩充*/
-//static TreeNode * while_stmt(void) {
-//    TreeNode * t = newStmtNode(WhileK);
-//    match(WHILE);
-//    if (t != NULL) {
-//        t->child[0] = exp();
-//    }
-//    match(DO);
-//    if (t != NULL) {
-//        t->child[1] = stmt_sequence();
-//    }
-//    match(ENDWHILE);
-//    return t;
-//}
-
-//static TreeNode * dowhile_stmt(void) {
-//    TreeNode * t = newStmtNode(DowhileK);
-//    match(DO);
-//    if (t != NULL) {
-//        t->child[0] = stmt_sequence();
-//    }
-//    match(WHILE);
-//    if (t != NULL) {
-//        t->child[1] = exp();
-//    }
-//    return t;
-//}
-
-
-//static TreeNode * for_stmt(void) {
-//    TreeNode * t = newStmtNode(ForIncK);
-//    match(FOR);
-//    if (t != NULL) {
-//        t->child[0] = assign_stmt();
-//        if (token == TO) {
-//            match(TO);
-//        }
-//        else if (token == DOWNTO) {
-//            match(DOWNTO);
-//            t->kind.stmt = ForDecK;
-//        }
-//        t->child[1] = simple_exp();
-//        match(DO);
-//        t->child[2] = stmt_sequence();
-//        match(ENDDO);
-//    }
-//    return t;
-//}
 
 /* function manage var map and fun map*/
 void addToVarMap(VarStruct v){

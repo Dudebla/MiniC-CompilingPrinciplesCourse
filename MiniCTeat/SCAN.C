@@ -112,12 +112,13 @@ static TypeToken reservedLookup(char * s)
 TypeToken getToken(void)
 {
     //保存上一个token的信息
-    lastToken = currentToken;
+    lastToken = token;
     lastTokenString = copyString(tokenString);
+    tokenLength = 0;
     /* index for storing into tokenString */
     int tokenStringIndex = 0;
     /* holds current token to be returned */
-//    TypeToken currentToken;
+    TypeToken currentToken;
     /* current state - always begins at START */
     StateType state = START;
     /* flag to indicate save to tokenString */
@@ -138,31 +139,29 @@ TypeToken getToken(void)
                 state = INASSIGN;
             else if ((c == ' ') || (c == '\t') || (c == '\n'))
                 save = FALSE;
-            else if (c == '{')
-            {
-                save = FALSE;
-                state = INCOMMENT;
-            }
             /*
-             * miniC修改部分
-             */
+            * miniC修改部分
+            */
             else if (c == '/')   //扫描的当前字符为“/”，表示可能为除法也可能为注释的第一个字符
             {
-                save = FALSE;
                 c = getNextChar(); //获取下一个字符进一步判断
                 ++tokenLength;
-                if(c == '*'){
+                if (c == '*') {
+                    save = FALSE;
                     state = INCOMMENT;
-                }else if(c == ' '){
+                }
+                else {
+                    save = TRUE;
                     ungetNextChar();
                     --tokenLength;
+                    c = '/';
                     state = DONE;
                     currentToken = OVER;
                 }
             }
             /*
-             * END
-             */
+            * END
+            */
             else
             {
                 state = DONE;
@@ -175,29 +174,32 @@ TypeToken getToken(void)
                 case '=':
                     c = getNextChar();
                     ++tokenLength;
-                    if(c == '='){
+                    if (c == '=') {
                         currentToken = EQ;
-                    }else{
+                    }
+                    else {
                         ungetNextChar();
                         --tokenLength;
+                        //c = '=';
                         currentToken = ASSIGN;
                     }
-                    currentToken = EQ;
                     break;
                 case '!':
                     c = getNextChar();
                     ++tokenLength;
-                    if(c == '='){
+                    if (c == '=') {
                         currentToken = NEQ;
-                    }else{
+                    }
+                    else {
                         currentToken = ERRO;
                     }
                 case '<':
                     c = getNextChar();
                     ++tokenLength;
-                    if(c == '='){ //manage token < and token <=
+                    if (c == '=') { //manage token < and token <=
                         currentToken = LTEQ;
-                    }else {
+                    }
+                    else {
                         ungetNextChar();
                         --tokenLength;
                         currentToken = LT;
@@ -206,9 +208,10 @@ TypeToken getToken(void)
                 case '>':
                     c = getNextChar();
                     ++tokenLength;
-                    if(c == '='){//manage token < and token <=
+                    if (c == '=') {//manage token < and token <=
                         currentToken = GTEQ;
-                    }else {
+                    }
+                    else {
                         ungetNextChar();
                         --tokenLength;
                         currentToken = GT;
@@ -259,18 +262,18 @@ TypeToken getToken(void)
                 }
             }
             break;
-//        case INCOMMENT:
-//            save = FALSE;
-//            if (c == EOF)
-//            {
-//                state = DONE;
-//                currentToken = ENDFILE;
-//            }
-//            else if (c == '}') state = START;
-//            break;
-        /*
-         * miniC修改部分
-         */
+            //        case INCOMMENT:
+            //            save = FALSE;
+            //            if (c == EOF)
+            //            {
+            //                state = DONE;
+            //                currentToken = ENDFILE;
+            //            }
+            //            else if (c == '}') state = START;
+            //            break;
+            /*
+            * miniC修改部分
+            */
         case INCOMMENT: //当前状态为注释内部状态
             save = FALSE;
             if (c == EOF) //是否读到文件末
@@ -278,7 +281,7 @@ TypeToken getToken(void)
                 state = DONE;
                 currentToken = ENDFILE;
             }
-            else{        //判读是否为注释结束符号
+            else {        //判读是否为注释结束符号
                 if (c == '*') {
                     c = getNextChar();   //提前读取下一个字符
                     ++tokenLength;
@@ -293,9 +296,9 @@ TypeToken getToken(void)
                 }
             }
             break;
-        /*
-         * END
-         */
+            /*
+            * END
+            */
         case INASSIGN:
             state = DONE;
             if (c == '=')
@@ -335,34 +338,37 @@ TypeToken getToken(void)
             currentToken = ERRO;
             break;
         }
-        if ((save) && (tokenStringIndex <= MAXTOKENLEN))
+        if ((save) && (tokenStringIndex <= MAXTOKENLEN)) {
             tokenString[tokenStringIndex++] = (char)c;
+        }
         if (state == DONE)
         {
             tokenString[tokenStringIndex] = '\0';
+            //tokenLength = tokenStringIndex ;
             if (currentToken == ID)
                 currentToken = reservedLookup(tokenString);
         }
     }
     if (currentToken == ID) {
-            //fprintf(listing, "\t%d: ", lineno);   //行号
-            char * tokenMessage = printToken(currentToken, tokenString); //token
-            //fprintf(listing, tokenMessage);
+        //fprintf(listing, "\t%d: ", lineno);   //行号
+        char * tokenMessage = printToken(currentToken, tokenString); //token
+        //fprintf(listing, tokenMessage);
 
-            //lexicalMessage.append(to_string(lineno) + ' ' + tokenString + '\n');
-            lexicalMessage += to_string(lineno);
-            lexicalMessage.append(" ");
-            lexicalMessage +=   tokenString ;
-            lexicalMessage.append("\n");
-        }
+        //lexicalMessage.append(to_string(lineno) + ' ' + tokenString + '\n');
+        lexicalMessage += to_string(lineno);
+        lexicalMessage.append(" ");
+        lexicalMessage +=   tokenString ;
+        lexicalMessage.append("\r\n");
+    }
     return currentToken;
-} /* end getToken */
+}
+ /* end getToken */
 
 void ungetToken(void) {
     while (tokenLength > 0) {
         ungetNextChar();
         --tokenLength;
     }
-    currentToken = lastToken;
-    strcpy_s(tokenString ,sizeof(lastTokenString),lastTokenString);
+    token = lastToken;
+    strcpy_s(tokenString ,strlen(lastTokenString)+1,lastTokenString);
 }
