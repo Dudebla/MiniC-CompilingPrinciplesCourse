@@ -126,6 +126,8 @@ void MainWindow::on_openFile_triggered()
                     //显示输出语法树
 //                    this->lexicalTextEdit->setPlainText(result);
 
+//                     this->lexicalTextEdit->setPlainText(lexicalMessage);
+
                }
                /*
                 ** END
