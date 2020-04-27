@@ -298,7 +298,7 @@ TreeNode * param(void){
 
     if(token == LBRACKET){  //lbracket: '[',数组类型参数
         t->type = IntList;
-        match(LBRACE);
+        match(LBRACKET);
         match(RBRACKET);
     }else{  //int类型参数
         t->type = Integer;
