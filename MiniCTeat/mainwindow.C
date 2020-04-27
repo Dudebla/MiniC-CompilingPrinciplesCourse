@@ -118,11 +118,11 @@ void MainWindow::on_openFile_triggered()
                     //生成语法树
                     syntaxTree = parse();
                     //打印语法树
-                    QString result;//存储打印的语法树
-                    result = printTree(syntaxTree);
+//                    QString result;//存储打印的语法树
+//                    result = printTree(syntaxTree);
 
                     //显示输出语法树
-                    this->lexicalTextEdit->setPlainText(result);
+//                    this->lexicalTextEdit->setPlainText(result);
 
                }
                /*
