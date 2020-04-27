@@ -10,6 +10,12 @@
 #include"GLOBALS.H"
 
 
+/*
+ * clear FunStructMap, add function input and output to FunStructMap
+*/
+void initMap(void);
+
+
 /* Procedure printToken prints a token
 * and its lexeme to the listing file
 */

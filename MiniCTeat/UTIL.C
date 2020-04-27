@@ -11,6 +11,30 @@
 #include<string>
 #include<sstream>
 using namespace std;
+
+extern std::map<char*, FunStruct> FunStructMap;
+
+void initMap(void){
+    if(!FunStructMap.empty()){
+        FunStructMap.clear();
+    }
+    FunStruct f;
+    VarStruct v;
+    //int input(void){...}
+    f.name = "input";
+    f.returnType = Integer;
+    FunStructMap[f.name] = f;
+
+    //void output(int x){...}
+    f.name = "output";
+    f.returnType = Void;
+    v.name = "x";
+    v.type = Integer;
+    f.params[v.name] = v;
+    FunStructMap[f.name] = f;
+    return;
+}
+
 /* Procedure printToken prints a token
  * and its lexeme to the listing file
  */
