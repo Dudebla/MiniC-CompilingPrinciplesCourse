@@ -717,6 +717,8 @@ TreeNode * call(void){
     if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
         syntaxError("unexpected call -> ");
         printToken(token, tokenString);
+    }else {
+        p->type = FunStructMap.find(p->attr.name)->second.returnType;
     }
 
     match(ID);
@@ -792,7 +794,7 @@ void addToVarMap(VarStruct v){
             FunStruct lastFun = (--FunStructMap.end())->second;
             std::map<char*, VarStruct> vMap = lastFun.params;
             if(vMap.find(v.name)==vMap.end()){
-                lastFun.params[v.name] = v;
+                (--FunStructMap.end())->second.params[v.name] = v;
             }else{
                 syntaxError("Duplicated declaration -> ");
                 printToken(ID, v.name);
