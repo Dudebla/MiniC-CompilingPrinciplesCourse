@@ -116,6 +116,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     t = newStmtNode(VarDclK);   //临时定义变量声明类型节点，保存ID名
     if ((t != NULL) && (token == ID))
         t->attr.name = copyString(tokenString);
+
     match(ID);
 
     switch (dclType) {
@@ -123,10 +124,17 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             switch (token) {
                 case SEMI:{   //semi: ';' ， 为int或void变量定义
                     t->type = beforeT==INT?Integer:Void;
+                    //定义Exp子节点
+                    TreeNode * k = newExpNode(IdK);
+                    k->type = t->type;
+                    k->attr.name = t->attr.name;
+                    t->child[0] = k;
+
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
                     addToVarMap(v);
+
                     match(SEMI);
                     break;
                 }
@@ -136,6 +144,11 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
+
+                    TreeNode * k = newExpNode(IdK);
+                    k->type = t->type;
+                    k->attr.name = t->attr.name;
+                    t->child[0] = k;
 
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
@@ -245,15 +258,18 @@ TreeNode * params(void){
             TreeNode * q = param();
             p->sibling = q;
             if(t == NULL){
-                t = p = q;
+                t = p;
+                p = q;
             }else{
                 p = q;
             }
         }
     }
     if(token == VOID){  //函数参数为空
-        t = newExpNode(IdK);
-        t->type = Void;       //结点类型为Void，name为空
+        t = newStmtNode(VarDclK);
+        t->attr.name = copyString(tokenString);
+        t->type = Void;
+
         match(VOID);
     }
 
@@ -277,10 +293,21 @@ TreeNode * param(void){
 
     if(token == LBRACKET){  //lbracket: '[',数组类型参数
         t->type = IntList;
+        //定义Exp子节点
+        TreeNode * k = newExpNode(IdK);
+        k->type = t->type;
+        k->attr.name = t->attr.name;
+        t->child[0] = k;
+
         match(LBRACKET);
         match(RBRACKET);
     }else{  //int类型参数
         t->type = Integer;
+        //定义Exp子节点
+        TreeNode * k = newExpNode(IdK);
+        k->type = t->type;
+        k->attr.name = t->attr.name;
+        t->child[0] = k;
     }
     VarStruct v;// add to funtion's params
     v.name = t->attr.name;
@@ -479,7 +506,7 @@ TreeNode * var(void){
 //            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
             if(VarStructMap.count(t->attr.name) == 0){// is not global var
                 if(!FunStructMap.empty()){
-                    map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
+                    map<char*, VarStruct> v = (--FunStructMap.end())->second.params;
 //                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
                     if(v.count(t->attr.name) == 0){// is not funtion's var
                         errorMessage += syntaxError("unexpected var -> ");
