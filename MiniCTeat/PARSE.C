@@ -67,8 +67,8 @@ static void match(TypeToken expected)
 {
     if (token == expected) token = getToken();
     else {
-        syntaxError("unexpected token -> ");
-        printToken(token, tokenString);
+        errorMessage += syntaxError("unexpected token -> ");
+        errorMessage += printToken(token, tokenString);
     }
 }
 
@@ -99,8 +99,8 @@ TreeNode * declaration(void){
     case VOID: t = var_fun_declaration(VarFunDcl); break;   //识别结果为变量定义或函数名定义
     case LBRACE: t = compound_stmt(); break;   //识别到 '{'则为函数体定义
     default:
-        syntaxError("unexpected token -> ");
-        printToken(token, tokenString);
+        errorMessage += syntaxError("unexpected token -> ");
+        errorMessage += printToken(token, tokenString);
         token = getToken();
         break;
     }
@@ -161,8 +161,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     break;
                 }
                 default:{
-                    syntaxError("unexpected token -> ");
-                    printToken(token, tokenString);
+                    errorMessage += syntaxError("unexpected token -> ");
+                    errorMessage += printToken(token, tokenString);
                     token = getToken();
                     break;
                 }
@@ -192,8 +192,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     match(SEMI);
                     break;}
             default:{
-                    syntaxError("unexpected token -> ");
-                    printToken(token, tokenString);
+                    errorMessage += syntaxError("unexpected token -> ");
+                    errorMessage += printToken(token, tokenString);
                     token = getToken();
                     break;}
             }
@@ -339,8 +339,9 @@ TreeNode * statement(void)
         case WHILE: t = iteration_stmt(); break;
         case LBRACE: t = compound_stmt(); break;
         case RETURN: t = return_stmt(); break;
-        default: syntaxError("unexpected token -> ");
-            printToken(token, tokenString);
+        default:
+            errorMessage += syntaxError("unexpected token -> ");
+            errorMessage += printToken(token, tokenString);
             token = getToken();
             break;
     } /* end case */
@@ -481,14 +482,14 @@ TreeNode * var(void){
                     map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
 //                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
                     if(v.count(t->attr.name) == 0){// is not funtion's var
-                        syntaxError("unexpected var -> ");
-                        printToken(token, tokenString);
+                        errorMessage += syntaxError("unexpected var -> ");
+                        errorMessage += printToken(token, tokenString);
                     }else{
                         tempV = v.find(t->attr.name)->second;
                     }
                 }else{
-                    syntaxError("unexpected var -> ");
-                    printToken(token, tokenString);
+                    errorMessage += syntaxError("unexpected var -> ");
+                    errorMessage += printToken(token, tokenString);
                 }
             }else{
                 tempV = VarStructMap.find(t->attr.name)->second;
@@ -498,8 +499,8 @@ TreeNode * var(void){
         case GlobalVarDcl:{
 //            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
             if(VarStructMap.count(t->attr.name) == 0){//use a uninited var
-                syntaxError("unexpected var -> ");
-                printToken(token, tokenString);
+                errorMessage += syntaxError("unexpected var -> ");
+                errorMessage += printToken(token, tokenString);
             }
             break;
         }
@@ -508,8 +509,8 @@ TreeNode * var(void){
     match(ID);
     if(t!=NULL && token==LBRACKET){
         if(tempV.type!=IntList){
-            syntaxError("unexpected token -> ");
-            printToken(token, tokenString);
+            errorMessage += syntaxError("unexpected token -> ");
+            errorMessage += printToken(token, tokenString);
         }
         t->type = IntList;
         match(LBRACKET);  //'['
@@ -590,13 +591,13 @@ TreeNode * return_stmt(void){
             p = p->child[0];
         }
         if(p->type!=lastFun.returnType){
-            syntaxError("unexpected return type ->");
-            printToken(ID, p->type==Integer?"Integer":"IntList");
+            errorMessage += syntaxError("unexpected return type ->");
+            errorMessage += printToken(ID, p->type==Integer?"Integer":"IntList");
         }
     }else{
         if(Void!=lastFun.returnType){
-            syntaxError("unexpected return type ->");
-            printToken(ID, "Void");
+            errorMessage += syntaxError("unexpected return type ->");
+            errorMessage += printToken(ID, "Void");
         }
     }
     match(SEMI);
@@ -641,8 +642,8 @@ TreeNode * factor(void)
         match(RPAREN);
         break;
     default:
-        syntaxError("unexpected token -> ");
-        printToken(token, tokenString);
+        errorMessage += syntaxError("unexpected token -> ");
+        errorMessage += printToken(token, tokenString);
         token = getToken();
         break;
     }
@@ -671,8 +672,8 @@ TreeNode * call(void){
     //make sure declarated function
 //    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
     if(FunStructMap.count(p->attr.name) == 0){//use a undelcarated function
-        syntaxError("unexpected call -> ");
-        printToken(token, tokenString);
+        errorMessage += syntaxError("unexpected call -> ");
+        errorMessage += printToken(token, tokenString);
     }else {
         p->type = FunStructMap.find(p->attr.name)->second.returnType;
     }
@@ -698,7 +699,7 @@ TreeNode * call(void){
     if (FunStructMap.count(p->attr.name) > 0) {
         unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
         if (expectNum != argsNum) {
-            syntaxError("unexpected number of args");
+            errorMessage += syntaxError("unexpected number of args");
         }
     }
 
@@ -734,11 +735,11 @@ void addToVarMap(VarStruct v){
             if(vMap.count(v.name) == 0){
                 (--FunStructMap.end())->second.params[v.name] = v;
             }else{
-                syntaxError("Duplicated declaration -> ");
-                printToken(ID, v.name);
+                errorMessage += syntaxError("Duplicated declaration -> ");
+                errorMessage += printToken(ID, v.name);
             }
         }else{
-            syntaxError("Not in function declaration: in manageVarMap(VarStruct v)");
+            errorMessage += syntaxError("Not in function declaration: in manageVarMap(VarStruct v)");
         }
         break;
     }
@@ -748,8 +749,8 @@ void addToVarMap(VarStruct v){
 
             VarStructMap[v.name] = v;
         }else{
-            syntaxError("Duplicated declaration -> ");
-            printToken(ID, v.name);
+            errorMessage += syntaxError("Duplicated declaration -> ");
+            errorMessage += printToken(ID, v.name);
         }
         break;
     }
@@ -761,8 +762,8 @@ void addToFunMap(FunStruct f){
     if(FunStructMap.count(f.name) == 0){
         FunStructMap[f.name] = f;
     }else{
-        syntaxError("Duplicated declaration -> ");
-        printToken(ID, f.name);
+        errorMessage += syntaxError("Duplicated declaration -> ");
+        errorMessage += printToken(ID, f.name);
     }
 }
 
@@ -780,7 +781,7 @@ TreeNode * parse(void)
     //t = stmt_sequence();
     t = declaration_list();
     if (token != ENDFILE)
-        syntaxError("Code ends before file\n");
+        errorMessage += syntaxError("Code ends before file\n");
     return t;
 }
 

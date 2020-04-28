@@ -38,7 +38,7 @@ FILE * listing;
 FILE * code;
 
 string lexicalMessage;
-
+string errorMessage;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -125,7 +125,7 @@ void MainWindow::on_openFile_triggered()
                     result = printTree(syntaxTree);
 
                     //显示输出语法树
-                    this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
+                    this->lexicalTextEdit->setPlainText(QString::fromStdString(errorMessage));
                     this->parserTextEdit->setPlainText(result);
 
 //                     this->lexicalTextEdit->setPlainText(lexicalMessage);
