@@ -145,48 +145,51 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
     switch (dclType) {
         case VarFunDcl:{
             switch (token) {
-            case SEMI:{   //semi: ';' ， 为int或void变量定义
-                t->type = beforeT==INT?Integer:Void;
-                VarStruct v;// add v to VarStructMap
-                v.name = t->attr.name;
-                v.type = t->type;
-                addToVarMap(v);
-                match(SEMI);
-                break;}
-            case LBRACKET:{   //lbracket: '['，为int或void数组定义
-                t->type = beforeT==INT?IntList:VoidList;
-                match(LBRACKET);
-                t->attr.val = atoi(tokenString);//length of list
-                match(NUM);
-                match(RBRACKET);
+                case SEMI:{   //semi: ';' ， 为int或void变量定义
+                    t->type = beforeT==INT?Integer:Void;
+                    VarStruct v;// add v to VarStructMap
+                    v.name = t->attr.name;
+                    v.type = t->type;
+                    addToVarMap(v);
+                    match(SEMI);
+                    break;
+                }
+                case LBRACKET:{   //lbracket: '['，为int或void数组定义
+                    t->type = beforeT==INT?IntList:VoidList;
+                    match(LBRACKET);
+                    t->attr.val = atoi(tokenString);//length of list
+                    match(NUM);
+                    match(RBRACKET);
 
-                VarStruct v;// add v to VarStructMap
-                v.name = t->attr.name;
-                v.type = t->type;
-                addToVarMap(v);
+                    VarStruct v;// add v to VarStructMap
+                    v.name = t->attr.name;
+                    v.type = t->type;
+                    addToVarMap(v);
 
-                match(SEMI);
-                break;}
-            case LPAREN:{  //lparen: '('   ，为函数定义，函数参数左括号
-                ManageMapState beforeState = manageMapState;
-                manageMapState = InFunDcl;
-                t->kind.stmt = FunDclK;   //更改节点类型为函数定义类型
-                t->type = beforeT==INT?Integer:Void;
-                FunStruct f;
-                f.name = t->attr.name;
-                f.returnType = t->type;
-                addToFunMap(f);
-                match(LPAREN);
-                t->child[0] = params();
-                match(RPAREN);
-                manageMapState = beforeState;
-                break;}
-            default:{
-                syntaxError("unexpected token -> ");
-                printToken(token, tokenString);
-                token = getToken();
-                break;
-            }
+                    match(SEMI);
+                    break;
+                }
+                case LPAREN:{  //lparen: '('   ，为函数定义，函数参数左括号
+                    ManageMapState beforeState = manageMapState;
+                    manageMapState = InFunDcl;
+                    t->kind.stmt = FunDclK;   //更改节点类型为函数定义类型
+                    t->type = beforeT==INT?Integer:Void;
+                    FunStruct f;
+                    f.name = t->attr.name;
+                    f.returnType = t->type;
+                    addToFunMap(f);
+                    match(LPAREN);
+                    t->child[0] = params();
+                    match(RPAREN);
+                    manageMapState = beforeState;
+                    break;
+                }
+                default:{
+                    syntaxError("unexpected token -> ");
+                    printToken(token, tokenString);
+                    token = getToken();
+                    break;
+                }
             }
             break;
         }
@@ -351,33 +354,6 @@ treeNode * statement_list(void){
 }
 
 
-
-//TreeNode * stmt_sequence(void)
-//{
-//    TreeNode * t = statement();
-//    TreeNode * p = t;
-//    while ((token != ENDFILE) && (token != END) &&
-//        (token != ELSE) && (token != UNTIL) && (token != WHILE)&& (token != ENDDO) && (token != ENDWHILE))
-//    {
-//        TreeNode * q;
-//        if (token == SEMI) {
-//            match(SEMI);
-//        }
-//        q = statement();
-//        if (q != NULL) {
-//            if (t == NULL) t = p = q;
-//            else /* now p cannot be NULL either */
-//            {
-//                p->sibling = q;
-//                p = q;
-//            }
-//        }
-//    }
-//    return t;
-//}
-
-//P394
-//lineno: 961
 TreeNode * statement(void)
 {
     TreeNode * t = NULL;
@@ -423,90 +399,90 @@ TreeNode * expression(void){
     if(token==ID){
         match(ID);
         switch(token){
-        case LT:
-        case LTEQ:
-        case GT:
-        case GTEQ:
-        case EQ:
-        case NEQ:
-        case PLUS:
-        case MINUS:
-        case TIMES:
-        case OVER:
-        case LPAREN://call, is simple-expression
-            ungetToken();//token is ID, call
-            t = simple_expression();
-            break;
-        case ASSIGN:{//ID = expression
-            ungetToken();
-            t = newExpNode(IdK);
-            if(t != NULL) t->type = Integer;
-            if (t != NULL) t->attr.name = copyString(tokenString);
-            match(ID);
-            match(ASSIGN);
-            TreeNode * p = newStmtNode(AssignK);
-            if(p!=NULL){
-                p->attr.op = ASSIGN;
-                p->child[0] = t;
-                p->child[1] = expression();
-                t = p;
-            }
-            break;
-        }
-        case LBRACKET:{//ID[expression]......
-            t = newExpNode(IdK);//teamplate node, store the ID[expression]
-            if(t!=NULL) t->attr.name = copyString(tokenString);
-            if(t!=NULL) t->type = IntList;
-            match(LBRACKET);
-            if(t!=NULL) t->child[0] = expression();
-            match(RBRACKET);
-            if(token==ASSIGN){//ID[expression]=expression
-                TreeNode * p = newStmtNode(AssignK);
-                p->type = IntList;
-                p->child[0] = t;
+            case LT:
+            case LTEQ:
+            case GT:
+            case GTEQ:
+            case EQ:
+            case NEQ:
+            case PLUS:
+            case MINUS:
+            case TIMES:
+            case OVER:
+            case LPAREN://call, is simple-expression
+                ungetToken();//token is ID, call
+                t = simple_expression();
+                break;
+            case ASSIGN:{//ID = expression
+                ungetToken();
+                t = newExpNode(IdK);
+                if(t != NULL) t->type = Integer;
+                if (t != NULL) t->attr.name = copyString(tokenString);
+                match(ID);
                 match(ASSIGN);
-                p->child[1] = expression();
-                t = p;
-            }else{// ID[expression]{mulop factor}{addop addtive_expression}{relop addtive_expression}
-                while ((token == TIMES) || (token == OVER))//match {mulop factor}
-                {
-                    TreeNode * p = newExpNode(OpK);
-                    if (p != NULL) {
-                        p->child[0] = t;
-                        p->attr.op = token;
-                        t = p;
-                        match(token);
-                        p->child[1] = factor();
-                    }
+                TreeNode * p = newStmtNode(AssignK);
+                if(p!=NULL){
+                    p->attr.op = ASSIGN;
+                    p->child[0] = t;
+                    p->child[1] = expression();
+                    t = p;
                 }
-                while ((token == PLUS) ||(token == MINUS)) {//match {addop addtive_expression}
-                    TreeNode * p = newExpNode(OpK);
-                    if (p != NULL) {
-                        p->child[0] = t;
-                        p->attr.op = token;
-                        t = p;
-                        match(token);
-                        p->child[1] = term();
-                    }
-                }
-                while ((token==LT)||(token==LTEQ)||(token==GT)||(token==GTEQ)||(token==EQ)||(token==NEQ)) {
-                    if(token==LT || token==GT || token==EQ || token==NEQ || token==LTEQ || token ==GTEQ){
+                break;
+            }
+            case LBRACKET:{//ID[expression]......
+                t = newExpNode(IdK);//teamplate node, store the ID[expression]
+                if(t!=NULL) t->attr.name = copyString(tokenString);
+                if(t!=NULL) t->type = IntList;
+                match(LBRACKET);
+                if(t!=NULL) t->child[0] = expression();
+                match(RBRACKET);
+                if(token==ASSIGN){//ID[expression]=expression
+                    TreeNode * p = newStmtNode(AssignK);
+                    p->type = IntList;
+                    p->child[0] = t;
+                    match(ASSIGN);
+                    p->child[1] = expression();
+                    t = p;
+                }else{// ID[expression]{mulop factor}{addop addtive_expression}{relop addtive_expression}
+                    while ((token == TIMES) || (token == OVER))//match {mulop factor}
+                    {
                         TreeNode * p = newExpNode(OpK);
                         if (p != NULL) {
                             p->child[0] = t;
                             p->attr.op = token;
                             t = p;
                             match(token);
-                            p->child[1] = addtive_expression();
+                            p->child[1] = factor();
+                        }
+                    }
+                    while ((token == PLUS) ||(token == MINUS)) {//match {addop addtive_expression}
+                        TreeNode * p = newExpNode(OpK);
+                        if (p != NULL) {
+                            p->child[0] = t;
+                            p->attr.op = token;
+                            t = p;
+                            match(token);
+                            p->child[1] = term();
+                        }
+                    }
+                    while ((token==LT)||(token==LTEQ)||(token==GT)||(token==GTEQ)||(token==EQ)||(token==NEQ)) {
+                        if(token==LT || token==GT || token==EQ || token==NEQ || token==LTEQ || token ==GTEQ){
+                            TreeNode * p = newExpNode(OpK);
+                            if (p != NULL) {
+                                p->child[0] = t;
+                                p->attr.op = token;
+                                t = p;
+                                match(token);
+                                p->child[1] = addtive_expression();
+                            }
                         }
                     }
                 }
+                break;
             }
-            break;
-        }
-        default:
-            ungetToken();
-            t = simple_expression();
+            default:
+                ungetToken();
+                t = simple_expression();
         }
     }else{//factor's (expression) or NUM
         t = simple_expression();
@@ -759,9 +735,12 @@ TreeNode * call(void){
         argsNum++;
         q = q->sibling;
     }
-    unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
-    if(expectNum!=argsNum){
-        syntaxError("unexpected number of args");
+
+    if (FunStructMap.find(p->attr.name) != FunStructMap.end()) {
+        unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
+        if (expectNum != argsNum) {
+            syntaxError("unexpected number of args");
+        }
     }
 
     match(RPAREN);
