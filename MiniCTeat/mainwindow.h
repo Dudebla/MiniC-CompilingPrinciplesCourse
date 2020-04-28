@@ -30,6 +30,7 @@ private:
     QTextEdit * sourceTextEdit;
     QTextEdit * lexicalTextEdit;
     QTextEdit * parserTextEdit;
+    QTextEdit * synerrorTextEdit;
 
 private slots:
     // file operation

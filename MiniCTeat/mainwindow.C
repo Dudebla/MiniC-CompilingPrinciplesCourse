@@ -40,11 +40,18 @@ FILE * code;
 string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
 string errorMessage;
 
+ManageMapState manageMapState;
+std::string lastDeclaredFunName;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint);    // 禁止最大化按钮
+
+    setFixedSize(this->width(),this->height());// enable size adjust
 
     // init state
     this->Flag_isOpen = 0; // mask: judge if open or create a file
@@ -58,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->lexicalTextEdit->setReadOnly(true);
     this->parserTextEdit = this->ui->parserTextEdit;
     this->parserTextEdit->setReadOnly(true);
+    this->synerrorTextEdit = this->ui->synerrorTextEdit;
 
 }
 
@@ -116,13 +124,6 @@ void MainWindow::on_openFile_triggered()
                    QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
                    return;
                }else{
-                    //init the global var
-                    lineno = 0;
-                    lexicalMessage = "";
-                    errorMessage = "";
-                    syntaxTree = NULL;
-                    VarStructMap.clear();
-                    FunStructMap.clear();
                     //init Function map
                     initMap();
                     //生成语法树
@@ -140,7 +141,6 @@ void MainWindow::on_openFile_triggered()
                /*
                 ** END
                */
-
 
                file.close();
                Flag_isOpen = 1;

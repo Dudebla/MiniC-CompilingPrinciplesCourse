@@ -6,76 +6,97 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
-    <height>589</height>
+    <width>1220</width>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>MiniC Source Code</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QTextEdit" name="sourceTextEdit">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QPushButton" name="changeStyleButton">
-      <property name="text">
-       <string>Change Style</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="lexical">
-       <attribute name="title">
-        <string>lexical</string>
-       </attribute>
-       <widget class="QTextEdit" name="lexicalTextEdit">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>401</width>
-          <height>451</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="parser">
-       <attribute name="title">
-        <string>parser</string>
-       </attribute>
-       <widget class="QTextEdit" name="parserTextEdit">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>401</width>
-          <height>451</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>128</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>MiniC Source Code</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="sourceTextEdit">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>32</y>
+      <width>591</width>
+      <height>621</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="changeStyleButton">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>10</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change Style</string>
+    </property>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>10</y>
+      <width>601</width>
+      <height>641</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="lexical">
+     <attribute name="title">
+      <string>lexical</string>
+     </attribute>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QTextEdit" name="lexicalTextEdit"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="parser">
+     <attribute name="title">
+      <string>parser</string>
+     </attribute>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QTextEdit" name="parserTextEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QTextEdit" name="synerrorTextEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>660</y>
+      <width>1201</width>
+      <height>79</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>

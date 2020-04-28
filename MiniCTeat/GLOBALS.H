@@ -130,6 +130,17 @@ extern std::map<std::string, VarStruct> VarStructMap;
 extern std::map<std::string, FunStruct> FunStructMap;
 
 
+typedef enum{
+    VarDcl, FunDcl, VarFunDcl
+}VarFunDclType;
+
+typedef enum{
+    InCompound, InFunDcl, GlobalVarDcl
+}ManageMapState;
+
+extern ManageMapState manageMapState;
+extern std::string lastDeclaredFunName;
+
 
 /**************************************************/
 /***********   Flags for tracing       ************/

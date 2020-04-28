@@ -8,13 +8,26 @@
 
 #include "GLOBALS.H"
 #include "UTIL.H"
+#include "PARSE.H"
 #include<string>
 #include<sstream>
 using namespace std;
 
 extern std::map<std::string, FunStruct> FunStructMap;
+extern TreeNode *syntaxTree;
+
+extern ManageMapState manageMapState;
+extern std::string lastDeclaredFunName;
 
 void initMap(void){
+    //init the global var
+    lineno = 0;
+    lexicalMessage = "";
+    errorMessage = "";
+    syntaxTree = NULL;
+    if(!VarStructMap.empty()){
+        VarStructMap.clear();
+    }
     if(!FunStructMap.empty()){
         FunStructMap.clear();
     }
@@ -32,6 +45,10 @@ void initMap(void){
     v.type = Integer;
     f.params[v.name] = v;
     FunStructMap[f.name] = f;
+
+    manageMapState = GlobalVarDcl;
+    lastDeclaredFunName = "output";
+
     return;
 }
 

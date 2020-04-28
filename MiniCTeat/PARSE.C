@@ -12,17 +12,6 @@
 #include<string>
 using namespace std;
 
-typedef enum{
-    VarDcl, FunDcl, VarFunDcl
-}VarFunDclType;
-
-typedef enum{
-    InCompound, InFunDcl, GlobalVarDcl
-}ManageMapState;
-
-ManageMapState manageMapState = GlobalVarDcl;
-std::string lastDeclaredFunName = "output";
-
 /*miniC functions*/
 static TreeNode * declaration_list(void);
 static TreeNode * declaration(void);
@@ -142,7 +131,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                 case LBRACKET:{   //lbracket: '['，为int或void数组定义
                     t->type = beforeT==INT?IntList:VoidList;
                     match(LBRACKET);
-//                    t->attr.val = atoi(tokenString);//length of list
+                    t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
                     //定义Exp子节点
