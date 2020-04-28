@@ -499,10 +499,12 @@ TreeNode * var(void){
     //make sure the var is declarated
     switch (manageMapState) {
         case InCompound:{
-            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
+//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
+            if(VarStructMap.count(t->attr.name) == 0){// is not global var
                 if(!FunStructMap.empty()){
                     map<char*, VarStruct> v = (FunStructMap.end()--)->second.params;
-                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
+//                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
+                    if(v.count(t->attr.name) == 0){// is not funtion's var
                         syntaxError("unexpected var -> ");
                         printToken(token, tokenString);
                     }else{
@@ -518,7 +520,8 @@ TreeNode * var(void){
             break;
         }
         case GlobalVarDcl:{
-            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
+//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
+            if(VarStructMap.count(t->attr.name) == 0){//use a uninited var
                 syntaxError("unexpected var -> ");
                 printToken(token, tokenString);
             }
@@ -714,7 +717,8 @@ TreeNode * call(void){
         p->attr.name = copyString(tokenString);
     }
     //make sure declarated function
-    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
+//    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
+    if(FunStructMap.count(p->attr.name) == 0){//use a undelcarated function
         syntaxError("unexpected call -> ");
         printToken(token, tokenString);
     }else {
@@ -738,7 +742,8 @@ TreeNode * call(void){
         q = q->sibling;
     }
 
-    if (FunStructMap.find(p->attr.name) != FunStructMap.end()) {
+//    if (FunStructMap.find(p->attr.name) != FunStructMap.end()) {
+    if (FunStructMap.count(p->attr.name) > 0) {
         unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
         if (expectNum != argsNum) {
             syntaxError("unexpected number of args");
@@ -793,7 +798,8 @@ void addToVarMap(VarStruct v){
         if(!FunStructMap.empty()){
             FunStruct lastFun = (--FunStructMap.end())->second;
             std::map<char*, VarStruct> vMap = lastFun.params;
-            if(vMap.find(v.name)==vMap.end()){
+//            if(vMap.find(v.name)==vMap.end()){
+            if(vMap.count(v.name) == 0){
                 (--FunStructMap.end())->second.params[v.name] = v;
             }else{
                 syntaxError("Duplicated declaration -> ");
@@ -805,7 +811,9 @@ void addToVarMap(VarStruct v){
         break;
     }
     case GlobalVarDcl:{
-        if(VarStructMap.find(v.name)==VarStructMap.end()){
+//        if(VarStructMap.find(v.name)==VarStructMap.end()){
+        if(VarStructMap.count(v.name) == 0){
+
             VarStructMap[v.name] = v;
         }else{
             syntaxError("Duplicated declaration -> ");
@@ -817,7 +825,8 @@ void addToVarMap(VarStruct v){
 }
 
 void addToFunMap(FunStruct f){
-    if(FunStructMap.find(f.name)==FunStructMap.end()){
+//    if(FunStructMap.find(f.name)==FunStructMap.end()){
+    if(FunStructMap.count(f.name) == 0){
         FunStructMap[f.name] = f;
     }else{
         syntaxError("Duplicated declaration -> ");
