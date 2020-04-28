@@ -25,8 +25,8 @@ const int STYLE_TREE_LIST = 1;
 const int STYLE_TREE_GRAPH = 0;
 
 TypeToken token;
-std::map<char*, VarStruct> VarStructMap;
-std::map<char*, FunStruct> FunStructMap;
+std::map<string, VarStruct> VarStructMap;
+std::map<string, FunStruct> FunStructMap;
 
 
 //保存生成的语法树
