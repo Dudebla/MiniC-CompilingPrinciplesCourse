@@ -49,7 +49,7 @@ static int getNextChar(void)
         memset(lineBuf,0,BUFLEN);
         if (fgets(lineBuf, BUFLEN - 1, source))
         {
-            if (EchoSource) fprintf(listing, "%4d: %s", lineno, lineBuf);
+//            if (EchoSource) fprintf(listing, "%4d: %s", lineno, lineBuf);
             bufsize = strlen(lineBuf);
             linepos = 0;
             return lineBuf[linepos++];
@@ -310,7 +310,6 @@ TypeToken getToken(void)
             break;
         case DONE:
         default: /* should never happen */
-            fprintf(listing, "Scanner Bug: state= %d\n", state);
             state = DONE;
             currentToken = ERRO;
             break;

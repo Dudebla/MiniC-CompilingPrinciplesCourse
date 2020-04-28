@@ -50,8 +50,7 @@ void addToVarMap(VarStruct v);
 void addToFunMap(FunStruct f);
 
 
-
-//static void syntaxError(char * message)
+//语法错误输出，返回输出内容
 static char* syntaxError(char * message)
 {
     string result;
@@ -70,7 +69,6 @@ static void match(TypeToken expected)
     else {
         syntaxError("unexpected token -> ");
         printToken(token, tokenString);
-        fprintf(listing, "      ");
     }
 }
 
