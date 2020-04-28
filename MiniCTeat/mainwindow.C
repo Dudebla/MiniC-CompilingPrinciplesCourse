@@ -25,8 +25,8 @@ const int STYLE_TREE_LIST = 1;
 const int STYLE_TREE_GRAPH = 0;
 
 TypeToken token;
-std::map<char*, VarStruct> VarStructMap;
-std::map<char*, FunStruct> FunStructMap;
+std::map<string, VarStruct> VarStructMap;
+std::map<string, FunStruct> FunStructMap;
 
 
 //保存生成的语法树
@@ -37,7 +37,7 @@ int lineno = 0;
 FILE * listing;
 FILE * code;
 
-string lexicalMessage;
+string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
 string errorMessage;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -116,6 +116,13 @@ void MainWindow::on_openFile_triggered()
                    QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
                    return;
                }else{
+                    //init the global var
+                    lineno = 0;
+                    lexicalMessage = "";
+                    errorMessage = "";
+                    syntaxTree = NULL;
+                    VarStructMap.clear();
+                    FunStructMap.clear();
                     //init Function map
                     initMap();
                     //生成语法树
@@ -128,7 +135,6 @@ void MainWindow::on_openFile_triggered()
                     this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
                     this->parserTextEdit->setPlainText(result);
 
-//                     this->lexicalTextEdit->setPlainText(lexicalMessage);
 
                }
                /*

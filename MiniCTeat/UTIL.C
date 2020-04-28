@@ -12,7 +12,7 @@
 #include<sstream>
 using namespace std;
 
-extern std::map<char*, FunStruct> FunStructMap;
+extern std::map<std::string, FunStruct> FunStructMap;
 
 void initMap(void){
     if(!FunStructMap.empty()){

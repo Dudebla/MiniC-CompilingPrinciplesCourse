@@ -21,6 +21,7 @@ typedef enum{
 }ManageMapState;
 
 ManageMapState manageMapState = GlobalVarDcl;
+std::string lastDeclaredFunName = "output";
 
 /*miniC functions*/
 static TreeNode * declaration_list(void);
@@ -141,10 +142,10 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                 case LBRACKET:{   //lbracket: '['，为int或void数组定义
                     t->type = beforeT==INT?IntList:VoidList;
                     match(LBRACKET);
-                    t->attr.val = atoi(tokenString);//length of list
+//                    t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
-
+                    //定义Exp子节点
                     TreeNode * k = newExpNode(IdK);
                     k->type = t->type;
                     k->attr.name = t->attr.name;
@@ -186,6 +187,13 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             switch (token) {
                 case SEMI:{
                     t->type = beforeT==INT?Integer:Void;
+
+                    //定义Exp子节点
+                    TreeNode * k = newExpNode(IdK);
+                    k->type = t->type;
+                    k->attr.name = t->attr.name;
+                    t->child[0] = k;
+
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
@@ -194,6 +202,13 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     break;}
                 case LBRACKET:{
                     t->type = beforeT==INT?IntList:VoidList;
+
+                    //定义Exp子节点
+                    TreeNode * k = newExpNode(IdK);
+                    k->type = t->type;
+                    k->attr.name = t->attr.name;
+                    t->child[0] = k;
+
                     match(LBRACKET);
                     t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
@@ -494,6 +509,7 @@ TreeNode * expression(void){
     return t;
 }
 
+
 TreeNode * var(void){
     TreeNode * t = newExpNode(IdK);
     if(t!=NULL){
@@ -503,11 +519,10 @@ TreeNode * var(void){
     //make sure the var is declarated
     switch (manageMapState) {
         case InCompound:{
-//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){// is not global var
             if(VarStructMap.count(t->attr.name) == 0){// is not global var
                 if(!FunStructMap.empty()){
-                    map<char*, VarStruct> v = (--FunStructMap.end())->second.params;
-//                    if(v.find(t->attr.name)==v.end()){// is not funtion's var
+
+                    std::map<std::string, VarStruct> v = FunStructMap[lastDeclaredFunName].params;
                     if(v.count(t->attr.name) == 0){// is not funtion's var
                         errorMessage += syntaxError("unexpected var -> ");
                         errorMessage += printToken(token, tokenString);
@@ -524,7 +539,6 @@ TreeNode * var(void){
             break;
         }
         case GlobalVarDcl:{
-//            if(VarStructMap.find(t->attr.name)==VarStructMap.end()){//use a uninited var
             if(VarStructMap.count(t->attr.name) == 0){//use a uninited var
                 errorMessage += syntaxError("unexpected var -> ");
                 errorMessage += printToken(token, tokenString);
@@ -605,10 +619,11 @@ TreeNode * iteration_stmt(void){
 TreeNode * return_stmt(void){
     TreeNode * t = newStmtNode(ReturnK);
     match(RETURN);
-    FunStruct lastFun = (--FunStructMap.end())->second;
-    char * funName = lastFun.name;
-    ExpType returnType = lastFun.returnType;
     TreeNode * p = t;
+    if(manageMapState!=InCompound || FunStructMap.size()==0){//not in funcation
+        errorMessage += syntaxError("unexpected return statement here, not in function");
+    }
+    FunStruct lastFun = FunStructMap[lastDeclaredFunName];
     if(t!=NULL && token!=SEMI){
         t->child[0] = expression();
         ExpType tempType = t->child[0]->type;
@@ -697,7 +712,6 @@ TreeNode * call(void){
         p->attr.name = copyString(tokenString);
     }
     //make sure declarated function
-//    if(FunStructMap.find(p->attr.name)==FunStructMap.end()){//use a undelcarated function
     if(FunStructMap.count(p->attr.name) == 0){//use a undelcarated function
         errorMessage += syntaxError("unexpected call -> ");
         errorMessage += printToken(token, tokenString);
@@ -726,7 +740,7 @@ TreeNode * call(void){
     if (FunStructMap.count(p->attr.name) > 0) {
         unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
         if (expectNum != argsNum) {
-            errorMessage += syntaxError("unexpected number of args");
+            errorMessage += syntaxError("unexpected number of args\r\n");
         }
     }
 
@@ -749,21 +763,19 @@ TreeNode * args(void){
     return t;
 }
 
-
 /* function manage var map and fun map*/
 void addToVarMap(VarStruct v){
     switch (manageMapState) {
     case InCompound:
     case InFunDcl:{
-        if(!FunStructMap.empty()){
-            FunStruct lastFun = (--FunStructMap.end())->second;
-            std::map<char*, VarStruct> vMap = lastFun.params;
-//            if(vMap.find(v.name)==vMap.end()){
+        if(lastDeclaredFunName.compare("output")!=0){
+            FunStruct lastFun = FunStructMap[lastDeclaredFunName];
+            std::map<std::string, VarStruct> vMap = lastFun.params;
             if(vMap.count(v.name) == 0){
-                (--FunStructMap.end())->second.params[v.name] = v;
+                FunStructMap[lastDeclaredFunName].params[v.name] = v;
             }else{
                 errorMessage += syntaxError("Duplicated declaration -> ");
-                errorMessage += printToken(ID, v.name);
+                errorMessage += printToken(ID, v.name.c_str());
             }
         }else{
             errorMessage += syntaxError("Not in function declaration: in manageVarMap(VarStruct v)");
@@ -773,11 +785,10 @@ void addToVarMap(VarStruct v){
     case GlobalVarDcl:{
 //        if(VarStructMap.find(v.name)==VarStructMap.end()){
         if(VarStructMap.count(v.name) == 0){
-
             VarStructMap[v.name] = v;
         }else{
             errorMessage += syntaxError("Duplicated declaration -> ");
-            errorMessage += printToken(ID, v.name);
+            errorMessage += printToken(ID, v.name.c_str());
         }
         break;
     }
@@ -785,12 +796,12 @@ void addToVarMap(VarStruct v){
 }
 
 void addToFunMap(FunStruct f){
-//    if(FunStructMap.find(f.name)==FunStructMap.end()){
     if(FunStructMap.count(f.name) == 0){
         FunStructMap[f.name] = f;
+        lastDeclaredFunName = f.name;
     }else{
         errorMessage += syntaxError("Duplicated declaration -> ");
-        errorMessage += printToken(ID, f.name);
+        errorMessage += printToken(ID, f.name.c_str());
     }
 }
 

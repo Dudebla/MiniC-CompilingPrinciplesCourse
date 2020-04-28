@@ -329,7 +329,7 @@ TypeToken getToken(void)
         char * tokenMessage = printToken(currentToken, tokenString); //token
 
         lexicalMessage += to_string(lineno);
-        lexicalMessage.append(" ");
+        lexicalMessage.append(" .");
         lexicalMessage +=   tokenString ;
         lexicalMessage.append("\r\n");
     }

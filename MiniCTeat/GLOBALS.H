@@ -103,7 +103,7 @@ typedef struct treeNode
 typedef struct varStruct
 {
     ExpType type; //变量类型
-    char * name;      //变量名
+    std::string name;      //变量名
 } VarStruct;
 
 /*
@@ -112,8 +112,8 @@ typedef struct varStruct
 typedef struct funStruct
 {
     ExpType returnType; //函数返回类型
-    char * name;      //函数名
-    std::map<char*, VarStruct> params;   //函数内部定义的参数及变量
+    std::string name;      //函数名
+    std::map<std::string, VarStruct> params;   //函数内部定义的参数及变量
 } FunStruct;
 
 /*
@@ -126,8 +126,8 @@ typedef struct funStruct
 //extern std::vector<VarStruct> VarVector;
 //extern std::vector<FunStruct> FunVector;
 
-extern std::map<char*, VarStruct> VarStructMap;
-extern std::map<char*, FunStruct> FunStructMap;
+extern std::map<std::string, VarStruct> VarStructMap;
+extern std::map<std::string, FunStruct> FunStructMap;
 
 
 
