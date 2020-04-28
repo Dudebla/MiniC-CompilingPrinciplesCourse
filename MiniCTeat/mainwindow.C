@@ -55,8 +55,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->sourceTextEdit = this->ui->sourceTextEdit;
 
     this->lexicalTextEdit = this->ui->lexicalTextEdit;
-//    this->lexicalWidget = this->ui->tabWidget->widget(0);
-//    this->parseWidget = this->ui->tabWidget->widget(1);
+    this->lexicalTextEdit->setReadOnly(true);
+    this->parserTextEdit = this->ui->parserTextEdit;
+    this->parserTextEdit->setReadOnly(true);
 
 }
 
@@ -120,11 +121,12 @@ void MainWindow::on_openFile_triggered()
                     //生成语法树
                     syntaxTree = parse();
                     //打印语法树
-//                    QString result;//存储打印的语法树
-//                    result = printTree(syntaxTree);
+                    QString result;//存储打印的语法树
+                    result = printTree(syntaxTree);
 
                     //显示输出语法树
                     this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
+                    this->parserTextEdit->setPlainText(result);
 
 //                     this->lexicalTextEdit->setPlainText(lexicalMessage);
 

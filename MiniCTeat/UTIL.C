@@ -289,7 +289,7 @@ char* printTree(TreeNode * tree)
                /*strcat_s(result,sizeof("Assign to: "), "Assign to: ");
                strcat_s(result,sizeof(tree->attr.name), tree->attr.name);
                strcat_s(result,4, "\r\n");*/
-               name = tree->attr.name;
+               name = tree->child[0]->attr.name;
                result += "Assign to: " + name + "\r\n";
                break;
            case ReadK:
@@ -338,7 +338,7 @@ char* printTree(TreeNode * tree)
                result += "return\r\n";
                break;
            case CallK:
-               name = tree->attr.name;
+               name = tree->child[0]->attr.name;
                result += "call function: " + name + "\r\n";
                break;
            default:
