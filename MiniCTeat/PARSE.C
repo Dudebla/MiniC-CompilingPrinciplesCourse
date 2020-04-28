@@ -12,26 +12,6 @@
 #include<string>
 using namespace std;
 
-//static TypeToken token; /* holds current token */
-
-                        /* function prototypes for recursive calls */
-//static TreeNode * stmt_sequence(void);
-//static TreeNode * statement(void);
-//static TreeNode * if_stmt(void);
-//static TreeNode * repeat_stmt(void);
-//static TreeNode * assign_stmt(void);
-//static TreeNode * read_stmt(void);
-//static TreeNode * write_stmt(void);
-//static TreeNode * exp(void);
-//static TreeNode * simple_exp(void);
-//static TreeNode * term(void);
-//static TreeNode * factor(void);
-
-/*TINY的文法扩充*/
-//static TreeNode * while_stmt(void);
-//static TreeNode * dowhile_stmt(void);
-//static TreeNode * for_stmt(void);
-
 typedef enum{
     VarDcl, FunDcl, VarFunDcl
 }VarFunDclType;
@@ -75,8 +55,6 @@ void addToFunMap(FunStruct f);
 static char* syntaxError(char * message)
 {
     string result;
-    //fprintf(listing, "\n>>> ");
-    //fprintf(listing, "Syntax error at line %d: %s", lineno, message);
     string temp = message;
     result += "\r\n>>>Syntax error at line " + lineno + temp;
     Error = TRUE;
@@ -545,19 +523,6 @@ TreeNode * var(void){
     return t;
 }
 
-//TreeNode * var(void) {
-//    TreeNode * t = newExpNode(IdK);
-//    if (t != NULL) {
-//        t->attr.name = copyString(tokenString);
-//    }
-//    match(ID);
-//    if (t != NULL && token == LBRACKET) {
-//        match(LBRACKET);  //'['
-//        t->child[0] = expression();   // ####需要判断是否为负数#####
-//        match(RBRACKET);
-//    }
-//    return t;
-//}
 
 TreeNode * simple_expression(void){
     TreeNode * t = NULL;
@@ -639,17 +604,6 @@ TreeNode * return_stmt(void){
     match(SEMI);
     return t;
 }
-
-//TreeNode * return_stmt(void) {
-//    TreeNode * t = newStmtNode(ReturnK);
-//    match(RETURN);
-//    if (t != NULL && token != SEMI) {
-//        t->child[0] = expression();
-//    }
-//    match(SEMI);
-//    return t;
-//}
-
 
 
 TreeNode * term(void)
@@ -755,26 +709,6 @@ TreeNode * call(void){
     return t;
 }
 
-//TreeNode * call(void) {
-//    TreeNode * t = newStmtNode(CallK);
-//    TreeNode * p = newExpNode(IdK);
-//    if (p != NULL && token == ID) {
-//        p->attr.name = copyString(tokenString);
-//    }
-//    match(ID);
-//    t->child[0] = p;
-//    match(LPAREN);
-
-//    if (token == ID || token == LPAREN || token == NUM) {
-//        TreeNode * q = args();
-//        t->child[1] = q;
-//    }
-
-//    match(RPAREN);
-
-//    return t;
-
-//}
 
 TreeNode * args(void){
     TreeNode * t = expression();

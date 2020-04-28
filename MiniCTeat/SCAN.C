@@ -71,14 +71,6 @@ static void ungetNextChar(void)
 }
 
 /* lookup table of reserved words */
-//static struct
-//{
-//    char* str;
-//    TypeToken tok;
-//} reservedWords[MAXRESERVED]
-//= { { "if",IF },{ "then",THEN },{ "else",ELSE },{ "end",END },
-//{ "repeat",REPEAT },{ "until",UNTIL },{ "read",READ },
-//{ "write",WRITE },{ "do" , DO },{"while",WHILE} , {"for",FOR},{"downto",DOWNTO},{"enddo",ENDDO},{"endwhile",ENDWHILE} };
 /*
  * miniC修改部分
  */
@@ -262,18 +254,6 @@ TypeToken getToken(void)
                 }
             }
             break;
-            //        case INCOMMENT:
-            //            save = FALSE;
-            //            if (c == EOF)
-            //            {
-            //                state = DONE;
-            //                currentToken = ENDFILE;
-            //            }
-            //            else if (c == '}') state = START;
-            //            break;
-            /*
-            * miniC修改部分
-            */
         case INCOMMENT: //当前状态为注释内部状态
             save = FALSE;
             if (c == EOF) //是否读到文件末
@@ -296,9 +276,6 @@ TypeToken getToken(void)
                 }
             }
             break;
-            /*
-            * END
-            */
         case INASSIGN:
             state = DONE;
             if (c == '=')
@@ -350,11 +327,8 @@ TypeToken getToken(void)
         }
     }
     if (currentToken == ID) {
-        //fprintf(listing, "\t%d: ", lineno);   //行号
         char * tokenMessage = printToken(currentToken, tokenString); //token
-        //fprintf(listing, tokenMessage);
 
-        //lexicalMessage.append(to_string(lineno) + ' ' + tokenString + '\n');
         lexicalMessage += to_string(lineno);
         lexicalMessage.append(" ");
         lexicalMessage +=   tokenString ;
