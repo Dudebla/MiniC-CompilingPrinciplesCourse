@@ -94,16 +94,17 @@ Mini C是一种适合编译器设计方案的语言它比TINY语言更复杂，�
 
 ```
 MiniCTest
-├─ head
+├─ MiniCTest.pro        //QT项目配置文件
+├─ head                 //头文件
 │  ├─ ANALYZE.H
 │  ├─ CGEN.H
 │  ├─ CODE.H
-│  ├─ GLOBAL.H
-│  ├─ mainwindows.h
-│  ├─ PARSE.H
-│  ├─ SCAN.H
-│  ├─ SYMTAB.H
-│  └─ UTIL.H
+│  ├─ GLOBAL.H          //存放全局变量、函数声明
+│  ├─ mainwindows.h     //窗口头文件
+│  ├─ PARSE.H           //语法分析函数声明
+│  ├─ SCAN.H            //词法分析函数声明
+│  ├─ SYMTAB.H 
+│  └─ UTIL.H            //全局变量初始化、输出语法树等工具函数声明
 ├─ source
 │  ├─ ANALYZE.C
 │  ├─ CGEN.C
@@ -113,7 +114,9 @@ MiniCTest
 │  ├─ PARSE.C
 │  ├─ SCAN.C
 │  ├─ SYMTAB.C
-└─ └─ UTIL.C
+│  └─ UTIL.C
+├─ ui
+└─ └─ mainwindow.ui     //ui文件
 ```
 
 ## 测试用例
