@@ -132,6 +132,8 @@ void MainWindow::on_openFile_triggered()
                     //打印语法树
                     QString result;//存储打印的语法树
                     result = printTree(syntaxTree);
+                    //若无语法错误，显示成功信息
+                    errorMessage = name + "  ==>  Success! 0 error(s)";
 
                     //显示输出语法树
                     this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
