@@ -11,6 +11,8 @@
 #include "PARSE.H"
 #include<string>
 #include<sstream>
+#include<QTextCodec>
+
 using namespace std;
 
 extern std::map<std::string, FunStruct> FunStructMap;
@@ -20,6 +22,14 @@ extern ManageMapState manageMapState;
 extern std::string lastDeclaredFunName;
 
 void initMap(void){
+
+    /*
+     ** C语言打开文件并存为FILE类型，保存到source变量中
+    */
+    //可打开含中文路径文件
+    QTextCodec *code = QTextCodec::codecForName("GB2312");
+    std::string name = code->fromUnicode(Last_fileName).data();
+    source=fopen(name.c_str(),"rb");
     //init the global var
     lineno = 0;
     lexicalMessage = "词法分析输出，格式：行号. 识别的ID \r\n";

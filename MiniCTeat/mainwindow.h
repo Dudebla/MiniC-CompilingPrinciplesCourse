@@ -20,13 +20,6 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    int Flag_isOpen; // mask: judge if open or create a file
-    int Flag_isNew; // mask: create a new file if 1
-    int Flag_parserResultStyle; //mask: parse result style is tree list if 1, tree graph other
-    QString Last_fileName; // name of file have saved last time
-    QString Last_fileContent; // content of file have saved last time
-    QString lexicalResult;//
-
     QTextEdit * sourceTextEdit;
     QTextEdit * lexicalTextEdit;
     QTextEdit * parserTextEdit;
