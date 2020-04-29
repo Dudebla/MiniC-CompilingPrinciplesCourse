@@ -163,25 +163,29 @@ void main(void)
 ```
 
 ## 运行效果
-* ### sample1
 
-![sample1_lexical](http://url/screenshot-software.png "screenshot sample1_lexical")
-![sample1_parse](http://url/screenshot-software.png "screenshot sample1_parse")
+* ### 主界面
+  ![mainwindow](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/mainwindow.jpg "screenshot mainwindow")
   
 
+* ### sample1
+
+![sample1_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_lexical.jpg "screenshot sample1_lexical")
+![sample1_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_parse.jpg "screenshot sample1_parse")
+  
 
 
 * ### sample2
 
-![sample2_lexical](http://url/screenshot-software.png "screenshot sample2_lexical")
-![sample2_parse](http://url/screenshot-software.png "screenshot sample2_parse")
+![sample2_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_lexical.jpg "screenshot sample2_lexical")
+![sample2_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_parse.jpg "screenshot sample2_parse")
 
 ## 下载
-* [Version 1.0](https://github.com/username/sw-name/archive/master.zip)
+* [Version 1.0](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/MiniCTeat.exe)
 
 ## 用法
-```$ git clone https://github.com/username/software-project.git
-...
+```
+运行MiniCTest.exe程序.
 ```
 ## 开发者
 
