@@ -446,9 +446,11 @@ TreeNode * expression(void){
                 break;
             }
             case LBRACKET:{//ID[expression]......
+                ungetToken();
                 t = newExpNode(IdK);//teamplate node, store the ID[expression]
                 if(t!=NULL) t->attr.name = copyString(tokenString);
                 if(t!=NULL) t->type = IntList;
+                match(ID);
                 match(LBRACKET);
                 if(t!=NULL) t->child[0] = expression();
                 match(RBRACKET);
