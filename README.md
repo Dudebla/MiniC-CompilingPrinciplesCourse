@@ -90,6 +90,32 @@ Mini C是一种适合编译器设计方案的语言它比TINY语言更复杂，�
 
 ### 代码指令生成
 
+## 项目目录树
+
+```
+MiniCTest
+├─ head
+│  ├─ ANALYZE.H
+│  ├─ CGEN.H
+│  ├─ CODE.H
+│  ├─ GLOBAL.H
+│  ├─ mainwindows.h
+│  ├─ PARSE.H
+│  ├─ SCAN.H
+│  ├─ SYMTAB.H
+│  └─ UTIL.H
+├─ source
+│  ├─ ANALYZE.C
+│  ├─ CGEN.C
+│  ├─ CODE.C
+│  ├─ GLOBAL.C
+│  ├─ mainwindow.c
+│  ├─ PARSE.C
+│  ├─ SCAN.C
+│  ├─ SYMTAB.C
+└─ └─ UTIL.C
+```
+
 ## 测试用例
 
 * sample1
@@ -189,7 +215,7 @@ void main(void)
 ```
 ## 开发者
 
-* [Contributors](https://github.com/username/sw-name/graphs/contributors)
+* [Contributors](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/graphs/contributors)
 
 
 
