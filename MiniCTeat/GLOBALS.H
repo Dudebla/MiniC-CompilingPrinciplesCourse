@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <map>
+#include <QString>
 
 #ifndef FALSE
 #define FALSE 0
@@ -58,6 +59,7 @@ typedef enum
 extern FILE* source; /* source code t ext file */
 extern FILE* listing; /* listing output text file */
 extern FILE* code; /* code text file for TM simulator */
+extern QString Last_fileName;
 
 extern int lineno; /* source line number for listing */
 extern int EOF_flag; /* corrects ungetNextChar behavior on EOF */

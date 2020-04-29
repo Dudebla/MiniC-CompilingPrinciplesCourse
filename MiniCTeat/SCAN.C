@@ -339,5 +339,5 @@ void ungetToken(void) {
         --tokenLength;
     }
     token = lastToken;
-    strcpy_s(tokenString ,strlen(lastTokenString)+1,lastTokenString);
+    strcpy(tokenString, lastTokenString);
 }

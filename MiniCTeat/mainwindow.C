@@ -28,7 +28,12 @@ TypeToken token;
 std::map<string, VarStruct> VarStructMap;
 std::map<string, FunStruct> FunStructMap;
 
-
+int Flag_isOpen; // mask: judge if open or create a file
+int Flag_isNew; // mask: create a new file if 1
+int Flag_parserResultStyle; //mask: parse result style is tree list if 1, tree graph other
+QString Last_fileName; // name of file have saved last time
+QString Last_fileContent; // content of file have saved last time
+QString lexicalResult;//
 //保存生成的语法树
 TreeNode *syntaxTree;
 //保存打开的源文件
@@ -55,10 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(this->width(),this->height());// enable size adjust
 
     // init state
-    this->Flag_isOpen = 0; // mask: judge if open or create a file
-    this->Flag_isNew = 1; // mask: 1 if create a new file, 0 other
-    this->Flag_parserResultStyle = STYLE_TREE_LIST; //mask: default 1, parse result show as list
-    this->lexicalResult = "";
+    Flag_isOpen = 0; // mask: judge if open or create a file
+    Flag_isNew = 1; // mask: 1 if create a new file, 0 other
+    Flag_parserResultStyle = STYLE_TREE_LIST; //mask: default 1, parse result show as list
+    lexicalResult = "";
 
     this->sourceTextEdit = this->ui->sourceTextEdit;
 
@@ -67,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->parserTextEdit = this->ui->parserTextEdit;
     this->parserTextEdit->setReadOnly(true);
     this->synerrorTextEdit = this->ui->synerrorTextEdit;
+    this->synerrorTextEdit->setReadOnly(true);
 
 }
 
@@ -105,48 +111,16 @@ void MainWindow::on_openFile_triggered()
            }
            else
            {
+               this->synerrorTextEdit->clear();
+               this->lexicalTextEdit->clear();
+               this->parserTextEdit->clear();
+
                QTextStream textStream(&file);       //读取文件，使用QTextStream
                while(!textStream.atEnd())
                {
                    this->sourceTextEdit->setPlainText(textStream.readAll());
                }
                this->sourceTextEdit->show();
-
-               /*
-                ** C语言打开文件并存为FILE类型，保存到source变量中
-               */
-               //可打开含中文路径文件
-               QTextCodec *code = QTextCodec::codecForName("GB2312");
-               std::string name = code->fromUnicode(fileName).data();
-               source=fopen(name.c_str(),"rb");
-
-               //调用生成语法树功能
-               if(!source){
-                   QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-                   return;
-               }else{
-                    //init Function map
-                    initMap();
-                    //生成语法树
-                    syntaxTree = parse();
-                    //打印语法树
-                    QString result;//存储打印的语法树
-                    result = printTree(syntaxTree);
-                    //若无语法错误，显示成功信息
-                    if(errorMessage == ""){
-                        errorMessage = name + "  ==>  Success! 0 error(s)";
-                    }
-
-                    //显示输出语法树
-                    this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
-                    this->parserTextEdit->setPlainText(result);
-                    this->synerrorTextEdit->setPlainText(QString::fromStdString(errorMessage));
-
-
-               }
-               /*
-                ** END
-               */
 
                file.close();
                Flag_isOpen = 1;
@@ -168,7 +142,7 @@ void MainWindow::on_openFile_triggered()
 */
 void MainWindow::on_saveFile_triggered()
 {
-    if(this->Flag_isNew){//toast fileDialog if 1 (is new file)
+    if(Flag_isNew){//toast fileDialog if 1 (is new file)
         if(this->sourceTextEdit->toPlainText()==""){
             QMessageBox::warning(this, tr("Warn"), tr("The content should not empty!"), QMessageBox::Ok);
         }else{
@@ -185,16 +159,16 @@ void MainWindow::on_saveFile_triggered()
                 QTextStream textStream(&fileName);
                 QString str = this->sourceTextEdit->toPlainText();
                 textStream<<str;
-                this->Last_fileContent = str;
+                Last_fileContent = str;
             }
             QMessageBox::information(this, "Save File", "Success saving the file!", QMessageBox::Ok);
             fileName.close();
-            this->Flag_isNew = 0;
-            this->Last_fileName = str;
+            Flag_isNew = 0;
+            Last_fileName = str;
         }
     }else{//is old file, save file
-        if(this->Flag_isOpen){
-            QFile file(this->Last_fileName);
+        if(Flag_isOpen){
+            QFile file(Last_fileName);
             if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
                 QMessageBox::warning(this, tr("Error"), tr("Failed opening the file!"), QMessageBox::Ok);
                 return;
@@ -202,7 +176,7 @@ void MainWindow::on_saveFile_triggered()
                 QTextStream textStream(&file);
                 QString str = this->sourceTextEdit->toPlainText();
                 textStream<<str;
-                this->Last_fileContent = str;
+                Last_fileContent = str;
                 file.close();
             }
         }else{
@@ -235,15 +209,29 @@ void MainWindow::on_lexicalFile_triggered()
         QMessageBox::warning(this, tr("Warn"), tr("The content should not empty!"), QMessageBox::Ok);
         return;
     }
-    this->lexicalResult = "lexical the content of sourceTextEdit";
-    //==========edit the lexical result=========================
-    // edit code here
-    //
+    lexicalResult = "lexical the content of sourceTextEdit";
+    //init Function map
+    initMap();
+    //调用生成语法树功能
+    if(!source){
+        QMessageBox::information(NULL, "Warning", "Can't open file",QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        return;
+    }else{
 
-    if(this->lexicalResult!=""){
-        this->lexicalTextEdit->clear();
-        this->lexicalTextEdit->setText(this->lexicalResult);
+         //生成语法树
+         syntaxTree = parse();
+         //若无语法错误，显示成功信息
+         if(errorMessage == ""){
+             errorMessage = Last_fileName.toStdString() + "  ==>  Success! 0 error(s)";
+         }
     }
+    /*
+     ** END
+    */
+    this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
+    this->synerrorTextEdit->setPlainText(QString::fromStdString(errorMessage));
+    lexicalResult = QString::fromStdString(lexicalMessage);
+
 }
 
 /*
@@ -251,7 +239,14 @@ void MainWindow::on_lexicalFile_triggered()
 */
 void MainWindow::on_parseFile_triggered()
 {
-
+    if(lexicalMessage==""){
+        this->on_lexicalFile_triggered();
+    }
+    //打印语法树
+    QString result;//存储打印的语法树
+    result = printTree(syntaxTree);
+    //显示输出语法树
+    this->parserTextEdit->setPlainText(result);
 }
 
 /*
@@ -290,7 +285,7 @@ void MainWindow::on_assemblyFile_triggered()
             //
 
             textStream<<str;
-            this->Last_fileContent = str;
+            Last_fileContent = str;
         }
         QMessageBox::information(this, "Save File", "Success saving the assemble instruction!", QMessageBox::Ok);
         fileName.close();
@@ -302,10 +297,10 @@ void MainWindow::on_assemblyFile_triggered()
 */
 void MainWindow::on_changeStyleButton_clicked()
 {
-    if(this->Flag_parserResultStyle==STYLE_TREE_LIST){
-        this->Flag_parserResultStyle = STYLE_TREE_GRAPH;
+    if(Flag_parserResultStyle==STYLE_TREE_LIST){
+        Flag_parserResultStyle = STYLE_TREE_GRAPH;
     }else{
-        this->Flag_parserResultStyle = STYLE_TREE_LIST;
+        Flag_parserResultStyle = STYLE_TREE_LIST;
     }
     if(this->ui->tabWidget->currentIndex()==1){ // reload
 
