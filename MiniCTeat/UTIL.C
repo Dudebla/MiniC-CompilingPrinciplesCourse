@@ -22,7 +22,7 @@ extern std::string lastDeclaredFunName;
 void initMap(void){
     //init the global var
     lineno = 0;
-    lexicalMessage = "";
+    lexicalMessage = "词法分析输出，格式：行号. 识别的ID \r\n";
     errorMessage = "";
     syntaxTree = NULL;
     if(!VarStructMap.empty()){
@@ -31,11 +31,13 @@ void initMap(void){
     if(!FunStructMap.empty()){
         FunStructMap.clear();
     }
+    EOF_flag = FALSE;
     FunStruct f;
     VarStruct v;
     //int input(void){...}
     f.name = "input";
     f.returnType = Integer;
+    f.paramsNum = 0;
     FunStructMap[f.name] = f;
 
     //void output(int x){...}
@@ -44,6 +46,7 @@ void initMap(void){
     v.name = "x";
     v.type = Integer;
     f.params[v.name] = v;
+    f.paramsNum =1 ;
     FunStructMap[f.name] = f;
 
     manageMapState = GlobalVarDcl;
@@ -67,7 +70,8 @@ char* printToken(TypeToken token, const char* tokenString)
    case RETURN:
    case INT:
    case VOID:
-       result += "reserved word: " + temp + "\r\n";
+       result += "reserved word: " + temp ;
+       result += "\r\n";
        break;
    case ASSIGN:
        result += ":=\r\n";
@@ -76,7 +80,7 @@ char* printToken(TypeToken token, const char* tokenString)
        result += "<\r\n";
        break;
    case EQ:
-       result += "=\r\n";
+       result += "==\r\n";
        break;
    case LTEQ:
        result += "<=\r\n";
@@ -126,13 +130,16 @@ char* printToken(TypeToken token, const char* tokenString)
        result += "EOF\r\n";
        break;
    case NUM:
-       result += "NUM, val= " + temp + "\r\n";
+       result += "NUM, val= " + temp ;
+       result += "\r\n";
        break;
    case ID:
-       result += "ID, name= " + temp + "\r\n";
+       result += "ID, name= " + temp ;
+       result += "\r\n";
        break;
    case ERRO:
-       result += "ERROR: " + temp + "\r\n";
+       result += "ERROR: " + temp ;
+       result += "\r\n";
        break;
    case ADDITIVE:
        result += "+=\r\n";

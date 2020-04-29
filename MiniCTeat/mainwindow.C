@@ -36,9 +36,10 @@ FILE * source;
 int lineno = 0;
 FILE * listing;
 FILE * code;
+int EOF_flag = false;
 
 string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
-string errorMessage;
+string errorMessage = "";
 
 ManageMapState manageMapState;
 std::string lastDeclaredFunName;
@@ -135,6 +136,7 @@ void MainWindow::on_openFile_triggered()
                     //显示输出语法树
                     this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
                     this->parserTextEdit->setPlainText(result);
+                    this->synerrorTextEdit->setPlainText(QString::fromStdString(errorMessage));
 
 
                }

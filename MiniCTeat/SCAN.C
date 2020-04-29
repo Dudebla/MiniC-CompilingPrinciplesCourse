@@ -21,7 +21,6 @@ StateType;
 
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN + 1];
-char *lastTokenString;
 
 
 /* BUFLEN = length of the input buffer for
@@ -31,10 +30,10 @@ char *lastTokenString;
 static char lineBuf[BUFLEN]; /* holds the current line */
 static int linepos = 0; /* current position in LineBuf */
 static int bufsize = 0; /* current size of buffer string */
-static int EOF_flag = FALSE; /* corrects ungetNextChar behavior on EOF */
+//static int EOF_flag = FALSE; /* corrects ungetNextChar behavior on EOF */
 static int tokenLength = 0; //当前token长度，用于ungetToken
-static TypeToken lastToken;
-TypeToken currentToken;
+TypeToken lastToken;
+char *lastTokenString;
 
 
 
@@ -46,10 +45,9 @@ static int getNextChar(void)
     if (!(linepos < bufsize))
     {
         lineno++;
-        memset(lineBuf,0,BUFLEN);
         if (fgets(lineBuf, BUFLEN - 1, source))
         {
-//            if (EchoSource) fprintf(listing, "%4d: %s", lineno, lineBuf);
+            if (EchoSource) fprintf(listing, "%4d: %s", lineno, lineBuf);
             bufsize = strlen(lineBuf);
             linepos = 0;
             return lineBuf[linepos++];
@@ -129,7 +127,7 @@ TypeToken getToken(void)
                 state = INID;
             else if (c == ':')
                 state = INASSIGN;
-            else if ((c == ' ') || (c == '\t') || (c == '\n') || (c == 13))
+            else if ((c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'))
                 save = FALSE;
             /*
             * miniC修改部分
@@ -320,22 +318,20 @@ TypeToken getToken(void)
         if (state == DONE)
         {
             tokenString[tokenStringIndex] = '\0';
-            //tokenLength = tokenStringIndex ;
             if (currentToken == ID)
                 currentToken = reservedLookup(tokenString);
         }
     }
     if (currentToken == ID) {
         char * tokenMessage = printToken(currentToken, tokenString); //token
-
         lexicalMessage += to_string(lineno);
-        lexicalMessage.append(" .");
+        lexicalMessage.append(".");
         lexicalMessage +=   tokenString ;
         lexicalMessage.append("\r\n");
     }
     return currentToken;
 }
- /* end getToken */
+/* end getToken */
 
 void ungetToken(void) {
     while (tokenLength > 0) {
@@ -343,5 +339,5 @@ void ungetToken(void) {
         --tokenLength;
     }
     token = lastToken;
-    strcpy(tokenString, lastTokenString);
+    strcpy_s(tokenString ,strlen(lastTokenString)+1,lastTokenString);
 }

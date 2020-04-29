@@ -60,6 +60,8 @@ extern FILE* listing; /* listing output text file */
 extern FILE* code; /* code text file for TM simulator */
 
 extern int lineno; /* source line number for listing */
+extern int EOF_flag; /* corrects ungetNextChar behavior on EOF */
+
 extern std::string lexicalMessage;
 extern std::string errorMessage;
 
@@ -113,6 +115,7 @@ typedef struct funStruct
 {
     ExpType returnType; //函数返回类型
     std::string name;      //函数名
+    int paramsNum;    //参数个数
     std::map<std::string, VarStruct> params;   //函数内部定义的参数及变量
 } FunStruct;
 

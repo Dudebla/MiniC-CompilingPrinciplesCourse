@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1220</width>
-    <height>786</height>
+    <height>818</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,10 +90,23 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>660</y>
+      <y>688</y>
       <width>1201</width>
-      <height>79</height>
+      <height>91</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>660</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Syntax Error</string>
     </property>
    </widget>
   </widget>

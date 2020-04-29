@@ -45,7 +45,7 @@ static char* syntaxError(char * message)
 {
     string result;
     string temp = message;
-    result += "\r\n>>>Syntax error at line " + lineno + temp;
+    result = "Syntax error at line: " + to_string(lineno) + ",  " + temp;
     Error = TRUE;
 
     char* r = new char[result.size() + 1];
@@ -131,7 +131,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                 case LBRACKET:{   //lbracket: '['，为int或void数组定义
                     t->type = beforeT==INT?IntList:VoidList;
                     match(LBRACKET);
-                    t->attr.val = atoi(tokenString);//length of list
+//                    t->attr.val = atoi(tokenString);//length of list
                     match(NUM);
                     match(RBRACKET);
                     //定义Exp子节点
@@ -156,6 +156,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     FunStruct f;
                     f.name = t->attr.name;
                     f.returnType = t->type;
+                    f.paramsNum = 0;
                     addToFunMap(f);
                     match(LPAREN);
                     t->child[0] = params();
@@ -208,11 +209,13 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     addToVarMap(v);
                     match(SEMI);
                     break;}
-            default:{
+            default:
+                {
                     errorMessage += syntaxError("unexpected token -> ");
                     errorMessage += printToken(token, tokenString);
                     token = getToken();
-                    break;}
+                    break;
+                }
             }
             break;
         }
@@ -223,6 +226,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             t->type = beforeT==INT?Integer:Void;
             FunStruct f;
             f.name = t->attr.name;
+            f.paramsNum = 0;
             f.returnType = t->type;
             addToFunMap(f);
             match(LPAREN);
@@ -302,6 +306,8 @@ TreeNode * param(void){
         k->type = t->type;
         k->attr.name = t->attr.name;
         t->child[0] = k;
+        //函数参数个数属性++
+        FunStructMap[lastDeclaredFunName].paramsNum++;
 
         match(LBRACKET);
         match(RBRACKET);
@@ -312,6 +318,8 @@ TreeNode * param(void){
         k->type = t->type;
         k->attr.name = t->attr.name;
         t->child[0] = k;
+        //函数参数个数属性++
+        FunStructMap[lastDeclaredFunName].paramsNum++;
     }
     VarStruct v;// add to funtion's params
     v.name = t->attr.name;
@@ -727,9 +735,10 @@ TreeNode * call(void){
 
 //    if (FunStructMap.find(p->attr.name) != FunStructMap.end()) {
     if (FunStructMap.count(p->attr.name) > 0) {
-        unsigned long expectNum = FunStructMap.find(p->attr.name)->second.params.size();
+        unsigned long expectNum = FunStructMap.find(p->attr.name)->second.paramsNum;
         if (expectNum != argsNum) {
-            errorMessage += syntaxError("unexpected number of args\r\n");
+            errorMessage += syntaxError("unexpected number of args -> ");
+            errorMessage += to_string(argsNum) + "\r\n";
         }
     }
 
@@ -772,7 +781,6 @@ void addToVarMap(VarStruct v){
         break;
     }
     case GlobalVarDcl:{
-//        if(VarStructMap.find(v.name)==VarStructMap.end()){
         if(VarStructMap.count(v.name) == 0){
             VarStructMap[v.name] = v;
         }else{
