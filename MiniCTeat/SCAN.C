@@ -125,8 +125,6 @@ TypeToken getToken(void)
                 state = INNUM;
             else if (isalpha(c))
                 state = INID;
-            else if (c == ':')
-                state = INASSIGN;
             else if ((c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'))
                 save = FALSE;
             /*
@@ -274,18 +272,18 @@ TypeToken getToken(void)
                 }
             }
             break;
-        case INASSIGN:
-            state = DONE;
-            if (c == '=')
-                currentToken = ASSIGN;
-            else
-            { /* backup in the input */
-                ungetNextChar();
-                --tokenLength;
-                save = FALSE;
-                currentToken = ERRO;
-            }
-            break;
+//        case INASSIGN:
+//            state = DONE;
+//            if (c == '=')
+//                currentToken = ASSIGN;
+//            else
+//            { /* backup in the input */
+//                ungetNextChar();
+//                --tokenLength;
+//                save = FALSE;
+//                currentToken = ERRO;
+//            }
+//            break;
         case INNUM:
             if (!isdigit(c))
             { /* backup in the input */
