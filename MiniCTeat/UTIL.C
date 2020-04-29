@@ -281,6 +281,9 @@ char* printTree(TreeNode * tree)
                name = tree->child[0]->attr.name;
                result += "call function: " + name + "\r\n";
                break;
+           case ArgsK:
+               result += "args: \r\n";
+               break;
            default:
                result += "Unknown ExpNode kind\r\n";
                break;

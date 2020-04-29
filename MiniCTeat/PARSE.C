@@ -723,14 +723,18 @@ TreeNode * call(void){
     if(token == ID || token == LPAREN || token == NUM ){
         TreeNode * q = args();
         t->child[1] = q;
+
     }
 
     //make sure the number of given args
     unsigned long argsNum = 0;
-    TreeNode * q =t->child[1];
-    while (q!=NULL) {
-        argsNum++;
-        q = q->sibling;
+    if(t->child[1] != NULL){
+        TreeNode * q =t->child[1];
+        q = q->child[0];
+        while (q!=NULL) {
+            argsNum++;
+            q = q->sibling;
+        }
     }
 
 //    if (FunStructMap.find(p->attr.name) != FunStructMap.end()) {
@@ -749,13 +753,22 @@ TreeNode * call(void){
 
 
 TreeNode * args(void){
-    TreeNode * t = expression();
-    TreeNode * p = t;
+    TreeNode * t = newStmtNode(ArgsK);
+    TreeNode * p = expression();
+    if(p != NULL){
+        t->child[0] = p;
+    }
+    TreeNode * q ;
     while(token == COMMA){
         match(COMMA);
         TreeNode * q = expression();
-        p->sibling = q;
-        p = q;
+        if(p != NULL){
+            p->sibling = q;
+            p = q;
+        }else{
+            t->child[0] = p = q;
+        }
+
     }
 
     return t;
