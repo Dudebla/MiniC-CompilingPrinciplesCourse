@@ -117,7 +117,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     //定义Exp子节点
                     TreeNode * k = newExpNode(IdK);
                     k->type = t->type;
-                    k->attr.name = t->attr.name;
+                    k->attr.name = copyString(t->attr.name);
                     t->child[0] = k;
 
                     VarStruct v;// add v to VarStructMap
@@ -131,14 +131,18 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                 case LBRACKET:{   //lbracket: '['，为int或void数组定义
                     t->type = beforeT==INT?IntList:VoidList;
                     match(LBRACKET);
-//                    t->attr.val = atoi(tokenString);//length of list
+                    TreeNode * k = newExpNode(IdK);
+                    k->type = t->type;
+                    //k->attr.name = t->attr.name;
+                    k->attr.name = copyString(t->attr.name);
+                    TreeNode * q = newExpNode(ConstK);
+                    q->attr.val = atoi(tokenString);//length of list
+                    k->sibling =q;
+                    t->child[0] = k;
                     match(NUM);
                     match(RBRACKET);
                     //定义Exp子节点
-                    TreeNode * k = newExpNode(IdK);
-                    k->type = t->type;
-                    k->attr.name = t->attr.name;
-                    t->child[0] = k;
+
 
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
@@ -181,7 +185,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     //定义Exp子节点
                     TreeNode * k = newExpNode(IdK);
                     k->type = t->type;
-                    k->attr.name = t->attr.name;
+                    //k->attr.name = t->attr.name;
+                    k->attr.name = copyString(t->attr.name);
                     t->child[0] = k;
 
                     VarStruct v;// add v to VarStructMap
@@ -192,15 +197,17 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     break;}
                 case LBRACKET:{
                     t->type = beforeT==INT?IntList:VoidList;
-
+                    match(LBRACKET);
                     //定义Exp子节点
                     TreeNode * k = newExpNode(IdK);
                     k->type = t->type;
-                    k->attr.name = t->attr.name;
-                    t->child[0] = k;
+                    //k->attr.name = t->attr.name;
+                    k->attr.name = copyString(t->attr.name);
+                    TreeNode * q = newExpNode(ConstK);
+                    q->attr.val = atoi(tokenString);//length of list
+                    k->sibling =q;
 
-                    match(LBRACKET);
-//                    t->attr.val = atoi(tokenString);;//length of list
+                    t->child[0] = k;
                     match(NUM);
                     match(RBRACKET);
                     VarStruct v;// add v to VarStructMap
@@ -304,7 +311,8 @@ TreeNode * param(void){
         //定义Exp子节点
         TreeNode * k = newExpNode(IdK);
         k->type = t->type;
-        k->attr.name = t->attr.name;
+        //k->attr.name = t->attr.name;
+        k->attr.name = copyString(t->attr.name);
         t->child[0] = k;
         //函数参数个数属性++
         FunStructMap[lastDeclaredFunName].paramsNum++;
@@ -316,7 +324,8 @@ TreeNode * param(void){
         //定义Exp子节点
         TreeNode * k = newExpNode(IdK);
         k->type = t->type;
-        k->attr.name = t->attr.name;
+        //k->attr.name = t->attr.name;
+        k->attr.name = copyString(t->attr.name);
         t->child[0] = k;
         //函数参数个数属性++
         FunStructMap[lastDeclaredFunName].paramsNum++;

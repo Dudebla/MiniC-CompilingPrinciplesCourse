@@ -239,6 +239,18 @@ static char* printSpaces(void)
    return r;
 }
 
+string expTypeToString(ExpType e){
+    string str = "unknown";
+    switch (e) {
+    case Void: str = "void";break;
+    case Integer: str = "int";break;
+    case IntList: str = "int[]";break;
+    case Boolean: str = "boolean";break;
+    case VoidList: str = "void[]";break;
+    }
+    return str;
+}
+
 /* procedure printTree prints a syntax tree to the
 * listing file using indentation to indicate subtrees
 */
@@ -252,6 +264,8 @@ char* printTree(TreeNode * tree)
        temp = printSpaces();
        string name;
        string val;
+       string exptypestr;
+       ExpType exptype;
        result += temp;
        if (tree->nodekind == StmtK)
        {
@@ -275,11 +289,15 @@ char* printTree(TreeNode * tree)
                break;
            case VarDclK:
                name = tree->attr.name;
-               result += "declare var: " + name + "\r\n";
+               exptype = tree->type;
+               exptypestr = expTypeToString(exptype);
+               result += "declare var: " + name + ", type: " + exptypestr + "\r\n";
                break;
            case FunDclK:
                name = tree->attr.name;
-               result += "declare fun: " + name + "\r\n";
+               exptype = tree->type;
+               exptypestr = expTypeToString(exptype);
+               result += "declare fun: " + name + ", return type: " + exptypestr + "\r\n";
                break;
            case CompndK:
                result += "function body\r\n";
