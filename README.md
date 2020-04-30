@@ -84,12 +84,16 @@ Mini C是一种适合编译器设计方案的语言它比TINY语言更复杂，�
 ## 功能规划
 
 * ### 词法分析
+  词法分析阶段是编译过程的第一个阶段，是编译的基础。词法分析模块是本实验项目第一个功能模块，核心任务是对用户给出的MiniC源程序转换为```字符串形式```，根据MiniC语言的此法规则将源程序中的字符扫描、识别出具有独立意义的```单词```，输出与源程序等价的token流。本模块根据MiniC语言的构词规则，定义了```关键字```、```标识符```、```常数```、```运算符```及```界符```等单词的识别。
 
 * ### 语法分析
+  语法分析阶段是编译过程的第二个阶段，也是继词法分析模块之后的功能模块，核心任务是根据已进行文法规则，对词法分析模块中的输出项判断结构上是否符合文法规则，符合时组合成各类语法短语，并以```语法树```的形式返回，否则返回错误信息。本功能模块使用```自顶向下```分析，进行语法分析前，将文法规则进行左递归消除和合并左公因子。考虑到MiniC语法复杂性，使用```LL(2)文法```。
 
-* ### 输出语法树
 
-* ### 代码指令产生
+* ### 输出语法树（待实现）
+  
+
+* ### 代码指令产生（待实现）
 
 ## 项目进度
 
@@ -203,20 +207,24 @@ void main(void)
 ## 运行效果
 
 * ### 主界面
-  ![mainwindow](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/mainwindow.jpg "screenshot mainwindow")
-  
+  <!-- ![mainwindow](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/mainwindow.jpg "screenshot mainwindow") -->
+   ![mainwindow](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\mainwindow.jpg "screenshot mainwindow")
 
 * ### sample1
 
 ![sample1_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_lexical.jpg "screenshot sample1_lexical")
 ![sample1_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_parse.jpg "screenshot sample1_parse")
-  
+<!-- ![sample1_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_lexical.jpg "screenshot sample1_lexical")
+![sample1_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample1_parse") -->
 
 
 * ### sample2
 
 ![sample2_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_lexical.jpg "screenshot sample2_lexical")
 ![sample2_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_parse.jpg "screenshot sample2_parse")
+
+<!-- ![sample2_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample2_lexical.jpg "screenshot sample2_lexical")
+![sample2_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample2_parse") -->
 
 ## 下载
 * [Version 1.0](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/MiniCTeat.exe)
@@ -233,15 +241,14 @@ void main(void)
 
 
 ## 证书 
-* 参见 [LICENSE](https://github.com/username/sw-name/blob/master/LICENSE.md) 文件
+* 参见 [LICENSE]() 文件
 
 ## 版本说明 
 * Version 1.0
 
 ## 联系我们
-#### 联系方式
-* Homepage: 
-* e-mail: 
+#### 联系方式 
+* e-mail: 20172131134@m.scnu.edu.cn 、 13128684834@163.com
 
 
 
