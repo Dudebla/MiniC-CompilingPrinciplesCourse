@@ -200,7 +200,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     t->child[0] = k;
 
                     match(LBRACKET);
-                    t->attr.val = atoi(tokenString);//length of list
+//                    t->attr.val = atoi(tokenString);;//length of list
                     match(NUM);
                     match(RBRACKET);
                     VarStruct v;// add v to VarStructMap
