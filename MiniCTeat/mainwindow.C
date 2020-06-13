@@ -283,6 +283,14 @@ void MainWindow::on_assemblyFile_triggered()
             //================ set the assemble instruction here=========
             // edit code here
             //
+            //生成汇编文件.cm
+            //初始化全局变量
+            initMap();
+            //生成语法树
+            syntaxTree = parse();
+            //解析语法树成为.cm文件
+            //代码产生并保存到名为“codefileName”的.cm文件中
+//            codeGen(syntaxTree, codefileName);
 
             textStream<<str;
             Last_fileContent = str;
