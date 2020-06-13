@@ -290,7 +290,7 @@ void MainWindow::on_assemblyFile_triggered()
             syntaxTree = parse();
             //解析语法树成为.cm文件
             //代码产生并保存到名为“codefileName”的.cm文件中
-//            codeGen(syntaxTree, codefileName);
+            //codeGen(syntaxTree, codefileName);
 
             textStream<<str;
             Last_fileContent = str;

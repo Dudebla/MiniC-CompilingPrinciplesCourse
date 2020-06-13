@@ -178,14 +178,14 @@ static void cGen(TreeNode * tree)
     if (tree != NULL)
     {
         switch (tree->nodekind) {
-        case StmtK:
-            genStmt(tree);
-            break;
-        case ExpK:
-            genExp(tree);
-            break;
-        default:
-            break;
+            case StmtK:
+                genStmt(tree);
+                break;
+            case ExpK:
+                genExp(tree);
+                break;
+            default:
+                break;
         }
         cGen(tree->sibling);
     }
@@ -205,7 +205,7 @@ void codeGen(TreeNode * syntaxTree, char * codefile)
     char * s = (char*)malloc(strlen(codefile) + 7);
     string temp = codefile;
     string str = "File: " + temp;
-    emitComment("TINY Compilation to TM Code");
+    emitComment("MiniC Compilation to CM Code");
     emitComment((char*)str.c_str());
     /* generate standard prelude */
     emitComment("Standard prelude:");
