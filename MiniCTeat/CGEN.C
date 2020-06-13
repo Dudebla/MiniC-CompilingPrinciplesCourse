@@ -30,68 +30,103 @@ static void genStmt(TreeNode * tree)
     int loc;
     switch (tree->kind.stmt) {
 
-    case IfK:
-        if (TraceCode) emitComment("-> if");
-        p1 = tree->child[0];
-        p2 = tree->child[1];
-        p3 = tree->child[2];
-        /* generate code for test expression */
-        cGen(p1);
-        savedLoc1 = emitSkip(1);
-        emitComment("if: jump to else belongs here");
-        /* recurse on then part */
-        cGen(p2);
-        savedLoc2 = emitSkip(1);
-        emitComment("if: jump to end belongs here");
-        currentLoc = emitSkip(0);
-        emitBackup(savedLoc1);
-        emitRM_Abs("JEQ", ac, currentLoc, "if: jmp to else");
-        emitRestore();
-        /* recurse on else part */
-        cGen(p3);
-        currentLoc = emitSkip(0);
-        emitBackup(savedLoc2);
-        emitRM_Abs("LDA", pc, currentLoc, "jmp to end");
-        emitRestore();
-        if (TraceCode)  emitComment("<- if");
-        break; /* if_k */
-    case AssignK:
-        if (TraceCode) emitComment("-> assign");
-        /* generate code for rhs */
-        cGen(tree->child[0]);
-        /* now store value */
-        loc = st_lookup(tree->attr.name);
-        emitRM("ST", ac, loc, gp, "assign: store value");
-        if (TraceCode)  emitComment("<- assign");
-        break; /* assign_k */
-    case ReadK:
-        emitRO("IN", ac, 0, 0, "read integer value");
-        loc = st_lookup(tree->attr.name);
-        emitRM("ST", ac, loc, gp, "read: store value");
-        break;
-    case WriteK:
-        /* generate code for expression to write */
-        cGen(tree->child[0]);
-        /* now output it */
-        emitRO("OUT", ac, 0, 0, "write ac");
-        break;
-    case WhileK:
-        if (TraceCode) emitComment("-> while");
-        p1 = tree->child[0];
-        p2 = tree->child[1];
-        savedLoc1 = emitSkip(1);
-        emitComment("while: jump after body comes back here");
-        /* generate code for test */
-        cGen(p1);
-        /* generate code for body */
-        cGen(p2);
-        emitRM_Abs("JEQ", ac, savedLoc1, "while: jmp back to body");
-        if (TraceCode)  emitComment("<- while");
-        break; /* while */
-    case VarDclK:
+        case IfK:
+            if (TraceCode) emitComment("-> if");
+            p1 = tree->child[0];
+            p2 = tree->child[1];
+            p3 = tree->child[2];
+            /* generate code for test expression */
+            cGen(p1);
+            savedLoc1 = emitSkip(1);
+            emitComment("if: jump to else belongs here");
+            /* recurse on then part */
+            cGen(p2);
+            savedLoc2 = emitSkip(1);
+            emitComment("if: jump to end belongs here");
+            currentLoc = emitSkip(0);
+            emitBackup(savedLoc1);
+            emitRM_Abs("JEQ", ac, currentLoc, "if: jmp to else");
+            emitRestore();
+            /* recurse on else part */
+            cGen(p3);
+            currentLoc = emitSkip(0);
+            emitBackup(savedLoc2);
+            emitRM_Abs("LDA", pc, currentLoc, "jmp to end");
+            emitRestore();
+            if (TraceCode)  emitComment("<- if");
+            break; /* if_k */
 
-    default:
-        break;
+        //待修改
+        case AssignK:
+            if (TraceCode) emitComment("-> assign");
+            /* generate code for rhs */
+            cGen(tree->child[0]);
+            /* now store value */
+            loc = st_lookup(tree->attr.name);
+            emitRM("ST", ac, loc, gp, "assign: store value");
+            if (TraceCode)  emitComment("<- assign");
+            break; /* assign_k */
+        case ReadK:
+            emitRO("IN", ac, 0, 0, "read integer value");
+            loc = st_lookup(tree->attr.name);
+            emitRM("ST", ac, loc, gp, "read: store value");
+            break;
+        case WriteK:
+            /* generate code for expression to write */
+            cGen(tree->child[0]);
+            /* now output it */
+            emitRO("OUT", ac, 0, 0, "write ac");
+            break;
+        case WhileK:
+            if (TraceCode) emitComment("-> while");
+            p1 = tree->child[0];
+            p2 = tree->child[1];
+            savedLoc1 = emitSkip(1);
+            emitComment("while: jump after body comes back here");
+            /* generate code for test */
+            cGen(p1);
+            /* generate code for body */
+            cGen(p2);
+            emitRM_Abs("JEQ", ac, savedLoc1, "while: jmp back to body");
+            if (TraceCode)  emitComment("<- while");
+            break; /* while */
+        case VarDclK:
+            if (TraceCode) emitComment("-> varDcl");
+
+            if (TraceCode)  emitComment("<- varDcl");
+            break;
+        case FunDclK:
+            if (TraceCode) emitComment("-> funDcl");
+
+            if (TraceCode)  emitComment("<- funDcl");
+            break;
+        case CompndK:
+            if (TraceCode) emitComment("-> Compnd");
+
+            if (TraceCode)  emitComment("<- Compnd");
+            break;
+        case ReturnK:
+            if (TraceCode) emitComment("-> return");
+
+            if (TraceCode)  emitComment("<- return");
+            break;
+        case CallK:
+            if (TraceCode) emitComment("-> call");
+
+            if (TraceCode)  emitComment("<- call");
+            break;
+        case ParamK:
+            if (TraceCode) emitComment("-> param");
+
+            if (TraceCode)  emitComment("<- param");
+            break;
+        case ArgsK:
+            if (TraceCode) emitComment("-> args");
+
+            if (TraceCode)  emitComment("<- args");
+            break;
+        default:
+            break;
     }
 } /* genStmt */
 

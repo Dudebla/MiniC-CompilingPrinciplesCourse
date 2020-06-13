@@ -42,6 +42,8 @@ int lineno = 0;
 FILE * listing;
 FILE * code;
 int EOF_flag = false;
+int TraceCode = TRUE;
+
 
 string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
 string errorMessage = "";
