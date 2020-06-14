@@ -13,15 +13,23 @@
 #include<string>
 using namespace std;
 
+#define ofpFO 0
+#define retFO -1
+#define initFO -2
+
 /* tmpOffset is the memory offset for temps
    It is decremented each time a temp is
    stored, and incremeted when loaded again
 */
 static int tmpOffset = 0;
+//全局变量的偏移量
+static int globalOffset = 0;
+static int localOffset = initFO;
 
-#define ofpFO 0
-#define retFO -1
-#define initFO -2
+/*
+ * 判断当前是否在函数体内
+*/
+static int isInFunc = FALSE;
 
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
@@ -32,6 +40,7 @@ static void genStmt(TreeNode * tree)
     TreeNode * p1, *p2, *p3;
     int savedLoc1, savedLoc2, currentLoc;
     int loc;
+    int size;  //偏移量
     switch (tree->kind.stmt) {
 
         case IfK:
@@ -111,8 +120,18 @@ static void genStmt(TreeNode * tree)
 
             if (TraceCode)  emitComment("<- while");
             break; /* while */
-        case VarDclK:
+        case VarDclK:   //变量声明
             if (TraceCode) emitComment("-> varDcl");
+
+            if (tree->type == IntList || tree->type == VoidList)   //数组变量声明
+                  size = tree->child[0]->attr.val;      //数组大小
+                else
+                  size = 1;                             //变量大小
+
+                if (isInFunc == TRUE)             //在函数内
+                  tmpOffset -= size;
+                else                              //在函数外
+                  globalOffset -= size;
 
             if (TraceCode)  emitComment("<- varDcl");
             break;
@@ -245,9 +264,6 @@ static void genExp(TreeNode * tree)
             emitRM("LDC",ac,0,ac,"false case");
             emitRM("LDA",pc,1,pc,"unconditional jmp");
             emitRM("LDC",ac,1,ac,"true case");
-            break;
-        case ADDITIVE:
-
             break;
         default:
             emitComment("BUG: Unknown operator");
