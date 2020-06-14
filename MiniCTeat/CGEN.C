@@ -31,6 +31,9 @@ static int localOffset = initFO;
 */
 static int isInFunc = FALSE;
 
+/* 当前位置的形参个数 */
+static int numOfParams = 0;
+
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
 
@@ -202,6 +205,8 @@ static void genStmt(TreeNode * tree)
             break;
         case ParamK:
             if (TraceCode) emitComment("-> param");
+
+
 
             if (TraceCode)  emitComment("<- param");
             break;
