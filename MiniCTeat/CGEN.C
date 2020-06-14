@@ -40,7 +40,8 @@ static void genStmt(TreeNode * tree)
     TreeNode * p1, *p2, *p3;
     int savedLoc1, savedLoc2, currentLoc;
     int loc;
-    int size;  //偏移量
+    int size;           //偏移量
+    int numOfArgs;      //call调用时实参个数
     switch (tree->kind.stmt) {
 
         case IfK:
@@ -129,7 +130,7 @@ static void genStmt(TreeNode * tree)
                 size = 1;                             //变量大小
 
             if (isInFunc == TRUE)             //在函数内
-                tmpOffset -= size;
+                localOffset -= size;
             else                              //在函数外
                 globalOffset -= size;
 
@@ -147,8 +148,8 @@ static void genStmt(TreeNode * tree)
             break;
         case ReturnK:
             if (TraceCode) emitComment("-> return");
-            p1 = tree->child[0];
 
+            p1 = tree->child[0];
             cGen(p1);
             emitRM("LD",pc,retFO,mp,"return: to caller");
 
@@ -156,6 +157,46 @@ static void genStmt(TreeNode * tree)
             break;
         case CallK:
             if (TraceCode) emitComment("-> call");
+
+            numOfArgs = 0;
+            p1 = tree->child[0];        //函数名ID
+            p2 = tree->child[1];        //函数实参Args
+
+            while(p2 != NULL){
+                cGen(p2);
+
+                /* generate code to push argument value */
+                //存入参数变量
+                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+                    "call: push argument");
+
+                p2 = p2->sibling;
+            }
+
+            if (strcmp(p1->attr.name, "input") == 0) {
+                /* generate code for input() function */
+                emitRO("IN",ac,0,0,"read integer value");
+            }else if (strcmp(p1->attr.name, "output") == 0) {
+                /* generate code for output(arg) function */
+                /* generate code for value to write */
+                emitRM("LD", ac, localOffset + initFO, mp, "load arg to ac");
+                /* now output it */
+                emitRO("OUT",ac,0,0,"write ac");
+            } else {    //其他函数的调用，这里看不太懂
+                /* generate code to store current mp */
+                emitRM("ST", mp, localOffset + ofpFO, mp, "call: store current mp");
+                /* generate code to push new frame */
+                emitRM("LDA", mp, localOffset, mp, "call: push new frame");
+                /* generate code to save return in ac */
+                emitRM("LDA", ac, 1, pc, "call: save return in ac");
+
+                /* generate code to relative-jump to function entry */
+                loc = -(st_lookup(p1->attr.name));      //返回函数名所在的位置？
+                emitRM("LD", pc, loc, gp, "call: relative jump to function entry");
+
+                /* generate code to pop current frame */
+                emitRM("LD", mp, ofpFO, mp, "call: pop current frame");
+            }
 
             if (TraceCode)  emitComment("<- call");
             break;
