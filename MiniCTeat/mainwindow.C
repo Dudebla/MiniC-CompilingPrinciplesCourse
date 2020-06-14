@@ -291,45 +291,27 @@ void MainWindow::on_assemblyFile_triggered()
         return;
     }
 
-    bool sourceIsCompile = true;//======sourceIsCompile sate=====
-    //==================set the sourceIsCompile sate here========
-    // edit code here
-    //
+    string tempPath = (Last_fileName.split('.')[0]+".cm").toStdString();
+    code = fopen(tempPath.c_str(), "w");
 
-
-    if(!sourceIsCompile){
-        QMessageBox::warning(this, tr("Error"), tr("Failed creating assemble instruction!"), QMessageBox::Ok);
+    if(code == NULL){
+        QMessageBox::warning(this, tr("Error"), tr("Failed opening the file!"), QMessageBox::Ok);
+        return;
     }else{
-        QFileDialog fileDialog;
-        QString tempPath = Last_fileName.split('.')[0]+".cm";
-        QString str = fileDialog.getSaveFileName(this, tr("Open File"), tempPath, tr("MiniC File(*.cm)"));//get new file name
-        if(str == ""){
-            return;
-        }
-        QFile fileName(str);
-        if(!fileName.open(QIODevice::WriteOnly | QIODevice::Text)){
-            QMessageBox::warning(this, tr("Error"), tr("Failed opening the file!"), QMessageBox::Ok);
-            return;
-        }else{
-            QTextStream textStream(&fileName);
-            QString str = "=======assemble instruction here=============";
-            //================ set the assemble instruction here=========
-            // edit code here
-            //
-            //生成汇编文件.cm
-            //初始化全局变量
-            initMap();
-            //生成语法树
-            syntaxTree = parse();
-            //解析语法树成为.cm文件
-            //代码产生并保存到名为“codefileName”的.cm文件中
-            //codeGen(syntaxTree, codefileName);
+        //生成汇编文件.cm
+        //初始化全局变量
+        initMap();
+        //生成语法树
+        syntaxTree = parse();
+        //解析语法树成为.cm文件
+        //代码产生并保存到名为“codefileName”的.cm文件中
+        codeGen(syntaxTree, tempPath.c_str());
 
-            textStream<<str;
-            Last_fileContent = str;
-        }
+
+        //textStream<<str;
+        //Last_fileContent = str;
         QMessageBox::information(this, "Save File", "Success saving the assemble instruction!", QMessageBox::Ok);
-        fileName.close();
+        fclose(code);
     }
 }
 
