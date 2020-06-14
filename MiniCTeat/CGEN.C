@@ -68,8 +68,14 @@ static void genStmt(TreeNode * tree)
 
             cGen(tree->child[0]);
             /* now store value */
-            loc = st_lookup(tree->attr.name);
-            emitRM("ST", ac, loc, gp, "assign: store value");
+//            loc = st_lookup(tree->attr.name);
+//            emitRM("ST", ac, loc, gp, "assign: store value");
+            emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
+            /* gen code for ac = right operand */
+            cGen(p2);
+            /* now load left operand */
+            emitRM("LD", ac1, ++tmpOffset, mp, "assign: load left(value)");
+            emitRM("ST", ac, 0, ac1, "assign: store value");
 
             if (TraceCode)  emitComment("<- assign");
             break; /* assign_k */
@@ -285,7 +291,7 @@ static void cGen(TreeNode * tree)
 * of the code file, and is used to print the
 * file name as a comment in the code file
 */
-void codeGen(TreeNode * syntaxTree, char * codefile)
+void codeGen(TreeNode * syntaxTree, const char * codefile)
 {
     char * s = (char*)malloc(strlen(codefile) + 7);
     string temp = codefile;
