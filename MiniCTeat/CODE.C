@@ -84,6 +84,7 @@ void emitBackup(int loc)
   * code position to the highest previously
   * unemitted position
   */
+//将当前代码位置设置到先前读取的最高位置
 void emitRestore(void)
 {
     emitLoc = highEmitLoc;
@@ -97,6 +98,7 @@ void emitRestore(void)
 * a = the absolute location in memory
 * c = a comment to be printed if TraceCode is TRUE
 */
+//将绝对引用转换为pc相对引用
 void emitRM_Abs(char *op, int r, int a, char * c)
 {
     fprintf(code, "%3d:  %5s  %d,%d(%d) ",

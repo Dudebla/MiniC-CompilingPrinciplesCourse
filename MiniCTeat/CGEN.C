@@ -19,6 +19,10 @@ using namespace std;
 */
 static int tmpOffset = 0;
 
+#define ofpFO 0
+#define retFO -1
+#define initFO -2
+
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
 
@@ -55,15 +59,18 @@ static void genStmt(TreeNode * tree)
             emitRestore();
             if (TraceCode)  emitComment("<- if");
             break; /* if_k */
-
         //待修改
         case AssignK:
             if (TraceCode) emitComment("-> assign");
-            /* generate code for rhs */
+
+            p1 = tree->child[0];
+            p2 = tree->child[1];
+
             cGen(tree->child[0]);
             /* now store value */
             loc = st_lookup(tree->attr.name);
             emitRM("ST", ac, loc, gp, "assign: store value");
+
             if (TraceCode)  emitComment("<- assign");
             break; /* assign_k */
         case ReadK:
@@ -81,13 +88,21 @@ static void genStmt(TreeNode * tree)
             if (TraceCode) emitComment("-> while");
             p1 = tree->child[0];
             p2 = tree->child[1];
-            savedLoc1 = emitSkip(1);
+            savedLoc1 = emitSkip(0);
             emitComment("while: jump after body comes back here");
             /* generate code for test */
             cGen(p1);
             /* generate code for body */
+            savedLoc2 = emitSkip(1);
+            emitComment("while: jump to end belongs here");
             cGen(p2);
-            emitRM_Abs("JEQ", ac, savedLoc1, "while: jmp back to body");
+            emitRM_Abs("LDA",pc,savedLoc1,"while: jmp back to test");
+
+            currentLoc = emitSkip(0);
+            emitBackup(savedLoc2);
+            emitRM_Abs("JEQ", ac, currentLoc, "while: jmp to end");
+            emitRestore();
+
             if (TraceCode)  emitComment("<- while");
             break; /* while */
         case VarDclK:
@@ -107,6 +122,10 @@ static void genStmt(TreeNode * tree)
             break;
         case ReturnK:
             if (TraceCode) emitComment("-> return");
+            p1 = tree->child[0];
+
+            cGen(p1);
+            emitRM("LD",pc,retFO,mp,"return: to caller");
 
             if (TraceCode)  emitComment("<- return");
             break;
@@ -186,12 +205,43 @@ static void genExp(TreeNode * tree)
             emitRM("LDA", pc, 1, pc, "unconditional jmp");
             emitRM("LDC", ac, 1, ac, "true case");
             break;
+        case LTEQ:
+            emitRO("SUB",ac,ac1,ac,"op <=");
+            emitRM("JLE",ac,2,pc,"br if true");
+            emitRM("LDC",ac,0,ac,"false case");
+            emitRM("LDA",pc,1,pc,"unconditional jmp");
+            emitRM("LDC",ac,1,ac,"true case");
+            break;
+        case GT:
+            emitRO("SUB",ac,ac1,ac,"op >");
+            emitRM("JGT",ac,2,pc,"br if true");
+            emitRM("LDC",ac,0,ac,"false case");
+            emitRM("LDA",pc,1,pc,"unconditional jmp");
+            emitRM("LDC",ac,1,ac,"true case");
+            break;
+        case GTEQ:
+            emitRO("SUB",ac,ac1,ac,"op >=");
+            emitRM("JGE",ac,2,pc,"br if true");
+            emitRM("LDC",ac,0,ac,"false case");
+            emitRM("LDA",pc,1,pc,"unconditional jmp");
+            emitRM("LDC",ac,1,ac,"true case");
+            break;
         case EQ:
             emitRO("SUB", ac, ac1, ac, "op ==");
             emitRM("JEQ", ac, 2, pc, "br if true");
             emitRM("LDC", ac, 0, ac, "false case");
             emitRM("LDA", pc, 1, pc, "unconditional jmp");
             emitRM("LDC", ac, 1, ac, "true case");
+            break;
+        case NEQ:
+            emitRO("SUB",ac,ac1,ac,"op !=");
+            emitRM("JNE",ac,2,pc,"br if true");
+            emitRM("LDC",ac,0,ac,"false case");
+            emitRM("LDA",pc,1,pc,"unconditional jmp");
+            emitRM("LDC",ac,1,ac,"true case");
+            break;
+        case ADDITIVE:
+
             break;
         default:
             emitComment("BUG: Unknown operator");
