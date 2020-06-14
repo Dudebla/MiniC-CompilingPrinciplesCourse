@@ -30,6 +30,7 @@ static int localOffset = initFO;
  * 判断当前是否在函数体内
 */
 static int isInFunc = FALSE;
+static int isInParam = FALSE;
 
 /* 当前位置的形参个数 */
 static int numOfParams = 0;
@@ -140,10 +141,48 @@ static void genStmt(TreeNode * tree)
             if (TraceCode)  emitComment("<- varDcl");
             break;
         case FunDclK:
-            if (TraceCode) emitComment("-> funDcl");
+            if (TraceCode){
+                char buffer[100];
+                sprintf(buffer, "-> funDcl (%s)", tree->attr.name);
+                emitComment(buffer);
+            }
 
-            if (TraceCode)  emitComment("<- funDcl");
-            break;
+            p1 = tree->child[0];//params
+            isInFunc = TRUE;
+
+            // store func location
+            loc = -(st_lookup(tree->attr.name));
+            savedLoc1 = emitSkip(1);
+            emitRM("ST", ac1, loc, gp, "func: store the location of func. entry");
+            // decrease global offset by 1
+            --globalOffset;
+
+            // next skip of the last skip of fundecl
+            savedLoc2 = emitSkip(1);
+            emitComment("func: uncondition jump to next declaration belongs here");
+
+            currentLoc = emitSkip(0);//first of func's body
+            emitComment("func: function body starts here");
+
+            emitBackup(savedLoc1);
+            emitRM("LDC", ac1, currentLoc, 0, "func: load function location");
+            emitRestore();
+
+            // store return address
+            emitRM("ST", ac, retFO, mp, "func: store return address");
+
+            localOffset = initFO;
+            numOfParams = 0;
+            isInParam = TRUE;
+            cGen(p1);
+            isInParam = FALSE;
+
+
+            if (TraceCode){
+                char buffer[100];
+                sprintf(buffer, "<- funDcl (%s)", tree->attr.name);
+                emitComment(buffer);
+            }
         case CompndK:
             if (TraceCode) emitComment("-> Compnd");
 
