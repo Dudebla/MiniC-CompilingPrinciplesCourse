@@ -41,6 +41,8 @@ static int numOfParams = 0;
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
 
+static void genExp(TreeNode * tree);
+
 /*returns the offset for temp variables in the block where list is */
 static int getBlockOffset(TreeNode * list){
     int offset = 0;
@@ -59,8 +61,8 @@ static int getBlockOffset(TreeNode * list){
             default:
                 break;
             }
+            node = node->sibling;
         }
-        node = node->sibling;
     }
     return offset;
 }
@@ -100,26 +102,6 @@ static void genStmt(TreeNode * tree)
             emitRestore();
             if (TraceCode)  emitComment("<- if");
             break; /* if_k */
-        //待修改
-        case AssignK:
-            if (TraceCode) emitComment("-> assign");
-
-            p1 = tree->child[0];
-            p2 = tree->child[1];
-
-            cGen(tree->child[0]);
-            /* now store value */
-//            loc = st_lookup(tree->attr.name);
-//            emitRM("ST", ac, loc, gp, "assign: store value");
-            emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
-            /* gen code for ac = right operand */
-            cGen(p2);
-            /* now load left operand */
-            emitRM("LD", ac1, ++tmpOffset, mp, "assign: load left(value)");
-            emitRM("ST", ac, 0, ac1, "assign: store value");
-
-            if (TraceCode)  emitComment("<- assign");
-            break; /* assign_k */
         case ReadK:
             emitRO("IN", ac, 0, 0, "read integer value");
             loc = st_lookup(tree->attr.name);
@@ -153,19 +135,27 @@ static void genStmt(TreeNode * tree)
             if (TraceCode)  emitComment("<- while");
             break; /* while */
         case VarDclK:   //变量声明
-            if (TraceCode) emitComment("-> varDcl");
+        if(isInParam){      //在函数声明的形参声明中
+            if (TraceCode) emitComment("-> param");
+                emitComment(tree->attr.name);
 
-            if (tree->type == IntList || tree->type == VoidList)   //数组变量声明
-                size = tree->child[0]->attr.val;      //数组大小
-            else
-                size = 1;                             //变量大小
+            --localOffset;
+            ++numOfParams;
 
-            if (isInFunc == TRUE)             //在函数内
-                localOffset -= size;
-            else                              //在函数外
-                globalOffset -= size;
+                if (TraceCode) emitComment("<- param");
+            }else{
+                if (TraceCode) emitComment("-> varDcl");
+                if (tree->type == IntList || tree->type == VoidList)   //数组变量声明
+                    size = tree->child[0]->attr.val;      //数组大小
+                else
+                    size = 1;                             //变量大小
+                if (isInFunc == TRUE)             //在函数内
+                    localOffset -= size;
+                else                              //在函数外
+                    globalOffset -= size;
 
-            if (TraceCode)  emitComment("<- varDcl");
+                if (TraceCode)  emitComment("<- varDcl");
+            }
             break;
         case FunDclK:
             if (TraceCode){
@@ -226,6 +216,7 @@ static void genStmt(TreeNode * tree)
                 sprintf(buffer, "<- funDcl (%s)", tree->attr.name);
                 emitComment(buffer);
             }
+            break;
         case CompndK:
             if (TraceCode) emitComment("-> Compnd");
 
@@ -251,51 +242,6 @@ static void genStmt(TreeNode * tree)
 
             if (TraceCode)  emitComment("<- return");
             break;
-        case CallK:
-            if (TraceCode) emitComment("-> call");
-
-            numOfArgs = 0;
-            p1 = tree->child[0];        //函数名ID
-            p2 = tree->child[1];        //函数实参Args
-
-            while(p2 != NULL){
-                cGen(p2);
-
-                /* generate code to push argument value */
-                //存入参数变量
-                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
-                    "call: push argument");
-
-                p2 = p2->sibling;
-            }
-
-            if (strcmp(p1->attr.name, "input") == 0) {
-                /* generate code for input() function */
-                emitRO("IN",ac,0,0,"read integer value");
-            }else if (strcmp(p1->attr.name, "output") == 0) {
-                /* generate code for output(arg) function */
-                /* generate code for value to write */
-                emitRM("LD", ac, localOffset + initFO, mp, "load arg to ac");
-                /* now output it */
-                emitRO("OUT",ac,0,0,"write ac");
-            } else {    //其他函数的调用，这里看不太懂
-                /* generate code to store current mp */
-                emitRM("ST", mp, localOffset + ofpFO, mp, "call: store current mp");
-                /* generate code to push new frame */
-                emitRM("LDA", mp, localOffset, mp, "call: push new frame");
-                /* generate code to save return in ac */
-                emitRM("LDA", ac, 1, pc, "call: save return in ac");
-
-                /* generate code to relative-jump to function entry */
-                loc = -(st_lookup(p1->attr.name));      //返回函数名所在的位置？
-                emitRM("LD", pc, loc, gp, "call: relative jump to function entry");
-
-                /* generate code to pop current frame */
-                emitRM("LD", mp, ofpFO, mp, "call: pop current frame");
-            }
-
-            if (TraceCode)  emitComment("<- call");
-            break;
         case ParamK:
             if (TraceCode) emitComment("-> param");
 
@@ -305,6 +251,18 @@ static void genStmt(TreeNode * tree)
             break;
         case ArgsK:
             if (TraceCode) emitComment("-> args");
+
+            numOfArgs = 0;
+            p1 = tree->child[0];
+            while (p1 != NULL) {
+                genExp(p1);
+
+                /* generate code to push argument value */
+                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+                    "call: push argument");
+
+                p1 = p1->sibling;
+            }
 
             if (TraceCode)  emitComment("<- args");
             break;
@@ -319,7 +277,61 @@ static void genExp(TreeNode * tree)
     int loc;
     TreeNode * p1, *p2;
     switch (tree->kind.exp) {
+    //待修改
+    case AssignK:
+        if (TraceCode) emitComment("-> assign");
 
+        p1 = tree->child[0];
+        p2 = tree->child[1];
+
+        cGen(tree->child[0]);
+        /* now store value */
+//            loc = st_lookup(tree->attr.name);
+//            emitRM("ST", ac, loc, gp, "assign: store value");
+        emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
+        /* gen code for ac = right operand */
+        cGen(p2);
+        /* now load left operand */
+        emitRM("LD", ac1, ++tmpOffset, mp, "assign: load left(value)");
+        emitRM("ST", ac, 0, ac1, "assign: store value");
+
+        if (TraceCode)  emitComment("<- assign");
+        break; /* assign_k */
+    case CallK:
+        if (TraceCode) emitComment("-> call");
+
+        p1 = tree->child[0];        //函数名ID
+        p2 = tree->child[1];        //函数实参Args
+
+        cGen(p2);
+
+        if (strcmp(p1->attr.name, "input") == 0) {
+            /* generate code for input() function */
+            emitRO("IN",ac,0,0,"read integer value");
+        }else if (strcmp(p1->attr.name, "output") == 0) {
+            /* generate code for output(arg) function */
+            /* generate code for value to write */
+            emitRM("LD", ac, localOffset + initFO, mp, "load arg to ac");
+            /* now output it */
+            emitRO("OUT",ac,0,0,"write ac");
+        } else {    //其他函数的调用，这里看不太懂
+            /* generate code to store current mp */
+            emitRM("ST", mp, localOffset + ofpFO, mp, "call: store current mp");
+            /* generate code to push new frame */
+            emitRM("LDA", mp, localOffset, mp, "call: push new frame");
+            /* generate code to save return in ac */
+            emitRM("LDA", ac, 1, pc, "call: save return in ac");
+
+            /* generate code to relative-jump to function entry */
+            loc = -(st_lookup(p1->attr.name));      //返回函数名所在的位置？
+            emitRM("LD", pc, loc, gp, "call: relative jump to function entry");
+
+            /* generate code to pop current frame */
+            emitRM("LD", mp, ofpFO, mp, "call: pop current frame");
+        }
+
+        if (TraceCode)  emitComment("<- call");
+        break;
     case ConstK:
         if (TraceCode) emitComment("-> Const");
         /* gen code to load integer constant using LDC */
