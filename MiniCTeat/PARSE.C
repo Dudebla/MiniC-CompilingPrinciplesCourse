@@ -166,6 +166,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     t->child[0] = params();
                     match(RPAREN);
                     manageMapState = beforeState;
+                    t->child[1] = compound_stmt();
                     break;
                 }
                 default:{
@@ -240,6 +241,7 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             t->child[0] = params();
             match(RPAREN);
             manageMapState = beforeState;
+            t->child[1] = compound_stmt();
             break;
         }
     }
@@ -253,11 +255,11 @@ TreeNode * compound_stmt(void){
     manageMapState = InCompound;
     if(t!=NULL) t->child[0] = local_declarations();
     if(t!=NULL){
-        if(t->child[0]!=NULL){
-            t->child[1] = statement_list();
-        }else{
-            t->child[0] = statement_list();
-        }
+//        if(t->child[0]!=NULL){
+        t->child[1] = statement_list();
+//        }else{
+//            t->child[0] = statement_list();
+//        }
     }
     match(RBRACE);   //'}'
     manageMapState = beforeState;
