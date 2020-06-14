@@ -76,9 +76,9 @@ extern TypeToken token;
 typedef enum { StmtK, ExpK } NodeKind;
 //typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK , WhileK, DowhileK, ForIncK, ForDecK, AdditiveK} StmtKind;
 /*miniC*/
-typedef enum { IfK, AssignK, ReadK, WriteK , WhileK, VarDclK, FunDclK, CompndK, ReturnK, CallK , ParamK , ArgsK} StmtKind;
+typedef enum { IfK, ReadK, WriteK , WhileK, VarDclK, FunDclK, CompndK, ReturnK , ParamK , ArgsK} StmtKind;
 
-typedef enum { OpK, ConstK, IdK } ExpKind;
+typedef enum { OpK, ConstK, IdK, AssignK, CallK } ExpKind;
 
 /* ExpType is used for type checking */
 typedef enum { Void, Integer, IntList, VoidList, Boolean } ExpType;

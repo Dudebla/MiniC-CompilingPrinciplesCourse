@@ -106,23 +106,28 @@ static void checkNode(TreeNode * t)
 { switch (t->nodekind)
   { case ExpK:
       switch (t->kind.exp)
-      { case OpK:
-          if ((t->child[0]->type != Integer) ||
-              (t->child[1]->type != Integer) ||
-              (t->child[0]->type != IntList) ||
-              (t->child[1]->type != IntList))
-            typeError(t,"Op applied to non-integer");
-          if ((t->attr.op == EQ) || (t->attr.op == LT) || (t->attr.op == LTEQ) || (t->attr.op == GT) || (t->attr.op == GTEQ) || (t->attr.op == NEQ))
-            t->type = Boolean;
-          else
-            t->type = t->child[0]->type;
-          break;
-        case ConstK:
-        case IdK:
-          t->type = Integer;
-          break;
-        default:
-          break;
+      {
+      case OpK:
+        if ((t->child[0]->type != Integer) ||
+          (t->child[1]->type != Integer) ||
+          (t->child[0]->type != IntList) ||
+          (t->child[1]->type != IntList))
+        typeError(t,"Op applied to non-integer");
+        if ((t->attr.op == EQ) || (t->attr.op == LT) || (t->attr.op == LTEQ) || (t->attr.op == GT) || (t->attr.op == GTEQ) || (t->attr.op == NEQ))
+        t->type = Boolean;
+        else
+        t->type = t->child[0]->type;
+        break;
+      case ConstK:
+      case IdK:
+        t->type = Integer;
+        break;
+      case AssignK:
+        if (t->child[0]->type != Integer || t->child[0]->type != IntList)
+          typeError(t->child[0],"assignment of non-integer value");
+        break;
+      default:
+        break;
       }
       break;
     case StmtK:
@@ -130,10 +135,6 @@ static void checkNode(TreeNode * t)
       { case IfK:
           if (t->child[0]->type == Integer || t->child[0]->type == IntList)
             typeError(t->child[0],"if test is not Boolean");
-          break;
-        case AssignK:
-          if (t->child[0]->type != Integer || t->child[0]->type != IntList)
-            typeError(t->child[0],"assignment of non-integer value");
           break;
         case WriteK:
           if (t->child[0]->type != Integer || t->child[0]->type != IntList)

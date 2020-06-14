@@ -273,16 +273,15 @@ char* printTree(TreeNode * tree)
            case IfK:
                result += "If\r\n";
                break;
-           case AssignK:
-               name = tree->child[0]->attr.name;
-               result += "Assign to: " + name + "\r\n";
-               break;
            case ReadK:
                name = tree->attr.name;
                result += "Read: " + name + "\r\n";
                break;
            case WriteK:
                result += "Write\r\n";
+               break;
+           case ArgsK:
+               result += "args: \r\n";
                break;
            case WhileK:
                result += "while\r\n";
@@ -305,13 +304,6 @@ char* printTree(TreeNode * tree)
            case ReturnK:
                result += "return\r\n";
                break;
-           case CallK:
-               name = tree->child[0]->attr.name;
-               result += "call function: " + name + "\r\n";
-               break;
-           case ArgsK:
-               result += "args: \r\n";
-               break;
            default:
                result += "Unknown ExpNode kind\r\n";
                break;
@@ -328,6 +320,14 @@ char* printTree(TreeNode * tree)
 
 
            switch (tree->kind.exp) {
+           case AssignK:
+               name = tree->child[0]->attr.name;
+               result += "Assign to: " + name + "\r\n";
+               break;
+           case CallK:
+               name = tree->child[0]->attr.name;
+               result += "call function: " + name + "\r\n";
+               break;
            case OpK:
                result += "Op: ";
                temp = printToken(tree->attr.op, "\0");

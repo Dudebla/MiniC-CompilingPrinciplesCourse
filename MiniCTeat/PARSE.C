@@ -445,7 +445,7 @@ TreeNode * expression(void){
                 if (t != NULL) t->attr.name = copyString(tokenString);
                 match(ID);
                 match(ASSIGN);
-                TreeNode * p = newStmtNode(AssignK);
+                TreeNode * p = newExpNode(AssignK);
                 if(p!=NULL){
                     p->attr.op = ASSIGN;
                     p->child[0] = t;
@@ -464,7 +464,7 @@ TreeNode * expression(void){
                 if(t!=NULL) t->child[0] = expression();
                 match(RBRACKET);
                 if(token==ASSIGN){//ID[expression]=expression
-                    TreeNode * p = newStmtNode(AssignK);
+                    TreeNode * p = newExpNode(AssignK);
                     p->type = IntList;
                     p->child[0] = t;
                     match(ASSIGN);
@@ -714,7 +714,7 @@ TreeNode * var_call(void){
 }
 
 TreeNode * call(void){
-    TreeNode * t = newStmtNode(CallK);
+    TreeNode * t = newExpNode(CallK);
     TreeNode * p = newExpNode(IdK);
     if(p != NULL && token == ID){
         p->attr.name = copyString(tokenString);
