@@ -5,7 +5,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
-#include<QTextCodec>
+#include <QTextCodec>
+#include <QTreeWidget>
 
 #include<string>
 /*
@@ -34,6 +35,7 @@ int Flag_parserResultStyle; //mask: parse result style is tree list if 1, tree g
 QString Last_fileName; // name of file have saved last time
 QString Last_fileContent; // content of file have saved last time
 QString lexicalResult;//
+QString parserResult;
 //保存生成的语法树
 TreeNode *syntaxTree;
 //保存打开的源文件
@@ -42,7 +44,7 @@ int lineno = 0;
 FILE * listing;
 FILE * code;
 int EOF_flag = false;
-int TraceCode = TRUE;
+//int TraceCode = TRUE;
 
 
 string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
@@ -116,6 +118,9 @@ void MainWindow::on_openFile_triggered()
                this->synerrorTextEdit->clear();
                this->lexicalTextEdit->clear();
                this->parserTextEdit->clear();
+
+               lexicalResult = "";
+               parserResult = "";
 
                QTextStream textStream(&file);       //读取文件，使用QTextStream
                while(!textStream.atEnd())
@@ -196,10 +201,22 @@ void MainWindow::on_clearFile_triggered()
     if(this->sourceTextEdit->toPlainText()!=""){
         this->sourceTextEdit->clear();
     }
+    if(this->lexicalTextEdit->toPlainText()!=""){
+        this->lexicalTextEdit->clear();
+    }
+    if(this->parserTextEdit->toPlainText()!=""){
+        this->parserTextEdit->clear();
+    }
+    if(this->synerrorTextEdit->toPlainText()!=""){
+        this->synerrorTextEdit->clear();
+    }
     Last_fileName = "";
     Last_fileContent = "";
     Flag_isNew = 1;
     Flag_isOpen = 0;
+    lexicalResult = "";
+    parserResult = "";
+    lexicalMessage = "";
 }
 
 /*
@@ -225,14 +242,19 @@ void MainWindow::on_lexicalFile_triggered()
          //若无语法错误，显示成功信息
          if(errorMessage == ""){
              errorMessage = Last_fileName.toStdString() + "  ==>  Success! 0 error(s)";
+             this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
+             lexicalResult = QString::fromStdString(lexicalMessage);
+         }else{
+             syntaxTree = NULL;
+             lexicalMessage = "";
          }
     }
     /*
      ** END
     */
-    this->lexicalTextEdit->setPlainText(QString::fromStdString(lexicalMessage));
+
     this->synerrorTextEdit->setPlainText(QString::fromStdString(errorMessage));
-    lexicalResult = QString::fromStdString(lexicalMessage);
+
 
 }
 
@@ -244,11 +266,15 @@ void MainWindow::on_parseFile_triggered()
     if(lexicalMessage==""){
         this->on_lexicalFile_triggered();
     }
+    if(lexicalMessage==""){
+        return;
+    }
     //打印语法树
-    QString result;//存储打印的语法树
-    result = printTree(syntaxTree);
+    //QString result;//存储打印的语法树
+    parserResult = printTree(syntaxTree);
     //显示输出语法树
-    this->parserTextEdit->setPlainText(result);
+    this->parserTextEdit->setPlainText(parserResult);
+
 }
 
 /*
@@ -258,6 +284,10 @@ void MainWindow::on_assemblyFile_triggered()
 {
     if(this->sourceTextEdit->toPlainText()==""){
         QMessageBox::warning(this, tr("Warn"), tr("The content should not empty!"), QMessageBox::Ok);
+        return;
+    }
+    if(parserResult==""){
+        QMessageBox::warning(this, tr("Warn"), tr("The source should be parsed before output .CM file!"), QMessageBox::Ok);
         return;
     }
 
@@ -271,7 +301,8 @@ void MainWindow::on_assemblyFile_triggered()
         QMessageBox::warning(this, tr("Error"), tr("Failed creating assemble instruction!"), QMessageBox::Ok);
     }else{
         QFileDialog fileDialog;
-        QString str = fileDialog.getSaveFileName(this, tr("Open File"), "..", tr("MiniC File(*.*)"));//get new file name
+        QString tempPath = Last_fileName.split('.')[0]+".cm";
+        QString str = fileDialog.getSaveFileName(this, tr("Open File"), tempPath, tr("MiniC File(*.cm)"));//get new file name
         if(str == ""){
             return;
         }
