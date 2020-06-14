@@ -124,14 +124,14 @@ static void genStmt(TreeNode * tree)
             if (TraceCode) emitComment("-> varDcl");
 
             if (tree->type == IntList || tree->type == VoidList)   //数组变量声明
-                  size = tree->child[0]->attr.val;      //数组大小
-                else
-                  size = 1;                             //变量大小
+                size = tree->child[0]->attr.val;      //数组大小
+            else
+                size = 1;                             //变量大小
 
-                if (isInFunc == TRUE)             //在函数内
-                  tmpOffset -= size;
-                else                              //在函数外
-                  globalOffset -= size;
+            if (isInFunc == TRUE)             //在函数内
+                tmpOffset -= size;
+            else                              //在函数外
+                globalOffset -= size;
 
             if (TraceCode)  emitComment("<- varDcl");
             break;
