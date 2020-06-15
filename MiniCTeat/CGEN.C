@@ -340,7 +340,12 @@ static void genExp(TreeNode * tree)
         break; /* ConstK */
 
     case IdK:
-        if (TraceCode) emitComment("-> Id");
+        if (TraceCode){
+            char buffer[100];
+//            emitComment("-> Id");
+            sprintf(buffer, "-> Id (%s)", tree->attr.name);
+            emitComment(buffer);
+        }
         loc = st_lookup(tree->attr.name);
         emitRM("LD", ac, loc, gp, "load id value");
         if (TraceCode)  emitComment("<- Id");
