@@ -123,6 +123,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
+                    v.size = 1;
+                    v.varType = COMN_VAR;
                     addToVarMap(v);
 
                     match(SEMI);
@@ -147,6 +149,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
+                    v.size = q->attr.val;
+                    v.varType = COMN_VAR;
                     addToVarMap(v);
 
                     match(SEMI);
@@ -193,6 +197,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
+                    v.size = 1;
+                    v.varType = COMN_VAR;
                     addToVarMap(v);
                     match(SEMI);
                     break;}
@@ -214,6 +220,8 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
+                    v.size = q->attr.val;
+                    v.varType = COMN_VAR;
                     addToVarMap(v);
                     match(SEMI);
                     break;}
@@ -335,6 +343,8 @@ TreeNode * param(void){
     VarStruct v;// add to funtion's params
     v.name = t->attr.name;
     v.type = t->type;
+    v.size = 1;
+    v.varType = PARAM_VAR;
     addToVarMap(v);
 
     return t;
@@ -796,7 +806,17 @@ void addToVarMap(VarStruct v){
             FunStruct lastFun = FunStructMap[lastDeclaredFunName];
             std::map<std::string, VarStruct> vMap = lastFun.params;
             if(vMap.count(v.name) == 0){
+                v.scope = int(vMap.size())-1;
+                if(vMap.find(lastDeclaredFunName)!=vMap.end()){
+                    VarStruct lastV = vMap[lastDeclaredFunName];
+                    if(lastV.varType==COMN_VAR){
+                        v.memloc = lastV.size + lastV.memloc;
+                    }else{
+                        v.memloc = lastV.scope + 1;
+                    }
+                }
                 FunStructMap[lastDeclaredFunName].params[v.name] = v;
+                lastDeclaredVarName = v.name;
             }else{
                 errorMessage += syntaxError("Duplicated declaration -> ");
                 errorMessage += printToken(ID, v.name.c_str());
@@ -808,7 +828,15 @@ void addToVarMap(VarStruct v){
     }
     case GlobalVarDcl:{
         if(VarStructMap.count(v.name) == 0){
+            v.scope = -1;
+            if(VarStructMap.find(lastDeclaredFunName)!=VarStructMap.end()){
+                VarStruct lastV = VarStructMap[lastDeclaredFunName];
+                v.memloc = lastV.size + lastV.memloc;
+            }else{
+                v.memloc = 0;
+            }
             VarStructMap[v.name] = v;
+            lastDeclaredVarName = v.name;
         }else{
             errorMessage += syntaxError("Duplicated declaration -> ");
             errorMessage += printToken(ID, v.name.c_str());

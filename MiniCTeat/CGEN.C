@@ -10,6 +10,7 @@
 #include "SYMTAB.H"
 #include "CODE.H"
 #include "CGEN.H"
+#include <vector>
 #include<string>
 using namespace std;
 
@@ -37,6 +38,8 @@ static int mainFuncLoc = 0;
 
 /* 当前位置的形参个数 */
 static int numOfParams = 0;
+
+static vector<FunStruct> funScope;
 
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);

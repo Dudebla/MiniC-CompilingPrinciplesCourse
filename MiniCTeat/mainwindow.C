@@ -52,6 +52,8 @@ string errorMessage = "";
 
 ManageMapState manageMapState;
 std::string lastDeclaredFunName;
+std::string lastDeclaredVarName;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -256,6 +258,12 @@ void MainWindow::on_lexicalFile_triggered()
     this->synerrorTextEdit->setPlainText(QString::fromStdString(errorMessage));
 
 
+}
+
+void * show(TreeNode * root, QTreeWidgetItem * twi){
+    while (root!=NULL) {
+
+    }
 }
 
 /*

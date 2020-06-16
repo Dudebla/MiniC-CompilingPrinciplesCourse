@@ -100,6 +100,8 @@ typedef struct treeNode
     ExpType type; /* for type checking of exps */
 } TreeNode;
 
+/*  var type in function, declare in param or in comp*/
+typedef enum { PARAM_VAR, COMN_VAR } Func_var;
 
 /*
 * miniC存储变量结构体
@@ -109,6 +111,9 @@ typedef struct varStruct
     ExpType type; //变量类型
     std::string name;      //变量名
     int memloc;          //在内存中的相对位置
+    int size; //length, default 1
+    int scope; //scope index, default -1
+    Func_var varType;
 } VarStruct;
 
 /*
@@ -140,6 +145,7 @@ typedef enum{
 
 extern ManageMapState manageMapState;
 extern std::string lastDeclaredFunName;
+extern std::string lastDeclaredVarName;
 
 
 /**************************************************/
