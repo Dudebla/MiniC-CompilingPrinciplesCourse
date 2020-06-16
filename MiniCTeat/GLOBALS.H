@@ -102,12 +102,13 @@ typedef struct treeNode
 
 
 /*
-* miniC存储全局变量结构体
+* miniC存储变量结构体
 */
 typedef struct varStruct
 {
     ExpType type; //变量类型
     std::string name;      //变量名
+    int memloc;          //在内存中的相对位置
 } VarStruct;
 
 /*
@@ -124,12 +125,6 @@ typedef struct funStruct
 /*
 * miniC存储全局变量及函数的vector容器
 */
-
-/*
-* miniC修改部分，添加map容器装载定义的全局变量和函数
-*/
-//extern std::vector<VarStruct> VarVector;
-//extern std::vector<FunStruct> FunVector;
 
 extern std::map<std::string, VarStruct> VarStructMap;
 extern std::map<std::string, FunStruct> FunStructMap;

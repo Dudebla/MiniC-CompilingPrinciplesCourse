@@ -286,8 +286,6 @@ static void genExp(TreeNode * tree)
 
         cGen(tree->child[0]);
         /* now store value */
-//            loc = st_lookup(tree->attr.name);
-//            emitRM("ST", ac, loc, gp, "assign: store value");
         emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
         /* gen code for ac = right operand */
         cGen(p2);
@@ -342,11 +340,11 @@ static void genExp(TreeNode * tree)
     case IdK:
         if (TraceCode){
             char buffer[100];
-//            emitComment("-> Id");
             sprintf(buffer, "-> Id (%s)", tree->attr.name);
             emitComment(buffer);
         }
         loc = st_lookup(tree->attr.name);
+        //从内存地址加载到寄存器ac
         emitRM("LD", ac, loc, gp, "load id value");
         if (TraceCode)  emitComment("<- Id");
         break; /* IdK */
