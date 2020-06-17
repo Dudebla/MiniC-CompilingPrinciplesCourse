@@ -620,7 +620,7 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     emitComment("End of standard prelude.");
     insertIOFunc();
     /* push global scope */
-    sc_push(globalScope);
+    sc_push(globalScoe);
     /* generate code for TINY program */
     cGen(syntaxTree);
     /* pop global scope */
