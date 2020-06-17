@@ -13,12 +13,21 @@
 #include <string.h>
 #include "SYMTAB.H"
 
-/* SIZE is the size of the hash table */
-#define SIZE 211
-
 /* SHIFT is the power of two used as multiplier
 in hash function  */
 #define SHIFT 4
+
+#define MAX_SCOPE 1000
+
+/* the hash table */
+static BucketList hashTable[SIZE];
+
+static Scope scopes[MAX_SCOPE];
+static int nScope = 0;
+static Scope scopeStack[MAX_SCOPE];
+static int nScopeStack = 0;
+static int location[MAX_SCOPE];
+
 
 /* the hash function */
 static int Hash(char * key)
@@ -32,32 +41,6 @@ static int Hash(char * key)
     }
     return temp;
 }
-
-/* the list of line numbers of the source
-* code in which a variable is referenced
-*/
-typedef struct LineListRec
-{
-    int lineno;
-    struct LineListRec * next;
-} *LineList;
-
-/* The record in the bucket lists for
-* each variable, including name,
-* assigned memory location, and
-* the list of line numbers in which
-* it appears in the source code
-*/
-typedef struct BucketListRec
-{
-    char * name;
-    LineList lines;
-    int memloc; /* memory location for variable */
-    struct BucketListRec * next;
-} *BucketList;
-
-/* the hash table */
-static BucketList hashTable[SIZE];
 
 /* Procedure st_insert inserts line numbers and
 * memory locations into the symbol table
@@ -103,6 +86,60 @@ int st_lookup(char * name)
     if (l == NULL) return -1;
     else return l->memloc;
 }
+
+
+//MiniC添加部分
+
+Scope sc_top( void )
+{
+    return scopeStack[nScopeStack - 1];
+}
+
+void sc_pop( void )
+{
+    --nScopeStack;
+}
+
+int addLocation( void )
+{
+    return location[nScopeStack - 1]++;
+}
+
+void sc_push( Scope scope )
+{
+    scopeStack[nScopeStack] = scope;
+    location[nScopeStack++] = 0;
+}
+
+Scope sc_create(char *funcName)
+{
+    Scope newScope;
+
+    newScope = (Scope) malloc(sizeof(struct ScopeRec));
+    newScope->funcName = funcName;
+    newScope->nestedLevel = nScopeStack;
+    newScope->parent = sc_top();
+
+    scopes[nScope++] = newScope;
+
+    return newScope;
+}
+
+BucketList st_bucket( char * name )
+{
+    int h = Hash(name);
+    Scope sc = sc_top();
+    while(sc) {
+    BucketList l = sc->hashTable[h];
+    while ((l != NULL) && (strcmp(name,l->name) != 0))
+      l = l->next;
+    if (l != NULL) return l;
+    sc = sc->parent;
+    }
+    return NULL;
+}
+
+
 
 /* Procedure printSymTab prints a formatted
 * listing of the symbol table contents

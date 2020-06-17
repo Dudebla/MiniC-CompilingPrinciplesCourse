@@ -26,18 +26,6 @@
 /* MAXRESERVED = the number of reserved words */
 #define MAXRESERVED 6
 
-//typedef enum
-// /* book-keeping tokens */
-//{
-//    ENDFILE, ERRO,
-//    /* reserved words */
-//    IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE, WHILE,DO, ENDWHILE,FOR,TO, DOWNTO, ENDDO,
-//    /* multicharacter tokens */
-//    ID, NUM,
-//    /* special symbols */
-//    ASSIGN, EQ, LT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI,ADDITIVE,POWER
-//} TypeToken;
-
 /*
  * miniC修改部分
  */
@@ -69,12 +57,11 @@ extern std::string errorMessage;
 
 extern TypeToken token;
 
-                   /**************************************************/
-                   /***********   Syntax tree for parsing ************/
-                   /**************************************************/
+/**************************************************/
+/***********   Syntax tree for parsing ************/
+/**************************************************/
 
 typedef enum { StmtK, ExpK } NodeKind;
-//typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK , WhileK, DowhileK, ForIncK, ForDecK, AdditiveK} StmtKind;
 /*miniC*/
 typedef enum { IfK, ReadK, WriteK , WhileK, VarDclK, FunDclK, CompndK, ReturnK , ParamK , ArgsK} StmtKind;
 
@@ -85,6 +72,15 @@ typedef enum { Void, Integer, IntList, VoidList, Boolean } ExpType;
 
 #define MAXCHILDREN 3
 
+struct ScopeRec;
+
+/* ArrayAttr is used for attributes for array variables */
+typedef struct arrayAttr {
+    TypeToken type;
+    char * name;
+    int size;
+} ArrayAttr;
+
 typedef struct treeNode
 {
     struct treeNode * child[MAXCHILDREN];
@@ -94,8 +90,11 @@ typedef struct treeNode
     union { StmtKind stmt; ExpKind exp; } kind;
     union {
         TypeToken op;
+        TypeToken type;
         int val;
         char * name;
+        ArrayAttr arr;
+        struct ScopeRec * scope;
     } attr;
     ExpType type; /* for type checking of exps */
 } TreeNode;
