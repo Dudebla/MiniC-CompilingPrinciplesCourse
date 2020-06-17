@@ -109,6 +109,28 @@ int st_lookup(char * name)
     else return l->memloc;
 }
 
+int st_lookup_top (char * name)
+{ int h = Hash(name);
+  Scope sc = sc_top();
+  while(sc) {
+    BucketList l = sc->hashTable[h];
+    while ((l != NULL) && (strcmp(name,l->name) != 0))
+      l = l->next;
+    if (l != NULL) return l->memloc;
+    break;
+  }
+  return -1;
+}
+
+int st_add_lineno(char * name, int lineno)
+{ BucketList l = st_bucket(name);
+  LineList ll = l->lines;
+  while (ll->next != NULL) ll = ll->next;
+  ll->next = (LineList) malloc(sizeof(struct LineListRec));
+  ll->next->lineno = lineno;
+  ll->next->next = NULL;
+}
+
 
 //MiniC添加部分
 
@@ -143,7 +165,6 @@ Scope sc_create(char *funcName)
     newScope->parent = sc_top();
 
     scopes[nScope++] = newScope;
-
     return newScope;
 }
 
