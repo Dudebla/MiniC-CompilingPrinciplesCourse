@@ -12,6 +12,10 @@
 #include<string>
 using namespace std;
 
+//MininC中间代码生成
+static char * funcName;
+static int preserveLastScope = FALSE;
+
 /*miniC functions*/
 static TreeNode * declaration_list(void);
 static TreeNode * declaration(void);

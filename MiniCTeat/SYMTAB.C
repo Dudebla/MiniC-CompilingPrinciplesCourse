@@ -47,13 +47,13 @@ static int Hash(char * key)
 * loc = memory location is inserted only the
 * first time, otherwise ignored
 */
-void st_insert(char * name, int lineno, int loc)
+/*void st_insert(char * name, int lineno, int loc)
 {
     int h = Hash(name);
     BucketList l = hashTable[h];
     while ((l != NULL) && (strcmp(name, l->name) != 0))
         l = l->next;
-    if (l == NULL) /* variable not yet in table */
+    if (l == NULL)
     {
         l = (BucketList)malloc(sizeof(struct BucketListRec));
         l->name = name;
@@ -64,7 +64,7 @@ void st_insert(char * name, int lineno, int loc)
         l->next = hashTable[h];
         hashTable[h] = l;
     }
-    else /* found in table, so just add line number */
+    else
     {
         LineList t = l->lines;
         while (t->next != NULL) t = t->next;
@@ -72,6 +72,28 @@ void st_insert(char * name, int lineno, int loc)
         t->next->lineno = lineno;
         t->next->next = NULL;
     }
+}*/ /* st_insert */
+
+//MiniC st_insert function
+void st_insert( char * name, int lineno, int loc, TreeNode * treeNode )
+{ int h = Hash(name);
+  Scope top = sc_top();
+  BucketList l =  top->hashTable[h];
+  while ((l != NULL) && (strcmp(name,l->name) != 0))
+    l = l->next;
+  if (l == NULL) /* variable not yet in table */
+  { l = (BucketList) malloc(sizeof(struct BucketListRec));
+    l->name = name;
+    l->treeNode = treeNode;
+    l->lines = (LineList) malloc(sizeof(struct LineListRec));
+    l->lines->lineno = lineno;
+    l->memloc = loc;
+    l->lines->next = NULL;
+    l->next = top->hashTable[h];
+    top->hashTable[h] = l; }
+  else /* found in table, so just add line number */
+  { // ERROR!
+  }
 } /* st_insert */
 
   /* Function st_lookup returns the memory

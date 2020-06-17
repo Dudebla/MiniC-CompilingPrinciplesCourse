@@ -10,6 +10,8 @@
 #include "SYMTAB.H"
 #include "CODE.H"
 #include "CGEN.H"
+#include "UTIL.H"
+#include "SYMTAB.H"
 #include <vector>
 #include<string>
 using namespace std;
@@ -456,6 +458,54 @@ static void cGen(TreeNode * tree)
 }
 
 
+static void insertIOFunc(void)
+{ TreeNode *func;
+  TreeNode *typeSpec;
+  TreeNode *param;
+  TreeNode *compStmt;
+
+  func = newStmtNode(FunDclK);
+
+  typeSpec = newStmtNode(FunDclK);
+  typeSpec->attr.type = INT;
+  func->type = Integer;
+
+  compStmt = newStmtNode(CompndK);
+  compStmt->child[0] = NULL;      // no local var
+  compStmt->child[1] = NULL;      // no stmt
+
+  func->lineno = 0;
+  func->attr.name = "input";
+  func->child[0] = typeSpec;
+  func->child[1] = NULL;          // no param
+  func->child[2] = compStmt;
+
+  st_insert("input", -1, addLocation(), func);
+
+  func = newStmtNode(FunDclK);
+
+  typeSpec = newStmtNode(FunDclK);
+  typeSpec->attr.type = VOID;
+  func->type = Void;
+
+  param = newStmtNode(ParamK);
+  param->attr.name = "arg";
+  param->child[0] = newStmtNode(FunDclK);
+  param->child[0]->attr.type = INT;
+
+  compStmt = newStmtNode(CompndK);
+  compStmt->child[0] = NULL;      // no local var
+  compStmt->child[1] = NULL;      // no stmt
+
+  func->lineno = 0;
+  func->attr.name = "output";
+  func->child[0] = typeSpec;
+  func->child[1] = param;
+  func->child[2] = compStmt;
+
+  st_insert("output", -1, addLocation(), func);
+}
+
 /**********************************************/
 /* the primary function of the code generator */
 /**********************************************/
@@ -477,6 +527,7 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     emitRM("LD", mp, 0, ac, "load maxaddress from location 0");
     emitRM("ST", ac, 0, ac, "clear location 0");
     emitComment("End of standard prelude.");
+    insertIOFunc();
     /* generate code for TINY program */
     cGen(syntaxTree);
     /* finish */
