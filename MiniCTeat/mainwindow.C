@@ -314,6 +314,7 @@ void MainWindow::on_assemblyFile_triggered()
         //生成语法树
         syntaxTree = parse();
         buildSymtab(syntaxTree);
+        typeCheck(syntaxTree);
         //解析语法树成为.cm文件
         //代码产生并保存到名为“codefileName”的.cm文件中
         codeGen(syntaxTree, tempPath.c_str());

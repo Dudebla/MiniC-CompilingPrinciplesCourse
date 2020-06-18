@@ -223,7 +223,7 @@ void buildSymtab(TreeNode * syntaxTree){
     traverse(syntaxTree,insertNode,afterInsertNode);
     sc_pop();
     if (TraceAnalyze){
-        fprintf(listing,"\nSymbol table:\n\n");
+        //fprintf(listing,"\nSymbol table:\n\n");
         printSymTab(listing);
     }
 }
@@ -301,37 +301,37 @@ static void checkNode(TreeNode * t){
                 t->type = t->child[0]->type;
             }
             break;
-        case CallK:{
-            const char *callingFuncName = t->attr.name;
-            const TreeNode * funcDecl = st_bucket(const_cast<char*>(callingFuncName))->treeNode;
-            TreeNode *arg;
-            TreeNode *param;
-            if (funcDecl == NULL)
-                break;
-            arg = t->child[0];
-            param = funcDecl->child[1];
-            if (funcDecl->kind.stmt != FunDclK){
-                errorMessage += typeError(t,"expected function symbol");
-                break;
-            }
-            while (arg != NULL) {
-                if (param == NULL) /* the number of arguments does not match to that of parameters */
-                    errorMessage += typeError(arg,"the number of parameters is wrong");
-                else if (arg->type == Void)
-                    errorMessage += typeError(arg,"void value cannot be passed as an argument");
-                else {  // no problem!
-                    arg = arg->sibling;
-                    param = param->sibling;
-                    continue;
-                }
-              /* any problem */
-                break;
-            }
-            if (arg == NULL && param != NULL)  /* the number of arguments does not match to
-               that of parameters */
-                errorMessage += typeError(t->child[0],"the number of parameters is wrong");
-            t->type = funcDecl->type;
-        }break;
+//        case CallK:{
+//            const char *callingFuncName = t->attr.name;
+//            const TreeNode * funcDecl = st_bucket(const_cast<char*>(callingFuncName))->treeNode;
+//            TreeNode *arg;
+//            TreeNode *param;
+//            if (funcDecl == NULL)
+//                break;
+//            arg = t->child[0];
+//            param = funcDecl->child[1];
+//            if (funcDecl->kind.stmt != FunDclK){
+//                errorMessage += typeError(t,"expected function symbol");
+//                break;
+//            }
+//            while (arg != NULL) {
+//                if (param == NULL) /* the number of arguments does not match to that of parameters */
+//                    errorMessage += typeError(arg,"the number of parameters is wrong");
+//                else if (arg->type == Void)
+//                    errorMessage += typeError(arg,"void value cannot be passed as an argument");
+//                else {  // no problem!
+//                    arg = arg->sibling;
+//                    param = param->sibling;
+//                    continue;
+//                }
+//              /* any problem */
+//                break;
+//            }
+//            if (arg == NULL && param != NULL)  /* the number of arguments does not match to
+//               that of parameters */
+//                errorMessage += typeError(t->child[0],"the number of parameters is wrong");
+//            t->type = funcDecl->type;
+//        }break;
         default:
             break;
         }

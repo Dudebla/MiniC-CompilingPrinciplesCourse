@@ -27,7 +27,7 @@ static char buffer[1000];
    It is decremented each time a temp is
    stored, and incremeted when loaded again
 */
-static int tmpOffset = 0;
+//static int tmpOffset = 0;
 //全局变量的偏移量
 static int globalOffset = 0;
 static int localOffset = initFO;
@@ -172,8 +172,8 @@ static void genStmt(TreeNode * tree)
             }
             break;
         case FunDclK:
-            if(tree->child[0]==NULL)
-                break;
+//            if(tree->child[0]==NULL)
+//                break;
             if (TraceCode){
                 sprintf(buffer, "-> funDcl (%s)", tree->attr.name);
                 emitComment(buffer);
@@ -288,11 +288,11 @@ static void genExp(TreeNode * tree, int lhs)
 //        cGen(tree->child[0]);
         genExp(p1, TRUE);
         /* now store value */
-        emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
+        emitRM("ST", ac, localOffset--, mp, "assign: push left(address)");
         /* gen code for ac = right operand */
         cGen(p2);
         /* now load left operand */
-        emitRM("LD", ac1, ++tmpOffset, mp, "assign: load left(value)");
+        emitRM("LD", ac1, ++localOffset, mp, "assign: load left(value)");
         emitRM("ST", ac, 0, ac1, "assign: store value");
 
         if (TraceCode)  emitComment("<- assign");
@@ -306,11 +306,12 @@ static void genExp(TreeNode * tree, int lhs)
 
     //        cGen(p2);
             int numOfArgs = 0;
-            while (p2!=NULL && p2->type!=Void) {
-                if(p2->type==IntList)
-                    genExp(p2, TRUE);
-                else
+            while (p2!=NULL) {
+                if(p2->type==Integer || p2->type==Boolean){
                     genExp(p2, FALSE);
+                }else if(p2->type==IntList)
+                    genExp(p2, TRUE);
+
                 /* generate code to push argument value */
                 emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
                     "call: push argument");
@@ -416,11 +417,11 @@ static void genExp(TreeNode * tree, int lhs)
         /* gen code for ac = left arg */
         cGen(p1);
         /* gen code to push left operand */
-        emitRM("ST", ac, tmpOffset--, mp, "op: push left");
+        emitRM("ST", ac, localOffset--, mp, "op: push left");
         /* gen code for ac = right operand */
         cGen(p2);
         /* now load left operand */
-        emitRM("LD", ac1, ++tmpOffset, mp, "op: load left");
+        emitRM("LD", ac1, ++localOffset, mp, "op: load left");
         switch (tree->attr.op) {
         case PLUS:
             emitRO("ADD", ac, ac1, ac, "op +");

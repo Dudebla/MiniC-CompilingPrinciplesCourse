@@ -163,10 +163,6 @@ Scope sc_create(char *funcName)
     newScope->funcName = funcName;
     newScope->nestedLevel = nScopeStack;
     newScope->parent = sc_top();
-    int i = 0;
-    while(i < SIZE){
-        newScope->hashTable[i++] = NULL;
-    }
 
     scopes[nScope++] = newScope;
     return newScope;
@@ -194,28 +190,28 @@ BucketList st_bucket( char * name )
 */
 void printSymTab(FILE * listing)
 {
-    int i;
-    fprintf(listing, "Variable Name  Location   Line Numbers\n");
-    fprintf(listing, "-------------  --------   ------------\n");
-    for (i = 0; i<SIZE; ++i)
-    {
-        if (hashTable[i] != NULL)
-        {
-            BucketList l = hashTable[i];
-            while (l != NULL)
-            {
-                LineList t = l->lines;
-                fprintf(listing, "%-14s ", l->name);
-                fprintf(listing, "%-8d  ", l->memloc);
-                while (t != NULL)
-                {
-                    fprintf(listing, "%4d ", t->lineno);
-                    t = t->next;
-                }
-                fprintf(listing, "\n");
-                l = l->next;
-            }
-        }
-    }
+//    int i;
+//    fprintf(listing, "Variable Name  Location   Line Numbers\n");
+//    fprintf(listing, "-------------  --------   ------------\n");
+//    for (i = 0; i<SIZE; ++i)
+//    {
+//        if (hashTable[i] != NULL)
+//        {
+//            BucketList l = hashTable[i];
+//            while (l != NULL)
+//            {
+//                LineList t = l->lines;
+//                fprintf(listing, "%-14s ", l->name);
+//                fprintf(listing, "%-8d  ", l->memloc);
+//                while (t != NULL)
+//                {
+//                    fprintf(listing, "%4d ", t->lineno);
+//                    t = t->next;
+//                }
+//                fprintf(listing, "\n");
+//                l = l->next;
+//            }
+//        }
+//    }
 } /* printSymTab */
 
