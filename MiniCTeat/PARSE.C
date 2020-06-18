@@ -606,7 +606,7 @@ TreeNode * simple_expression(void){
                 t = q;
             }
             match(token);
-            p->child[1] = addtive_expression();
+            q->child[1] = addtive_expression();
         }
     }
     if(t == NULL){

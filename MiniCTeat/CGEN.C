@@ -260,13 +260,13 @@ static void genStmt(TreeNode * tree)
 
             if (TraceCode)  emitComment("<- return");
             break;
-        case ParamK:
-            if (TraceCode) emitComment("-> param");
-            --localOffset;
-            ++numOfParams;
+//        case ParamK:
+//            if (TraceCode) emitComment("-> param");
+//            --localOffset;
+//            ++numOfParams;
 
-            if (TraceCode)  emitComment("<- param");
-            break;
+//            if (TraceCode)  emitComment("<- param");
+//            break;
         default:
             break;
     }
@@ -399,7 +399,7 @@ static void genExp(TreeNode * tree, int lhs)
             else /* symbol found in global scope */
                 emitRO("ADD", ac, gp, ac, "id: calculate the address");
         }
-        if (TRUE) {
+        if (lhs) {
             emitRM("LDA", ac, 0, ac, "load id address");
         } else {
             emitRM("LD", ac, 0, ac, "load id value");
