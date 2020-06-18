@@ -623,7 +623,6 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     emitRM("LDA",mp,0,gp,"copy gp to mp");
     emitRM("ST", ac, 0, ac, "clear location 0");
     emitComment("End of standard prelude.");
-    insertIOFunc();
     /* push global scope */
     sc_push(globalScope);
     /* generate code for TINY program */

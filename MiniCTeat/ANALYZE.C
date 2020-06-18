@@ -171,8 +171,6 @@ static void insertNode( TreeNode * t)
       case ExpK:
           switch (t->kind.exp) {
           case IdK:
-          case AssignK:
-          case CallK:
               if (st_lookup(t->attr.name) == -1)
               /* not yet in table, error */
                   symbolError(t, "undelcared symbol");
@@ -180,6 +178,18 @@ static void insertNode( TreeNode * t)
               /* already in table, so ignore location,
                add line number of use only */
                   st_add_lineno(t->attr.name,t->lineno);
+              break;
+          case AssignK:
+          case CallK:
+              if (st_lookup(t->child[0]->attr.name) == -1)
+              /* not yet in table, error */
+                  symbolError(t, "undelcared symbol");
+              else
+              /* already in table, so ignore location,
+               add line number of use only */
+                  st_add_lineno(t->attr.name,t->lineno);
+              break;
+          case ArgsK:
               break;
           default:
               break;
