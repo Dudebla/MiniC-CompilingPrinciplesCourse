@@ -163,6 +163,10 @@ Scope sc_create(char *funcName)
     newScope->funcName = funcName;
     newScope->nestedLevel = nScopeStack;
     newScope->parent = sc_top();
+    int i = 0;
+    while(i < SIZE){
+        newScope->hashTable[i++] = NULL;
+    }
 
     scopes[nScope++] = newScope;
     return newScope;
