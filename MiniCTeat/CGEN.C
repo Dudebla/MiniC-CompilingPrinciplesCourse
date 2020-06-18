@@ -311,6 +311,8 @@ static void genExp(TreeNode * tree, int lhs)
                     genExp(p2, FALSE);
                 }else if(p2->type==IntList)
                     genExp(p2, TRUE);
+                else if(p2->nodekind==ExpK)
+                    genExp(p2, FALSE);
 
                 /* generate code to push argument value */
                 emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,

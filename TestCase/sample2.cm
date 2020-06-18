@@ -1,413 +1,612 @@
 * MiniC Compilation to CM Code
 * File: /home/dude/Desktop/class/Compiling/MiniC-CompilingPrinciplesCourse/TestCase/sample2.cm
 * Standard prelude:
- 42:     LD  6,0(0) 	load maxaddress from location 0
- 43:    LDA  6,0(5) 	copy gp to mp
- 44:     ST  0,0(0) 	clear location 0
+100:     LD  6,0(0) 	load maxaddress from location 0
+101:    LDA  6,0(5) 	copy gp to mp
+102:     ST  0,0(0) 	clear location 0
 * End of standard prelude.
 * -> varDcl
 * <- varDcl
 * -> funDcl (minloc)
- 46:     ST  1,1(5) 	func: store the location of func. entry
+104:     ST  1,1(5) 	func: store the location of func. entry
 * func: uncondition jump to next declaration belongs here
 * func: function body starts here
- 45:    LDC  1,48(0) 	func: load function location
- 48:     ST  0,-1(6) 	func: store return address
-* -> param
-* <- param
-* -> param
-* <- param
-* -> param
-* <- param
+103:    LDC  1,106(0) 	func: load function location
+106:     ST  0,-1(6) 	func: store return address
 * -> Compnd
 * -> assign
 * -> Id (k)
- 49:    LDC  0,1(0) 	id: load varOffset
- 50:    ADD  0,5,0 	id: calculate the address
- 51:    LDA  0,0(0) 	load id address
+107:    LDC  0,1(0) 	id: load varOffset
+108:    ADD  0,5,0 	id: calculate the address
+109:    LDA  0,0(0) 	load id address
 * <- Id
- 52:     ST  0,0(6) 	assign: push left(address)
+110:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (low)
- 53:    LDC  0,1(0) 	id: load varOffset
- 54:    ADD  0,5,0 	id: calculate the address
- 55:    LDA  0,0(0) 	load id address
+111:    LDC  0,1(0) 	id: load varOffset
+112:    ADD  0,5,0 	id: calculate the address
+113:     LD  0,0(0) 	load id value
 * <- Id
- 56:     LD  1,0(6) 	assign: load left(value)
- 57:     ST  0,0(1) 	assign: store value
+114:     LD  1,-5(6) 	assign: load left(value)
+115:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (x)
- 58:    LDC  0,1(0) 	id: load varOffset
- 59:    ADD  0,5,0 	id: calculate the address
- 60:    LDA  0,0(0) 	load id address
+116:    LDC  0,1(0) 	id: load varOffset
+117:    ADD  0,5,0 	id: calculate the address
+118:    LDA  0,0(0) 	load id address
 * <- Id
- 61:     ST  0,0(6) 	assign: push left(address)
+119:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (a)
- 62:    LDC  0,1(0) 	id: load varOffset
- 63:    ADD  0,5,0 	id: calculate the address
- 64:     ST  0,-8(6) 	id: push base address
+120:    LDC  0,1(0) 	id: load varOffset
+121:    ADD  0,5,0 	id: calculate the address
+122:     ST  0,-6(6) 	id: push base address
 * -> Id (low)
- 65:    LDC  0,1(0) 	id: load varOffset
- 66:    ADD  0,5,0 	id: calculate the address
- 67:    LDA  0,0(0) 	load id address
+123:    LDC  0,1(0) 	id: load varOffset
+124:    ADD  0,5,0 	id: calculate the address
+125:     LD  0,0(0) 	load id value
 * <- Id
- 68:     LD  1,-8(6) 	id: pop base address
- 69:    SUB  0,1,0 	id: calculate element address with index
- 70:    LDA  0,0(0) 	load id address
+126:     LD  1,-6(6) 	id: pop base address
+127:    SUB  0,1,0 	id: calculate element address with index
+128:     LD  0,0(0) 	load id value
 * <- Id
- 71:     LD  1,0(6) 	assign: load left(value)
- 72:     ST  0,0(1) 	assign: store value
+129:     LD  1,-5(6) 	assign: load left(value)
+130:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (i)
- 73:    LDC  0,1(0) 	id: load varOffset
- 74:    ADD  0,5,0 	id: calculate the address
- 75:    LDA  0,0(0) 	load id address
+131:    LDC  0,1(0) 	id: load varOffset
+132:    ADD  0,5,0 	id: calculate the address
+133:    LDA  0,0(0) 	load id address
 * <- Id
- 76:     ST  0,0(6) 	assign: push left(address)
+134:     ST  0,-5(6) 	assign: push left(address)
 * -> Op
 * -> Id (low)
- 77:    LDC  0,1(0) 	id: load varOffset
- 78:    ADD  0,5,0 	id: calculate the address
- 79:    LDA  0,0(0) 	load id address
+135:    LDC  0,1(0) 	id: load varOffset
+136:    ADD  0,5,0 	id: calculate the address
+137:     LD  0,0(0) 	load id value
 * <- Id
- 80:     ST  0,-1(6) 	op: push left
+138:     ST  0,-6(6) 	op: push left
 * -> Const
- 81:    LDC  0,1(0) 	load const
+139:    LDC  0,1(0) 	load const
 * <- Const
- 82:     LD  1,-1(6) 	op: load left
- 83:    ADD  0,1,0 	op +
+140:     LD  1,-6(6) 	op: load left
+141:    ADD  0,1,0 	op +
 * <- Op
- 84:     LD  1,0(6) 	assign: load left(value)
- 85:     ST  0,0(1) 	assign: store value
+142:     LD  1,-5(6) 	assign: load left(value)
+143:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> while
 * while: jump after body comes back here
 * -> Op
 * -> Id (i)
- 86:    LDC  0,1(0) 	id: load varOffset
- 87:    ADD  0,5,0 	id: calculate the address
- 88:    LDA  0,0(0) 	load id address
+144:    LDC  0,1(0) 	id: load varOffset
+145:    ADD  0,5,0 	id: calculate the address
+146:     LD  0,0(0) 	load id value
 * <- Id
- 89:     ST  0,0(6) 	op: push left
- 90:     LD  1,0(6) 	op: load left
- 91:    SUB  0,1,0 	op <
- 92:    JLT  0,2(7) 	br if true
- 93:    LDC  0,0(0) 	false case
- 94:    LDA  7,1(7) 	unconditional jmp
- 95:    LDC  0,1(0) 	true case
+147:     ST  0,-5(6) 	op: push left
+* -> Id (high)
+148:    LDC  0,1(0) 	id: load varOffset
+149:    ADD  0,5,0 	id: calculate the address
+150:     LD  0,0(0) 	load id value
+* <- Id
+151:     LD  1,-5(6) 	op: load left
+152:    SUB  0,1,0 	op <
+153:    JLT  0,2(7) 	br if true
+154:    LDC  0,0(0) 	false case
+155:    LDA  7,1(7) 	unconditional jmp
+156:    LDC  0,1(0) 	true case
 * <- Op
 * while: jump to end belongs here
 * -> Compnd
 * -> if
 * -> Op
 * -> Id (a)
- 97:    LDC  0,1(0) 	id: load varOffset
- 98:    ADD  0,5,0 	id: calculate the address
- 99:     ST  0,-8(6) 	id: push base address
+158:    LDC  0,1(0) 	id: load varOffset
+159:    ADD  0,5,0 	id: calculate the address
+160:     ST  0,-5(6) 	id: push base address
 * -> Id (i)
-100:    LDC  0,1(0) 	id: load varOffset
-101:    ADD  0,5,0 	id: calculate the address
-102:    LDA  0,0(0) 	load id address
+161:    LDC  0,1(0) 	id: load varOffset
+162:    ADD  0,5,0 	id: calculate the address
+163:     LD  0,0(0) 	load id value
 * <- Id
-103:     LD  1,-8(6) 	id: pop base address
-104:    SUB  0,1,0 	id: calculate element address with index
-105:    LDA  0,0(0) 	load id address
+164:     LD  1,-5(6) 	id: pop base address
+165:    SUB  0,1,0 	id: calculate element address with index
+166:     LD  0,0(0) 	load id value
 * <- Id
-106:     ST  0,0(6) 	op: push left
+167:     ST  0,-5(6) 	op: push left
 * -> Id (x)
-107:    LDC  0,1(0) 	id: load varOffset
-108:    ADD  0,5,0 	id: calculate the address
-109:    LDA  0,0(0) 	load id address
+168:    LDC  0,1(0) 	id: load varOffset
+169:    ADD  0,5,0 	id: calculate the address
+170:     LD  0,0(0) 	load id value
 * <- Id
-110:     LD  1,0(6) 	op: load left
-111:    SUB  0,1,0 	op <
-112:    JLT  0,2(7) 	br if true
-113:    LDC  0,0(0) 	false case
-114:    LDA  7,1(7) 	unconditional jmp
-115:    LDC  0,1(0) 	true case
+171:     LD  1,-5(6) 	op: load left
+172:    SUB  0,1,0 	op <
+173:    JLT  0,2(7) 	br if true
+174:    LDC  0,0(0) 	false case
+175:    LDA  7,1(7) 	unconditional jmp
+176:    LDC  0,1(0) 	true case
 * <- Op
 * if: jump to else belongs here
 * -> Compnd
 * -> assign
 * -> Id (x)
-117:    LDC  0,1(0) 	id: load varOffset
-118:    ADD  0,5,0 	id: calculate the address
-119:    LDA  0,0(0) 	load id address
+178:    LDC  0,1(0) 	id: load varOffset
+179:    ADD  0,5,0 	id: calculate the address
+180:    LDA  0,0(0) 	load id address
 * <- Id
-120:     ST  0,0(6) 	assign: push left(address)
+181:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (a)
-121:    LDC  0,1(0) 	id: load varOffset
-122:    ADD  0,5,0 	id: calculate the address
-123:     ST  0,-8(6) 	id: push base address
+182:    LDC  0,1(0) 	id: load varOffset
+183:    ADD  0,5,0 	id: calculate the address
+184:     ST  0,-6(6) 	id: push base address
 * -> Id (i)
-124:    LDC  0,1(0) 	id: load varOffset
-125:    ADD  0,5,0 	id: calculate the address
-126:    LDA  0,0(0) 	load id address
+185:    LDC  0,1(0) 	id: load varOffset
+186:    ADD  0,5,0 	id: calculate the address
+187:     LD  0,0(0) 	load id value
 * <- Id
-127:     LD  1,-8(6) 	id: pop base address
-128:    SUB  0,1,0 	id: calculate element address with index
-129:    LDA  0,0(0) 	load id address
+188:     LD  1,-6(6) 	id: pop base address
+189:    SUB  0,1,0 	id: calculate element address with index
+190:     LD  0,0(0) 	load id value
 * <- Id
-130:     LD  1,0(6) 	assign: load left(value)
-131:     ST  0,0(1) 	assign: store value
+191:     LD  1,-5(6) 	assign: load left(value)
+192:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (k)
-132:    LDC  0,1(0) 	id: load varOffset
-133:    ADD  0,5,0 	id: calculate the address
-134:    LDA  0,0(0) 	load id address
+193:    LDC  0,1(0) 	id: load varOffset
+194:    ADD  0,5,0 	id: calculate the address
+195:    LDA  0,0(0) 	load id address
 * <- Id
-135:     ST  0,0(6) 	assign: push left(address)
+196:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (i)
-136:    LDC  0,1(0) 	id: load varOffset
-137:    ADD  0,5,0 	id: calculate the address
-138:    LDA  0,0(0) 	load id address
+197:    LDC  0,1(0) 	id: load varOffset
+198:    ADD  0,5,0 	id: calculate the address
+199:     LD  0,0(0) 	load id value
 * <- Id
-139:     LD  1,0(6) 	assign: load left(value)
-140:     ST  0,0(1) 	assign: store value
+200:     LD  1,-5(6) 	assign: load left(value)
+201:     ST  0,0(1) 	assign: store value
 * <- assign
 * <- Compnd
 * if: jump to end belongs here
-116:    JEQ  0,25(7) 	if: jmp to else
-141:    LDA  7,0(7) 	jmp to end
+177:    JEQ  0,25(7) 	if: jmp to else
+202:    LDA  7,0(7) 	jmp to end
 * <- if
 * -> assign
 * -> Id (i)
-142:    LDC  0,1(0) 	id: load varOffset
-143:    ADD  0,5,0 	id: calculate the address
-144:    LDA  0,0(0) 	load id address
+203:    LDC  0,1(0) 	id: load varOffset
+204:    ADD  0,5,0 	id: calculate the address
+205:    LDA  0,0(0) 	load id address
 * <- Id
-145:     ST  0,0(6) 	assign: push left(address)
+206:     ST  0,-5(6) 	assign: push left(address)
 * -> Op
 * -> Id (i)
-146:    LDC  0,1(0) 	id: load varOffset
-147:    ADD  0,5,0 	id: calculate the address
-148:    LDA  0,0(0) 	load id address
+207:    LDC  0,1(0) 	id: load varOffset
+208:    ADD  0,5,0 	id: calculate the address
+209:     LD  0,0(0) 	load id value
 * <- Id
-149:     ST  0,-1(6) 	op: push left
+210:     ST  0,-6(6) 	op: push left
 * -> Const
-150:    LDC  0,1(0) 	load const
+211:    LDC  0,1(0) 	load const
 * <- Const
-151:     LD  1,-1(6) 	op: load left
-152:    ADD  0,1,0 	op +
+212:     LD  1,-6(6) 	op: load left
+213:    ADD  0,1,0 	op +
 * <- Op
-153:     LD  1,0(6) 	assign: load left(value)
-154:     ST  0,0(1) 	assign: store value
+214:     LD  1,-5(6) 	assign: load left(value)
+215:     ST  0,0(1) 	assign: store value
 * <- assign
 * <- Compnd
-155:    LDA  7,-70(7) 	while: jmp back to test
- 96:    JEQ  0,59(7) 	while: jmp to end
+216:    LDA  7,-73(7) 	while: jmp back to test
+157:    JEQ  0,59(7) 	while: jmp to end
 * <- while
 * -> return
 * -> Id (k)
-156:    LDC  0,1(0) 	id: load varOffset
-157:    ADD  0,5,0 	id: calculate the address
-158:    LDA  0,0(0) 	load id address
+217:    LDC  0,1(0) 	id: load varOffset
+218:    ADD  0,5,0 	id: calculate the address
+219:     LD  0,0(0) 	load id value
 * <- Id
-159:     LD  7,-1(6) 	return: to caller
+220:     LD  7,-1(6) 	return: to caller
 * <- return
 * <- Compnd
-160:     LD  7,-1(6) 	fun: load pc with return address
- 47:    LDA  7,113(7) 	func: uncondiction jump to next declaration
+221:     LD  7,-1(6) 	fun: load pc with return address
+105:    LDA  7,116(7) 	func: uncondiction jump to next declaration
 * <- funDcl (minloc)
 * -> funDcl (sort)
-162:     ST  1,1(5) 	func: store the location of func. entry
+223:     ST  1,1(5) 	func: store the location of func. entry
 * func: uncondition jump to next declaration belongs here
 * func: function body starts here
-161:    LDC  1,164(0) 	func: load function location
-164:     ST  0,-1(6) 	func: store return address
-* -> param
-* <- param
-* -> param
-* <- param
-* -> param
-* <- param
+222:    LDC  1,225(0) 	func: load function location
+225:     ST  0,-1(6) 	func: store return address
 * -> Compnd
 * -> assign
 * -> Id (i)
-165:    LDC  0,1(0) 	id: load varOffset
-166:    ADD  0,5,0 	id: calculate the address
-167:    LDA  0,0(0) 	load id address
+226:    LDC  0,1(0) 	id: load varOffset
+227:    ADD  0,5,0 	id: calculate the address
+228:    LDA  0,0(0) 	load id address
 * <- Id
-168:     ST  0,0(6) 	assign: push left(address)
+229:     ST  0,-4(6) 	assign: push left(address)
 * -> Id (low)
-169:    LDC  0,1(0) 	id: load varOffset
-170:    ADD  0,5,0 	id: calculate the address
-171:    LDA  0,0(0) 	load id address
+230:    LDC  0,1(0) 	id: load varOffset
+231:    ADD  0,5,0 	id: calculate the address
+232:     LD  0,0(0) 	load id value
 * <- Id
-172:     LD  1,0(6) 	assign: load left(value)
-173:     ST  0,0(1) 	assign: store value
+233:     LD  1,-4(6) 	assign: load left(value)
+234:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> while
 * while: jump after body comes back here
 * -> Op
 * -> Id (i)
-174:    LDC  0,1(0) 	id: load varOffset
-175:    ADD  0,5,0 	id: calculate the address
-176:    LDA  0,0(0) 	load id address
+235:    LDC  0,1(0) 	id: load varOffset
+236:    ADD  0,5,0 	id: calculate the address
+237:     LD  0,0(0) 	load id value
 * <- Id
-177:     ST  0,0(6) 	op: push left
-178:     LD  1,0(6) 	op: load left
-179:    SUB  0,1,0 	op <
-180:    JLT  0,2(7) 	br if true
-181:    LDC  0,0(0) 	false case
-182:    LDA  7,1(7) 	unconditional jmp
-183:    LDC  0,1(0) 	true case
+238:     ST  0,-4(6) 	op: push left
+* -> Op
+* -> Id (high)
+239:    LDC  0,1(0) 	id: load varOffset
+240:    ADD  0,5,0 	id: calculate the address
+241:     LD  0,0(0) 	load id value
+* <- Id
+242:     ST  0,-5(6) 	op: push left
+* -> Const
+243:    LDC  0,1(0) 	load const
+* <- Const
+244:     LD  1,-5(6) 	op: load left
+245:    SUB  0,1,0 	op -
+* <- Op
+246:     LD  1,-4(6) 	op: load left
+247:    SUB  0,1,0 	op <
+248:    JLT  0,2(7) 	br if true
+249:    LDC  0,0(0) 	false case
+250:    LDA  7,1(7) 	unconditional jmp
+251:    LDC  0,1(0) 	true case
 * <- Op
 * while: jump to end belongs here
 * -> Compnd
 * -> assign
 * -> Id (k)
-185:    LDC  0,1(0) 	id: load varOffset
-186:    ADD  0,5,0 	id: calculate the address
-187:    LDA  0,0(0) 	load id address
+253:    LDC  0,1(0) 	id: load varOffset
+254:    ADD  0,5,0 	id: calculate the address
+255:    LDA  0,0(0) 	load id address
 * <- Id
-188:     ST  0,0(6) 	assign: push left(address)
+256:     ST  0,-5(6) 	assign: push left(address)
 * -> call
 * -> Id (a)
-189:    LDC  0,1(0) 	id: load varOffset
-190:    ADD  0,5,0 	id: calculate the address
-191:    LDA  0,0(0) 	load id address
+257:    LDC  0,1(0) 	id: load varOffset
+258:    ADD  0,5,0 	id: calculate the address
+259:     LD  0,0(0) 	load id value
 * <- Id
-192:     ST  0,-10(6) 	call: push argument
+260:     ST  0,-8(6) 	call: push argument
 * -> Id (i)
-193:    LDC  0,1(0) 	id: load varOffset
-194:    ADD  0,5,0 	id: calculate the address
-195:    LDA  0,0(0) 	load id address
+261:    LDC  0,1(0) 	id: load varOffset
+262:    ADD  0,5,0 	id: calculate the address
+263:     LD  0,0(0) 	load id value
 * <- Id
-196:     ST  0,-11(6) 	call: push argument
+264:     ST  0,-9(6) 	call: push argument
 * -> Id (high)
-197:    LDC  0,1(0) 	id: load varOffset
-198:    ADD  0,5,0 	id: calculate the address
-199:    LDA  0,0(0) 	load id address
+265:    LDC  0,1(0) 	id: load varOffset
+266:    ADD  0,5,0 	id: calculate the address
+267:     LD  0,0(0) 	load id value
 * <- Id
-200:     ST  0,-12(6) 	call: push argument
-201:     ST  6,-8(6) 	call: store current mp
-202:    LDA  6,-8(6) 	call: push new frame
-203:    LDA  0,1(7) 	call: save return in ac
-204:     LD  7,1(5) 	call: relative jump to function entry
-205:     LD  6,0(6) 	call: pop current frame
+268:     ST  0,-10(6) 	call: push argument
+269:     ST  6,-6(6) 	call: store current mp
+270:    LDA  6,-6(6) 	call: push new frame
+271:    LDA  0,1(7) 	call: save return in ac
+272:     LD  7,1(5) 	call: relative jump to function entry
+273:     LD  6,0(6) 	call: pop current frame
 * <- call
-206:     LD  1,0(6) 	assign: load left(value)
-207:     ST  0,0(1) 	assign: store value
+274:     LD  1,-5(6) 	assign: load left(value)
+275:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (t)
-208:    LDC  0,1(0) 	id: load varOffset
-209:    ADD  0,5,0 	id: calculate the address
-210:    LDA  0,0(0) 	load id address
+276:    LDC  0,1(0) 	id: load varOffset
+277:    ADD  0,5,0 	id: calculate the address
+278:    LDA  0,0(0) 	load id address
 * <- Id
-211:     ST  0,0(6) 	assign: push left(address)
+279:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (a)
-212:    LDC  0,1(0) 	id: load varOffset
-213:    ADD  0,5,0 	id: calculate the address
-214:     ST  0,-8(6) 	id: push base address
+280:    LDC  0,1(0) 	id: load varOffset
+281:    ADD  0,5,0 	id: calculate the address
+282:     ST  0,-6(6) 	id: push base address
 * -> Id (k)
-215:    LDC  0,1(0) 	id: load varOffset
-216:    ADD  0,5,0 	id: calculate the address
-217:    LDA  0,0(0) 	load id address
+283:    LDC  0,1(0) 	id: load varOffset
+284:    ADD  0,5,0 	id: calculate the address
+285:     LD  0,0(0) 	load id value
 * <- Id
-218:     LD  1,-8(6) 	id: pop base address
-219:    SUB  0,1,0 	id: calculate element address with index
-220:    LDA  0,0(0) 	load id address
+286:     LD  1,-6(6) 	id: pop base address
+287:    SUB  0,1,0 	id: calculate element address with index
+288:     LD  0,0(0) 	load id value
 * <- Id
-221:     LD  1,0(6) 	assign: load left(value)
-222:     ST  0,0(1) 	assign: store value
+289:     LD  1,-5(6) 	assign: load left(value)
+290:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (a)
-223:    LDC  0,1(0) 	id: load varOffset
-224:    ADD  0,5,0 	id: calculate the address
-225:     ST  0,-8(6) 	id: push base address
+291:    LDC  0,1(0) 	id: load varOffset
+292:    ADD  0,5,0 	id: calculate the address
+293:     ST  0,-5(6) 	id: push base address
 * -> Id (k)
-226:    LDC  0,1(0) 	id: load varOffset
-227:    ADD  0,5,0 	id: calculate the address
-228:    LDA  0,0(0) 	load id address
+294:    LDC  0,1(0) 	id: load varOffset
+295:    ADD  0,5,0 	id: calculate the address
+296:     LD  0,0(0) 	load id value
 * <- Id
-229:     LD  1,-8(6) 	id: pop base address
-230:    SUB  0,1,0 	id: calculate element address with index
-231:    LDA  0,0(0) 	load id address
+297:     LD  1,-5(6) 	id: pop base address
+298:    SUB  0,1,0 	id: calculate element address with index
+299:    LDA  0,0(0) 	load id address
 * <- Id
-232:     ST  0,0(6) 	assign: push left(address)
+300:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (a)
-233:    LDC  0,1(0) 	id: load varOffset
-234:    ADD  0,5,0 	id: calculate the address
-235:     ST  0,-8(6) 	id: push base address
+301:    LDC  0,1(0) 	id: load varOffset
+302:    ADD  0,5,0 	id: calculate the address
+303:     ST  0,-6(6) 	id: push base address
 * -> Id (i)
-236:    LDC  0,1(0) 	id: load varOffset
-237:    ADD  0,5,0 	id: calculate the address
-238:    LDA  0,0(0) 	load id address
+304:    LDC  0,1(0) 	id: load varOffset
+305:    ADD  0,5,0 	id: calculate the address
+306:     LD  0,0(0) 	load id value
 * <- Id
-239:     LD  1,-8(6) 	id: pop base address
-240:    SUB  0,1,0 	id: calculate element address with index
-241:    LDA  0,0(0) 	load id address
+307:     LD  1,-6(6) 	id: pop base address
+308:    SUB  0,1,0 	id: calculate element address with index
+309:     LD  0,0(0) 	load id value
 * <- Id
-242:     LD  1,0(6) 	assign: load left(value)
-243:     ST  0,0(1) 	assign: store value
+310:     LD  1,-5(6) 	assign: load left(value)
+311:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (a)
-244:    LDC  0,1(0) 	id: load varOffset
-245:    ADD  0,5,0 	id: calculate the address
-246:     ST  0,-8(6) 	id: push base address
+312:    LDC  0,1(0) 	id: load varOffset
+313:    ADD  0,5,0 	id: calculate the address
+314:     ST  0,-5(6) 	id: push base address
 * -> Id (i)
-247:    LDC  0,1(0) 	id: load varOffset
-248:    ADD  0,5,0 	id: calculate the address
-249:    LDA  0,0(0) 	load id address
+315:    LDC  0,1(0) 	id: load varOffset
+316:    ADD  0,5,0 	id: calculate the address
+317:     LD  0,0(0) 	load id value
 * <- Id
-250:     LD  1,-8(6) 	id: pop base address
-251:    SUB  0,1,0 	id: calculate element address with index
-252:    LDA  0,0(0) 	load id address
+318:     LD  1,-5(6) 	id: pop base address
+319:    SUB  0,1,0 	id: calculate element address with index
+320:    LDA  0,0(0) 	load id address
 * <- Id
-253:     ST  0,0(6) 	assign: push left(address)
+321:     ST  0,-5(6) 	assign: push left(address)
 * -> Id (t)
-254:    LDC  0,1(0) 	id: load varOffset
-255:    ADD  0,5,0 	id: calculate the address
-256:    LDA  0,0(0) 	load id address
+322:    LDC  0,1(0) 	id: load varOffset
+323:    ADD  0,5,0 	id: calculate the address
+324:     LD  0,0(0) 	load id value
 * <- Id
-257:     LD  1,0(6) 	assign: load left(value)
-258:     ST  0,0(1) 	assign: store value
+325:     LD  1,-5(6) 	assign: load left(value)
+326:     ST  0,0(1) 	assign: store value
 * <- assign
 * -> assign
 * -> Id (i)
-259:    LDC  0,1(0) 	id: load varOffset
-260:    ADD  0,5,0 	id: calculate the address
-261:    LDA  0,0(0) 	load id address
+327:    LDC  0,1(0) 	id: load varOffset
+328:    ADD  0,5,0 	id: calculate the address
+329:    LDA  0,0(0) 	load id address
 * <- Id
-262:     ST  0,0(6) 	assign: push left(address)
+330:     ST  0,-5(6) 	assign: push left(address)
 * -> Op
 * -> Id (i)
-263:    LDC  0,1(0) 	id: load varOffset
-264:    ADD  0,5,0 	id: calculate the address
-265:    LDA  0,0(0) 	load id address
+331:    LDC  0,1(0) 	id: load varOffset
+332:    ADD  0,5,0 	id: calculate the address
+333:     LD  0,0(0) 	load id value
 * <- Id
-266:     ST  0,-1(6) 	op: push left
+334:     ST  0,-6(6) 	op: push left
 * -> Const
-267:    LDC  0,1(0) 	load const
+335:    LDC  0,1(0) 	load const
 * <- Const
-268:     LD  1,-1(6) 	op: load left
-269:    ADD  0,1,0 	op +
+336:     LD  1,-6(6) 	op: load left
+337:    ADD  0,1,0 	op +
 * <- Op
-270:     LD  1,0(6) 	assign: load left(value)
-271:     ST  0,0(1) 	assign: store value
+338:     LD  1,-5(6) 	assign: load left(value)
+339:     ST  0,0(1) 	assign: store value
 * <- assign
 * <- Compnd
-272:    LDA  7,-99(7) 	while: jmp back to test
-184:    JEQ  0,88(7) 	while: jmp to end
+340:    LDA  7,-106(7) 	while: jmp back to test
+252:    JEQ  0,88(7) 	while: jmp to end
 * <- while
 * <- Compnd
-273:     LD  7,-1(6) 	fun: load pc with return address
-163:    LDA  7,110(7) 	func: uncondiction jump to next declaration
+341:     LD  7,-1(6) 	fun: load pc with return address
+224:    LDA  7,117(7) 	func: uncondiction jump to next declaration
 * <- funDcl (sort)
-274:    LDC  0,-1439459923(0) 	init: load globalOffset
-275:    ADD  6,6,0 	init: initialize mp with globalOffset
+* -> funDcl (main)
+343:     ST  1,1(5) 	func: store the location of func. entry
+* func: uncondition jump to next declaration belongs here
+* func: function body starts here
+342:    LDC  1,345(0) 	func: load function location
+345:     ST  0,-1(6) 	func: store return address
+* -> Compnd
+* -> assign
+* -> Id (i)
+346:    LDC  0,1(0) 	id: load varOffset
+347:    ADD  0,5,0 	id: calculate the address
+348:    LDA  0,0(0) 	load id address
+* <- Id
+349:     ST  0,-3(6) 	assign: push left(address)
+* -> Const
+350:    LDC  0,0(0) 	load const
+* <- Const
+351:     LD  1,-3(6) 	assign: load left(value)
+352:     ST  0,0(1) 	assign: store value
+* <- assign
+* -> while
+* while: jump after body comes back here
+* -> Op
+* -> Id (i)
+353:    LDC  0,1(0) 	id: load varOffset
+354:    ADD  0,5,0 	id: calculate the address
+355:     LD  0,0(0) 	load id value
+* <- Id
+356:     ST  0,-3(6) 	op: push left
+* -> Const
+357:    LDC  0,10(0) 	load const
+* <- Const
+358:     LD  1,-3(6) 	op: load left
+359:    SUB  0,1,0 	op <
+360:    JLT  0,2(7) 	br if true
+361:    LDC  0,0(0) 	false case
+362:    LDA  7,1(7) 	unconditional jmp
+363:    LDC  0,1(0) 	true case
+* <- Op
+* while: jump to end belongs here
+* -> Compnd
+* -> assign
+* -> Id (x)
+365:    LDC  0,1(0) 	id: load varOffset
+366:    ADD  0,5,0 	id: calculate the address
+367:     ST  0,-3(6) 	id: push base address
+* -> Id (i)
+368:    LDC  0,1(0) 	id: load varOffset
+369:    ADD  0,5,0 	id: calculate the address
+370:     LD  0,0(0) 	load id value
+* <- Id
+371:     LD  1,-3(6) 	id: pop base address
+372:    SUB  0,1,0 	id: calculate element address with index
+373:    LDA  0,0(0) 	load id address
+* <- Id
+374:     ST  0,-3(6) 	assign: push left(address)
+* -> call
+375:     IN  0,0,0 	read integer value
+* <- call
+376:     LD  1,-3(6) 	assign: load left(value)
+377:     ST  0,0(1) 	assign: store value
+* <- assign
+* -> assign
+* -> Id (i)
+378:    LDC  0,1(0) 	id: load varOffset
+379:    ADD  0,5,0 	id: calculate the address
+380:    LDA  0,0(0) 	load id address
+* <- Id
+381:     ST  0,-3(6) 	assign: push left(address)
+* -> Op
+* -> Id (i)
+382:    LDC  0,1(0) 	id: load varOffset
+383:    ADD  0,5,0 	id: calculate the address
+384:     LD  0,0(0) 	load id value
+* <- Id
+385:     ST  0,-4(6) 	op: push left
+* -> Const
+386:    LDC  0,1(0) 	load const
+* <- Const
+387:     LD  1,-4(6) 	op: load left
+388:    ADD  0,1,0 	op +
+* <- Op
+389:     LD  1,-3(6) 	assign: load left(value)
+390:     ST  0,0(1) 	assign: store value
+* <- assign
+* -> call
+* -> Id (x)
+391:    LDC  0,1(0) 	id: load varOffset
+392:    ADD  0,5,0 	id: calculate the address
+393:     LD  0,0(0) 	load id value
+* <- Id
+394:     ST  0,-5(6) 	call: push argument
+* -> Const
+395:    LDC  0,0(0) 	load const
+* <- Const
+396:     ST  0,-6(6) 	call: push argument
+* -> Const
+397:    LDC  0,10(0) 	load const
+* <- Const
+398:     ST  0,-7(6) 	call: push argument
+399:     ST  6,-3(6) 	call: store current mp
+400:    LDA  6,-3(6) 	call: push new frame
+401:    LDA  0,1(7) 	call: save return in ac
+402:     LD  7,1(5) 	call: relative jump to function entry
+403:     LD  6,0(6) 	call: pop current frame
+* <- call
+* -> assign
+* -> Id (i)
+404:    LDC  0,1(0) 	id: load varOffset
+405:    ADD  0,5,0 	id: calculate the address
+406:    LDA  0,0(0) 	load id address
+* <- Id
+407:     ST  0,-3(6) 	assign: push left(address)
+* -> Const
+408:    LDC  0,0(0) 	load const
+* <- Const
+409:     LD  1,-3(6) 	assign: load left(value)
+410:     ST  0,0(1) 	assign: store value
+* <- assign
+* -> while
+* while: jump after body comes back here
+* -> Op
+* -> Id (i)
+411:    LDC  0,1(0) 	id: load varOffset
+412:    ADD  0,5,0 	id: calculate the address
+413:     LD  0,0(0) 	load id value
+* <- Id
+414:     ST  0,-3(6) 	op: push left
+* -> Const
+415:    LDC  0,10(0) 	load const
+* <- Const
+416:     LD  1,-3(6) 	op: load left
+417:    SUB  0,1,0 	op <
+418:    JLT  0,2(7) 	br if true
+419:    LDC  0,0(0) 	false case
+420:    LDA  7,1(7) 	unconditional jmp
+421:    LDC  0,1(0) 	true case
+* <- Op
+* while: jump to end belongs here
+* -> Compnd
+* -> call
+* -> Id (x)
+423:    LDC  0,1(0) 	id: load varOffset
+424:    ADD  0,5,0 	id: calculate the address
+425:     ST  0,-3(6) 	id: push base address
+* -> Id (i)
+426:    LDC  0,1(0) 	id: load varOffset
+427:    ADD  0,5,0 	id: calculate the address
+428:     LD  0,0(0) 	load id value
+* <- Id
+429:     LD  1,-3(6) 	id: pop base address
+430:    SUB  0,1,0 	id: calculate element address with index
+431:    LDA  0,0(0) 	load id address
+* <- Id
+432:     ST  0,-5(6) 	call: push argument
+433:     LD  0,-5(6) 	load arg to ac
+434:    OUT  0,0,0 	write ac
+* <- call
+* -> assign
+* -> Id (i)
+435:    LDC  0,1(0) 	id: load varOffset
+436:    ADD  0,5,0 	id: calculate the address
+437:    LDA  0,0(0) 	load id address
+* <- Id
+438:     ST  0,-3(6) 	assign: push left(address)
+* -> Op
+* -> Id (i)
+439:    LDC  0,1(0) 	id: load varOffset
+440:    ADD  0,5,0 	id: calculate the address
+441:     LD  0,0(0) 	load id value
+* <- Id
+442:     ST  0,-4(6) 	op: push left
+* -> Const
+443:    LDC  0,1(0) 	load const
+* <- Const
+444:     LD  1,-4(6) 	op: load left
+445:    ADD  0,1,0 	op +
+* <- Op
+446:     LD  1,-3(6) 	assign: load left(value)
+447:     ST  0,0(1) 	assign: store value
+* <- assign
+* <- Compnd
+448:    LDA  7,-38(7) 	while: jmp back to test
+422:    JEQ  0,26(7) 	while: jmp to end
+* <- while
+* <- Compnd
+449:    LDA  7,-97(7) 	while: jmp back to test
+364:    JEQ  0,85(7) 	while: jmp to end
+* <- while
+* <- Compnd
+450:     LD  7,-1(6) 	fun: load pc with return address
+344:    LDA  7,106(7) 	func: uncondiction jump to next declaration
+* <- funDcl (main)
+451:    LDC  0,1168242059(0) 	init: load globalOffset
+452:    ADD  6,6,0 	init: initialize mp with globalOffset
 * -> Call
-276:     ST  6,0(6) 	call: store current mp
-277:    LDA  6,0(6) 	call: push new frame
-278:    LDA  0,1(7) 	call: save return in ac
-279:    LDC  7,0(0) 	call: unconditional jump to main() entry
-280:     LD  6,0(6) 	call: pop current frame
+453:     ST  6,0(6) 	call: store current mp
+454:    LDA  6,0(6) 	call: push new frame
+455:    LDA  0,1(7) 	call: save return in ac
+456:    LDC  7,345(0) 	call: unconditional jump to main() entry
+457:     LD  6,0(6) 	call: pop current frame
 * <- Call
 * End of execution.
-281:   HALT  0,0,0 	
+458:   HALT  0,0,0 	
