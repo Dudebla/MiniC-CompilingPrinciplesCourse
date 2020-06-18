@@ -17,6 +17,8 @@
 #include<string>
 using namespace std;
 
+static char buffer[1000];
+
 #define ofpFO 0
 #define retFO -1
 #define initFO -2
@@ -89,7 +91,6 @@ static void genStmt(TreeNode * tree)
     int size;           //偏移量
     int numOfArgs;      //call调用时实参个数
     switch (tree->kind.stmt) {
-
         case IfK:
             if (TraceCode) emitComment("-> if");
             p1 = tree->child[0];
@@ -148,12 +149,12 @@ static void genStmt(TreeNode * tree)
             if (TraceCode)  emitComment("<- while");
             break; /* while */
         case VarDclK:   //变量声明
-        if(isInParam){      //在函数声明的形参声明中
-            if (TraceCode) emitComment("-> param");
+            if(isInParam){      //在函数声明的形参声明中
+                if (TraceCode) emitComment("-> param");
                 emitComment(tree->attr.name);
 
-            --localOffset;
-            ++numOfParams;
+                --localOffset;
+                ++numOfParams;
 
                 if (TraceCode) emitComment("<- param");
             }else{
@@ -174,7 +175,6 @@ static void genStmt(TreeNode * tree)
             if(tree->child[0]==NULL)
                 break;
             if (TraceCode){
-                char buffer[100];
                 sprintf(buffer, "-> funDcl (%s)", tree->attr.name);
                 emitComment(buffer);
             }
@@ -207,6 +207,7 @@ static void genStmt(TreeNode * tree)
             // calculate localOffset and params
             localOffset = initFO;
             numOfParams = 0;
+
             isInParam = TRUE;
             cGen(p1);//manage param
             isInParam = FALSE;
@@ -227,7 +228,6 @@ static void genStmt(TreeNode * tree)
             isInFunc = FALSE;
 
             if (TraceCode){
-                char buffer[100];
                 sprintf(buffer, "<- funDcl (%s)", tree->attr.name);
                 emitComment(buffer);
             }
@@ -240,10 +240,14 @@ static void genStmt(TreeNode * tree)
 
             size = getBlockOffset(p1);
             localOffset -= size;
+
+            /* push scope */
             sc_push(tree->attr.scope);
             cGen(p2);
+            /* pop scope */
             sc_pop();
-            localOffset -= size;
+
+            localOffset += size;
 
             if (TraceCode)  emitComment("<- Compnd");
             break;
@@ -263,23 +267,6 @@ static void genStmt(TreeNode * tree)
 
             if (TraceCode)  emitComment("<- param");
             break;
-//        case ArgsK:
-//            if (TraceCode) emitComment("-> args");
-
-//            numOfArgs = 0;
-//            p1 = tree->child[0];
-//            while (p1 != NULL) {
-//                genExp(p1, TRUE);
-
-//                /* generate code to push argument value */
-//                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
-//                    "call: push argument");
-
-//                p1 = p1->sibling;
-//            }
-
-//            if (TraceCode)  emitComment("<- args");
-//            break;
         default:
             break;
     }
@@ -290,8 +277,8 @@ static void genExp(TreeNode * tree, int lhs)
 {
     int loc;
     TreeNode * p1, *p2;
+    int varOffset;
     switch (tree->kind.exp) {
-    //待修改
     case AssignK:
         if (TraceCode) emitComment("-> assign");
 
@@ -340,7 +327,7 @@ static void genExp(TreeNode * tree, int lhs)
             emitRM("LD", ac, localOffset + initFO, mp, "load arg to ac");
             /* now output it */
             emitRO("OUT",ac,0,0,"write ac");
-        } else {    //其他函数的调用，这里看不太懂
+        } else {    //其他函数的调用
             /* generate code to store current mp */
             emitRM("ST", mp, localOffset + ofpFO, mp, "call: store current mp");
             /* generate code to push new frame */
@@ -405,22 +392,23 @@ static void genExp(TreeNode * tree, int lhs)
         /* gen code to get correct varOffset */
         emitRM("LD", ac1, ++localOffset, mp, "id: pop base address");
         emitRO("SUB", ac, ac1, ac, "id: calculate element address with index");
-    } else { /* kind of node is for non-array id */
-        /* generate code for address */
-        if (loc >= 0) /* symbol found in current frame */
-            emitRO("ADD", ac, mp, ac, "id: calculate the address");
-        else /* symbol found in global scope */
-            emitRO("ADD", ac, gp, ac, "id: calculate the address");
-    }
-    if (TRUE) {
-        emitRM("LDA", ac, 0, ac, "load id address");
-    } else {
-        emitRM("LD", ac, 0, ac, "load id value");
-    }
-    if (TraceCode)
-        emitComment("<- Id");
-    break; /* IdK, ArrIdK */
-    }
+        } else { /* kind of node is for non-array id */
+            /* generate code for address */
+            if (loc >= 0) /* symbol found in current frame */
+                emitRO("ADD", ac, mp, ac, "id: calculate the address");
+            else /* symbol found in global scope */
+                emitRO("ADD", ac, gp, ac, "id: calculate the address");
+        }
+        if (TRUE) {
+            emitRM("LDA", ac, 0, ac, "load id address");
+        } else {
+            emitRM("LD", ac, 0, ac, "load id value");
+        }
+        if (TraceCode)
+            emitComment("<- Id");
+        break; /* IdK, ArrIdK */
+        }
+
     case OpK:
         if (TraceCode) emitComment("-> Op");
         p1 = tree->child[0];
@@ -541,7 +529,77 @@ static void cGen(TreeNode * tree)
     }
 }
 
+static void insertIOFunc(void)
+{
+    TreeNode *func;
+    TreeNode *typeSpec;
+    TreeNode *param;
+    TreeNode *compStmt;
 
+    func = newStmtNode(FunDclK);
+
+    typeSpec = newStmtNode(FunDclK);
+    typeSpec->attr.type = INT;
+    func->type = Integer;
+
+    compStmt = newStmtNode(CompndK);
+    compStmt->child[0] = NULL;      // no local var
+    compStmt->child[1] = NULL;      // no stmt
+
+    func->lineno = 0;
+    func->attr.name = "input";
+    func->child[0] = typeSpec;
+    func->child[1] = NULL;          // no param
+    func->child[2] = compStmt;
+
+    st_insert("input", -1, addLocation(), func);
+
+    func = newStmtNode(FunDclK);
+
+    typeSpec = newStmtNode(FunDclK);
+    typeSpec->attr.type = VOID;
+    func->type = Void;
+
+    param = newStmtNode(ParamK);
+    param->attr.name = "arg";
+    param->child[0] = newStmtNode(FunDclK);
+    param->child[0]->attr.type = INT;
+
+    compStmt = newStmtNode(CompndK);
+    compStmt->child[0] = NULL;      // no local var
+    compStmt->child[1] = NULL;      // no stmt
+
+    func->lineno = 0;
+    func->attr.name = "output";
+    func->child[0] = typeSpec;
+    func->child[1] = param;
+    func->child[2] = compStmt;
+
+    st_insert("output", -1, addLocation(), func);
+}
+
+
+void genMainCall() {
+    emitRM("LDC", ac, globalOffset, 0, "init: load globalOffset");
+    emitRO("ADD", mp, mp, ac, "init: initialize mp with globalOffset");
+
+    if (TraceCode) emitComment("-> Call");
+
+    /* generate code to store current mp */
+    emitRM("ST", mp, ofpFO, mp, "call: store current mp");
+    /* generate code to push new frame */
+    emitRM("LDA", mp, 0, mp, "call: push new frame");
+    /* generate code to save return in ac */
+    emitRM("LDA", ac, 1, pc, "call: save return in ac");
+
+    /* generate code for unconditional jump to function entry */
+    emitRM("LDC", pc, mainFuncLoc, 0, "call: unconditional jump to main() entry");
+
+    /* generate code to pop current frame */
+    emitRM("LD", mp, ofpFO, mp, "call: pop current frame");
+
+    if (TraceCode) emitComment("<- Call");
+}
 
 /**********************************************/
 /* the primary function of the code generator */
@@ -565,11 +623,14 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     emitRM("LDA",mp,0,gp,"copy gp to mp");
     emitRM("ST", ac, 0, ac, "clear location 0");
     emitComment("End of standard prelude.");
-//    insertIOFunc();
+    insertIOFunc();
+    /* push global scope */
     sc_push(globalScope);
     /* generate code for TINY program */
     cGen(syntaxTree);
+    /* pop global scope */
     sc_pop();
+    genMainCall();
     /* finish */
     emitComment("End of execution.");
     emitRO("HALT", 0, 0, 0, "");

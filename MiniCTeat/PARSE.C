@@ -291,9 +291,9 @@ TreeNode * params(void){
         }
     }
     if(token == VOID){  //函数参数为空
-        t = newStmtNode(VarDclK);
-        t->attr.name = copyString(tokenString);
-        t->type = Void;
+//        t = newStmtNode(VarDclK);
+//        t->attr.name = copyString(tokenString);
+//        t->type = Void;
 
         match(VOID);
     }
