@@ -13,10 +13,6 @@
 #include<string>
 using namespace std;
 
-//MininC中间代码生成
-static char * funcName;
-static int preserveLastScope = FALSE;
-
 /*miniC functions*/
 static TreeNode * declaration_list(void);
 static TreeNode * declaration(void);
@@ -42,7 +38,7 @@ static TreeNode * call(void);
 static TreeNode * args(void);
 
 void addToVarMap(VarStruct v);
-void addToFunMap(FunStruct f, TreeNode * t);
+void addToFunMap(FunStruct f);
 
 
 //语法错误输出，返回输出内容
@@ -125,13 +121,6 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     k->attr.name = copyString(t->attr.name);
                     t->child[0] = k;
 
-                    if(st_lookup_top(t->attr.name)<0){
-                        st_insert(t->attr.name, t->lineno, addLocation(), t);
-                    }else{
-                        errorMessage += syntaxError("Duplicated declaration -> ");
-                        errorMessage += printToken(ID, t->attr.name);
-                    }
-
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
@@ -157,14 +146,6 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     match(RBRACKET);
                     //定义Exp子节点
 
-                    if(st_lookup_top(t->attr.name)<0){
-                        st_insert(t->attr.name, t->lineno, addLocation(), t);
-                    }else{
-                        errorMessage += syntaxError("Duplicated declaration -> ");
-                        errorMessage += printToken(ID, t->attr.name);
-                    }
-
-
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
@@ -184,13 +165,12 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     f.name = t->attr.name;
                     f.returnType = t->type;
                     f.paramsNum = 0;
-                    addToFunMap(f, t);
+                    addToFunMap(f);
                     match(LPAREN);
                     t->child[0] = params();
                     match(RPAREN);
                     manageMapState = beforeState;
                     t->child[1] = compound_stmt();
-                    sc_pop();
                     break;
                 }
                 default:{
@@ -214,13 +194,6 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     k->attr.name = copyString(t->attr.name);
                     t->child[0] = k;
 
-                    if(st_lookup_top(t->attr.name)<0){
-                        st_insert(t->attr.name, t->lineno, addLocation(), t);
-                    }else{
-                        errorMessage += syntaxError("Duplicated declaration -> ");
-                        errorMessage += printToken(ID, t->attr.name);
-                    }
-
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
                     v.type = t->type;
@@ -243,13 +216,6 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
                     t->child[0] = k;
                     match(NUM);
                     match(RBRACKET);
-
-                    if(st_lookup_top(t->attr.name)<0){
-                        st_insert(t->attr.name, t->lineno, addLocation(), t);
-                    }else{
-                        errorMessage += syntaxError("Duplicated declaration -> ");
-                        errorMessage += printToken(ID, t->attr.name);
-                    }
 
                     VarStruct v;// add v to VarStructMap
                     v.name = t->attr.name;
@@ -278,13 +244,12 @@ TreeNode * var_fun_declaration(VarFunDclType dclType){
             f.name = t->attr.name;
             f.paramsNum = 0;
             f.returnType = t->type;
-            addToFunMap(f, t);
+            addToFunMap(f);
             match(LPAREN);
             t->child[0] = params();
             match(RPAREN);
             manageMapState = beforeState;
             t->child[1] = compound_stmt();
-            sc_pop();
             break;
         }
     }
@@ -306,13 +271,6 @@ TreeNode * compound_stmt(void){
     }
     match(RBRACE);   //'}'
     manageMapState = beforeState;
-    if(preserveLastScope){
-        preserveLastScope = FALSE;
-    }else{
-        Scope s = sc_create(const_cast<char*>(lastDeclaredFunName.c_str()));
-        sc_push(s);
-    }
-    t->attr.scope = sc_top();
     return t;
 }
 
@@ -352,7 +310,7 @@ TreeNode * param(void){
     beforeT = token; //before存储参数类型
     match(INT); //此时token为ID
 
-    t = newStmtNode(VarDclK);   //临时定义变量声明类型节点，保存ID名
+    t = newStmtNode(ParamK);   //临时定义变量声明类型节点，保存ID名
     if ((t != NULL) && (token == ID)){
         t->attr.name = copyString(tokenString);
     }
@@ -382,14 +340,6 @@ TreeNode * param(void){
         //函数参数个数属性++
         FunStructMap[lastDeclaredFunName].paramsNum++;
     }
-
-    if(st_lookup(t->attr.name)<0){
-        st_insert(t->attr.name, t->lineno, addLocation(), t);
-    }else{
-        errorMessage += syntaxError("Duplicated declaration -> ");
-        errorMessage += printToken(ID, t->attr.name);
-    }
-
     VarStruct v;// add to funtion's params
     v.name = t->attr.name;
     v.type = t->type;
@@ -585,12 +535,6 @@ TreeNode * var(void){
     if(t!=NULL){
         t->attr.name = copyString(tokenString);
     }
-    if(st_lookup(t->attr.name)==-1){
-        errorMessage += syntaxError("unexpected var -> ");
-        errorMessage += printToken(token, tokenString);
-    }else{
-        st_add_lineno(t->attr.name, t->lineno);
-    }
     VarStruct tempV;
     //make sure the var is declarated
     switch (manageMapState) {
@@ -636,6 +580,16 @@ TreeNode * var(void){
     }else{
         t->type = Integer;
     }
+//    TreeNode * k = NULL;
+//    if(tempV.varType==PARAM_VAR){
+//        k = newStmtNode(ParamK);
+//        k->attr.name = copyString(t->attr.name);
+//        k->type = t->type;
+//        k->child[0] = newExpNode(IdK);
+//        k->child[0]->type = t->type;
+//        k->child[0]->attr.name = copyString(t->attr.name);
+//        t = k;
+//    }
     return t;
 }
 
@@ -787,12 +741,6 @@ TreeNode * call(void){
     if(p != NULL && token == ID){
         p->attr.name = copyString(tokenString);
     }
-    if(st_lookup(p->attr.name)==-1){
-        errorMessage += syntaxError("unexpected call -> ");
-        errorMessage += printToken(token, tokenString);
-    }else{
-        st_add_lineno(p->attr.name, p->lineno);
-    }
     //make sure declarated function
     if(FunStructMap.count(p->attr.name) == 0){//use a undelcarated function
         errorMessage += syntaxError("unexpected call -> ");
@@ -838,7 +786,8 @@ TreeNode * call(void){
 
 
 TreeNode * args(void){
-    TreeNode * t = newStmtNode(ArgsK);
+//    TreeNode * t = newStmtNode(ArgsK);
+    TreeNode * t = newExpNode(ArgsK);
     TreeNode * p = expression();
     if(p != NULL){
         t->child[0] = p;
@@ -908,15 +857,7 @@ void addToVarMap(VarStruct v){
     }
 }
 
-void addToFunMap(FunStruct f, TreeNode * t){
-    if(st_lookup_top(const_cast<char*>(f.name.c_str()))>=0){
-        errorMessage += syntaxError("Duplicated declaration -> ");
-        errorMessage += printToken(ID, f.name.c_str());
-    }else{
-        st_insert(const_cast<char*>(f.name.c_str()), t->lineno, addLocation(), t);
-        sc_push(sc_create(const_cast<char*>(f.name.c_str())));
-        preserveLastScope = TRUE;
-    }
+void addToFunMap(FunStruct f){
     if(FunStructMap.count(f.name) == 0){
         FunStructMap[f.name] = f;
         lastDeclaredFunName = f.name;

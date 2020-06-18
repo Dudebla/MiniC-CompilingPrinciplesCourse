@@ -12,6 +12,7 @@
 #include "CGEN.H"
 #include "UTIL.H"
 #include "SYMTAB.H"
+#include "ANALYZE.H"
 #include <vector>
 #include<string>
 using namespace std;
@@ -46,14 +47,21 @@ static vector<FunStruct> funScope;
 /* prototype for internal recursive code generator */
 static void cGen (TreeNode * tree);
 
-static void genExp(TreeNode * tree);
+static void genExp(TreeNode * tree, int lhs);
 
 /*returns the offset for temp variables in the block where list is */
 static int getBlockOffset(TreeNode * list){
     int offset = 0;
     if(list == NULL){//no vardecl
         return offset;
-    }else{
+    }else if(list->kind.stmt == ParamK){
+        /* parameter declaration */
+        TreeNode *node = list;
+        while (node != NULL) {
+            ++offset;
+            node = node->sibling;
+        }
+    }else if(list->kind.stmt == VarDclK) {
         TreeNode * node = list;
         while(node!=NULL){
             switch (node->type) {//Void, Integer, IntList, VoidList, Boolean
@@ -163,6 +171,8 @@ static void genStmt(TreeNode * tree)
             }
             break;
         case FunDclK:
+            if(tree->child[0]==NULL)
+                break;
             if (TraceCode){
                 char buffer[100];
                 sprintf(buffer, "-> funDcl (%s)", tree->attr.name);
@@ -230,11 +240,10 @@ static void genStmt(TreeNode * tree)
 
             size = getBlockOffset(p1);
             localOffset -= size;
-
+            sc_push(tree->attr.scope);
             cGen(p2);
-
+            sc_pop();
             localOffset -= size;
-
 
             if (TraceCode)  emitComment("<- Compnd");
             break;
@@ -249,35 +258,35 @@ static void genStmt(TreeNode * tree)
             break;
         case ParamK:
             if (TraceCode) emitComment("-> param");
-
-
+            --localOffset;
+            ++numOfParams;
 
             if (TraceCode)  emitComment("<- param");
             break;
-        case ArgsK:
-            if (TraceCode) emitComment("-> args");
+//        case ArgsK:
+//            if (TraceCode) emitComment("-> args");
 
-            numOfArgs = 0;
-            p1 = tree->child[0];
-            while (p1 != NULL) {
-                genExp(p1);
+//            numOfArgs = 0;
+//            p1 = tree->child[0];
+//            while (p1 != NULL) {
+//                genExp(p1, TRUE);
 
-                /* generate code to push argument value */
-                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
-                    "call: push argument");
+//                /* generate code to push argument value */
+//                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+//                    "call: push argument");
 
-                p1 = p1->sibling;
-            }
+//                p1 = p1->sibling;
+//            }
 
-            if (TraceCode)  emitComment("<- args");
-            break;
+//            if (TraceCode)  emitComment("<- args");
+//            break;
         default:
             break;
     }
 } /* genStmt */
 
   /* Procedure genExp generates code at an expression node */
-static void genExp(TreeNode * tree)
+static void genExp(TreeNode * tree, int lhs)
 {
     int loc;
     TreeNode * p1, *p2;
@@ -289,7 +298,8 @@ static void genExp(TreeNode * tree)
         p1 = tree->child[0];
         p2 = tree->child[1];
 
-        cGen(tree->child[0]);
+//        cGen(tree->child[0]);
+        genExp(p1, TRUE);
         /* now store value */
         emitRM("ST", ac, tmpOffset--, mp, "assign: push left(address)");
         /* gen code for ac = right operand */
@@ -300,13 +310,26 @@ static void genExp(TreeNode * tree)
 
         if (TraceCode)  emitComment("<- assign");
         break; /* assign_k */
-    case CallK:
+    case CallK:{
         if (TraceCode) emitComment("-> call");
 
         p1 = tree->child[0];        //函数名ID
-        p2 = tree->child[1];        //函数实参Args
+        if(tree->child[1]!=NULL){
+            p2 = tree->child[1]->child[0];        //函数实参Args
 
-        cGen(p2);
+    //        cGen(p2);
+            int numOfArgs = 0;
+            while (p2!=NULL && p2->type!=Void) {
+                if(p2->type==IntList)
+                    genExp(p2, TRUE);
+                else
+                    genExp(p2, FALSE);
+                /* generate code to push argument value */
+                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+                    "call: push argument");
+                p2 = p2->sibling;
+            }
+        }
 
         if (strcmp(p1->attr.name, "input") == 0) {
             /* generate code for input() function */
@@ -335,25 +358,69 @@ static void genExp(TreeNode * tree)
 
         if (TraceCode)  emitComment("<- call");
         break;
-    case ConstK:
+    }
+    case ConstK:{
         if (TraceCode) emitComment("-> Const");
         /* gen code to load integer constant using LDC */
         emitRM("LDC", ac, tree->attr.val, 0, "load const");
         if (TraceCode)  emitComment("<- Const");
         break; /* ConstK */
-
-    case IdK:
+    }
+    case IdK:{
         if (TraceCode){
             char buffer[100];
             sprintf(buffer, "-> Id (%s)", tree->attr.name);
             emitComment(buffer);
         }
+//        loc = st_lookup(tree->attr.name);
+//        //从内存地址加载到寄存器ac
+//        emitRM("LD", ac, loc, gp, "load id value");
+//        if (TraceCode)  emitComment("<- Id");
+//        break; /* IdK */
         loc = st_lookup(tree->attr.name);
-        //从内存地址加载到寄存器ac
-        emitRM("LD", ac, loc, gp, "load id value");
-        if (TraceCode)  emitComment("<- Id");
-        break; /* IdK */
+        int varOffset = 0;
+        if(loc >=0)
+            varOffset = initFO - loc;
+        else
+            varOffset = -(st_lookup(tree->attr.name));
+        emitRM("LDC", ac, varOffset, 0, "id: load varOffset");
 
+        if (tree->type == IntList) {/* kind of node is for array id */
+            if (loc >= 0 && loc < numOfParams) { /* generate code to push address */
+                emitRO("ADD", ac, mp, ac, "id: load the memory address of base address of array to ac");
+                emitRO("LD", ac, 0, ac, "id: load the base address of array to ac");
+            } else { /* global or local variable */
+                /* generate code for address */
+                if (loc >= 0) /* symbol found in current frame */
+                    emitRO("ADD", ac, mp, ac, "id: calculate the address");
+                else /* symbol found in global scope */
+                emitRO("ADD", ac, gp, ac, "id: calculate the address");
+            }
+        /* generate code to push localOffset */
+        emitRM("ST", ac, localOffset--, mp, "id: push base address");
+
+        /* generate code for index expression */
+        p1 = tree->child[0];
+        cGen(p1);
+        /* gen code to get correct varOffset */
+        emitRM("LD", ac1, ++localOffset, mp, "id: pop base address");
+        emitRO("SUB", ac, ac1, ac, "id: calculate element address with index");
+    } else { /* kind of node is for non-array id */
+        /* generate code for address */
+        if (loc >= 0) /* symbol found in current frame */
+            emitRO("ADD", ac, mp, ac, "id: calculate the address");
+        else /* symbol found in global scope */
+            emitRO("ADD", ac, gp, ac, "id: calculate the address");
+    }
+    if (TRUE) {
+        emitRM("LDA", ac, 0, ac, "load id address");
+    } else {
+        emitRM("LD", ac, 0, ac, "load id value");
+    }
+    if (TraceCode)
+        emitComment("<- Id");
+    break; /* IdK, ArrIdK */
+    }
     case OpK:
         if (TraceCode) emitComment("-> Op");
         p1 = tree->child[0];
@@ -430,7 +497,24 @@ static void genExp(TreeNode * tree)
         } /* case op */
         if (TraceCode)  emitComment("<- Op");
         break; /* OpK */
+    case ArgsK:{
+        if (TraceCode) emitComment("-> args");
 
+        int numOfArgs = 0;
+        p1 = tree->child[0];
+        while (p1 != NULL) {
+            genExp(p1, TRUE);
+
+            /* generate code to push argument value */
+            emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+                "call: push argument");
+
+            p1 = p1->sibling;
+        }
+
+        if (TraceCode)  emitComment("<- args");
+        break;
+    }
     default:
         break;
     }
@@ -448,7 +532,7 @@ static void cGen(TreeNode * tree)
                 genStmt(tree);
                 break;
             case ExpK:
-                genExp(tree);
+                genExp(tree, FALSE);
                 break;
             default:
                 break;
@@ -458,53 +542,6 @@ static void cGen(TreeNode * tree)
 }
 
 
-static void insertIOFunc(void)
-{ TreeNode *func;
-  TreeNode *typeSpec;
-  TreeNode *param;
-  TreeNode *compStmt;
-
-  func = newStmtNode(FunDclK);
-
-  typeSpec = newStmtNode(FunDclK);
-  typeSpec->attr.type = INT;
-  func->type = Integer;
-
-  compStmt = newStmtNode(CompndK);
-  compStmt->child[0] = NULL;      // no local var
-  compStmt->child[1] = NULL;      // no stmt
-
-  func->lineno = 0;
-  func->attr.name = "input";
-  func->child[0] = typeSpec;
-  func->child[1] = NULL;          // no param
-  func->child[2] = compStmt;
-
-  st_insert("input", -1, addLocation(), func);
-
-  func = newStmtNode(FunDclK);
-
-  typeSpec = newStmtNode(FunDclK);
-  typeSpec->attr.type = VOID;
-  func->type = Void;
-
-  param = newStmtNode(ParamK);
-  param->attr.name = "arg";
-  param->child[0] = newStmtNode(FunDclK);
-  param->child[0]->attr.type = INT;
-
-  compStmt = newStmtNode(CompndK);
-  compStmt->child[0] = NULL;      // no local var
-  compStmt->child[1] = NULL;      // no stmt
-
-  func->lineno = 0;
-  func->attr.name = "output";
-  func->child[0] = typeSpec;
-  func->child[1] = param;
-  func->child[2] = compStmt;
-
-  st_insert("output", -1, addLocation(), func);
-}
 
 /**********************************************/
 /* the primary function of the code generator */
@@ -525,11 +562,14 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     /* generate standard prelude */
     emitComment("Standard prelude:");
     emitRM("LD", mp, 0, ac, "load maxaddress from location 0");
+    emitRM("LDA",mp,0,gp,"copy gp to mp");
     emitRM("ST", ac, 0, ac, "clear location 0");
     emitComment("End of standard prelude.");
-    insertIOFunc();
+//    insertIOFunc();
+    sc_push(globalScope);
     /* generate code for TINY program */
     cGen(syntaxTree);
+    sc_pop();
     /* finish */
     emitComment("End of execution.");
     emitRO("HALT", 0, 0, 0, "");

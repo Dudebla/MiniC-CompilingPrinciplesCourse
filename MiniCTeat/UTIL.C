@@ -280,9 +280,9 @@ char* printTree(TreeNode * tree)
            case WriteK:
                result += "Write\r\n";
                break;
-           case ArgsK:
-               result += "args: \r\n";
-               break;
+//           case ArgsK:
+//               result += "args: \r\n";
+//               break;
            case WhileK:
                result += "while\r\n";
                break;
@@ -303,6 +303,12 @@ char* printTree(TreeNode * tree)
                break;
            case ReturnK:
                result += "return\r\n";
+               break;
+           case ParamK:
+               name = tree->attr.name;
+               exptype = tree->type;
+               exptypestr = expTypeToString(exptype);
+               result += "param: " + name + ", type: " + exptypestr;
                break;
            default:
                result += "Unknown ExpNode kind\r\n";
@@ -340,6 +346,9 @@ char* printTree(TreeNode * tree)
            case IdK:
                name = tree->attr.name;
                result += "Id: " + name + "\r\n";
+               break;
+           case ArgsK:
+               result += "args: \r\n";
                break;
            default:
                result += "Unknown ExpNode kind\r\n";
