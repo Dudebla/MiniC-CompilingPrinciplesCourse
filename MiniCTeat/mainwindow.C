@@ -1,3 +1,12 @@
+/**
+  * mainwindow.C
+  *
+  * @brief The program's UI control file. Handle user event.
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/4/10
+  */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -22,39 +31,36 @@
 
 using namespace std;
 
-const int STYLE_TREE_LIST = 1;
-const int STYLE_TREE_GRAPH = 0;
 
-TypeToken token;
-std::map<string, VarStruct> VarStructMap;
-std::map<string, FunStruct> FunStructMap;
+TypeToken token;// using for souce content's scan
+std::map<string, VarStruct> VarStructMap;// using for analyzation, storing the vars and params
+std::map<string, FunStruct> FunStructMap;// using for analyzation, storeing the functions
 
-int Flag_isOpen; // mask: judge if open or create a file
+int Flag_isOpen; // mask: flag for open or create a file
 int Flag_isNew; // mask: create a new file if 1
 int Flag_parserResultStyle; //mask: parse result style is tree list if 1, tree graph other
 QString Last_fileName; // name of file have saved last time
 QString Last_fileContent; // content of file have saved last time
-QString lexicalResult;//
-QString parserResult;
+QString lexicalResult;// storing the lex result as QString for displaying
+QString parserResult;// storing the syntaxtree as QString for displaying
 //保存生成的语法树
-TreeNode *syntaxTree;
+TreeNode *syntaxTree;// storing the synextree as tree for compiling
 //保存打开的源文件
-FILE * source;
-int lineno = 0;
-FILE * listing;
-FILE * code;
-int EOF_flag = false;
-//int TraceCode = TRUE;
+FILE * source;// storing the source file
+int lineno = 0;// mask for scaning lines of source
+FILE * listing;// listing output text file
+FILE * code;// code text file for TM simulator
+int EOF_flag = false;// corrects ungetNextChar behavior on EOF
 
 
-string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";
-string errorMessage = "";
+string lexicalMessage = "词法分析输出，格式：行号. 识别的ID";// lexial message for display
+string errorMessage = "";// error message for display
 
-ManageMapState manageMapState;
-std::string lastDeclaredFunName;
-std::string lastDeclaredVarName;
+ManageMapState manageMapState;// marking the status while parsing
+std::string lastDeclaredFunName;// marking the last declared function
+std::string lastDeclaredVarName;// marking the last declared var
 
-Scope globalScope;
+Scope globalScope;// storing the status
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -70,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // init state
     Flag_isOpen = 0; // mask: judge if open or create a file
     Flag_isNew = 1; // mask: 1 if create a new file, 0 other
-    Flag_parserResultStyle = STYLE_TREE_LIST; //mask: default 1, parse result show as list
     lexicalResult = "";
 
     this->sourceTextEdit = this->ui->sourceTextEdit;
@@ -81,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->parserTextEdit->setReadOnly(true);
     this->synerrorTextEdit = this->ui->synerrorTextEdit;
     this->synerrorTextEdit->setReadOnly(true);
+    this->assemblyTextEdit = this->ui->assemblyTextEdit;
+    this->assemblyTextEdit->setReadOnly(true);
+
 
 }
 
@@ -311,6 +319,7 @@ void MainWindow::on_assemblyFile_triggered()
         //生成汇编文件.cm
         //初始化全局变量
         initMap();
+        errorMessage = "";
         //生成语法树
         syntaxTree = parse();
         buildSymtab(syntaxTree);
@@ -318,27 +327,30 @@ void MainWindow::on_assemblyFile_triggered()
         //解析语法树成为.cm文件
         //代码产生并保存到名为“codefileName”的.cm文件中
         codeGen(syntaxTree, tempPath.c_str());
-
+        this->synerrorTextEdit->setText(QString::fromStdString(errorMessage));
 
         //textStream<<str;
         //Last_fileContent = str;
         QMessageBox::information(this, "Save File", "Success saving the assemble instruction!", QMessageBox::Ok);
         fclose(code);
     }
-}
+    QFile file(tempPath.c_str());
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        if(file.isReadable())
+        {
 
-/*
- * change the style showing in parse widget
-*/
-void MainWindow::on_changeStyleButton_clicked()
-{
-    if(Flag_parserResultStyle==STYLE_TREE_LIST){
-        Flag_parserResultStyle = STYLE_TREE_GRAPH;
-    }else{
-        Flag_parserResultStyle = STYLE_TREE_LIST;
-    }
-    if(this->ui->tabWidget->currentIndex()==1){ // reload
+            this->assemblyTextEdit->clear();
 
+            QTextStream textStream(&file);       //读取文件，使用QTextStream
+            while(!textStream.atEnd())
+            {
+                this->assemblyTextEdit->setPlainText(textStream.readAll());
+            }
+            this->assemblyTextEdit->show();
+
+            file.close();
+        }
     }
 }
 

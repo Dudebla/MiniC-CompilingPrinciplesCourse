@@ -1,3 +1,12 @@
+/**
+  * mainwindow.h
+  *
+  * @brief The program's UI control file. Handle user event.
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/4/10
+  */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -24,6 +33,7 @@ private:
     QTextEdit * lexicalTextEdit;
     QTextEdit * parserTextEdit;
     QTextEdit * synerrorTextEdit;
+    QTextEdit * assemblyTextEdit;
 
 private slots:
     // file operation

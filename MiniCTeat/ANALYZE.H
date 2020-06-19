@@ -1,9 +1,11 @@
-/****************************************************/
-/* File: analyze.h                                  */
-/* Semantic analyzer interface for TINY compiler    */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * ANALYZE.H
+  *
+  * @brief Semantic analyzer implementation for the CMINUS compiler
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/6/5
+  */
 
 #ifndef _ANALYZE_H_
 #define _ANALYZE_H_
