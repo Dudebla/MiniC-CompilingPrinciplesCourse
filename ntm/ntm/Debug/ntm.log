@@ -1,3 +1,4 @@
-﻿  TM.C
+﻿D:\VS2017\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: 中间目录(Debug\)包含从另一个项目(ntm.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+  TM.C
 e:\编译原理课程项目\tiny 编译器及解释器\tiny 解释器 虚拟机\tm.c(360): warning C4013: “gets”未定义；假设外部返回 int
-  ntm.vcxproj -> E:\MiniC-CompilingPrinciplesCourse\ntm\Debug\ntm.exe
+  ntm.vcxproj -> E:\MiniC-CompilingPrinciplesCourse\ntm\Debug\woaibianyiyuanli.exe
