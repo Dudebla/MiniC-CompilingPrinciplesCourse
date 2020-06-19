@@ -1,9 +1,11 @@
-/****************************************************/
-/* File: scan.c                                     */
-/* The scanner implementation for the TINY compiler */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * SCAN.h
+  *
+  * @brief The scanner interface for the CMINUS compiler
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/4/20
+  */
 
 #include "GLOBALS.H"
 #include "UTIL.H"
@@ -272,18 +274,6 @@ TypeToken getToken(void)
                 }
             }
             break;
-//        case INASSIGN:
-//            state = DONE;
-//            if (c == '=')
-//                currentToken = ASSIGN;
-//            else
-//            { /* backup in the input */
-//                ungetNextChar();
-//                --tokenLength;
-//                save = FALSE;
-//                currentToken = ERRO;
-//            }
-//            break;
         case INNUM:
             if (!isdigit(c))
             { /* backup in the input */

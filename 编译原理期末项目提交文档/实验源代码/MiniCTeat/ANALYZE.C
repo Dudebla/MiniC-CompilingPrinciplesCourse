@@ -1,10 +1,11 @@
-/****************************************************/
-/* File: analyze.c                                  */
-/* Semantic analyzer implementation                 */
-/* for the TINY compiler                            */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * ANALYZE.C
+  *
+  * @brief Semantic analyzer implementation for the CMINUS compiler
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/6/5
+  */
 
 #include "GLOBALS.H"
 #include "SYMTAB.H"
@@ -38,46 +39,6 @@ static void traverse( TreeNode * t,
     traverse(t->sibling,preProc,postProc);
   }
 }
-
-//static void insertIOFunc(void)
-//{ TreeNode *func;
-//  TreeNode *typeSpec;
-//  TreeNode *param;
-//  TreeNode *compStmt;
-
-
-//  func = newStmtNode(FunDclK);
-//  //int input(void)
-//  compStmt = newStmtNode(CompndK);
-//  compStmt->child[0] = NULL;      // no local var
-//  compStmt->child[1] = NULL;      // no stmt
-//  func->lineno = 0;
-//  func->type = Integer;
-//  func->attr.name = copyString("input");
-//  func->child[0] = NULL; //no param
-//  func->child[1] = compStmt;
-//  st_insert("input", -1, addLocation(), func);
-
-//  //void output(int)
-//  string paramName = "arg";
-//  func = newStmtNode(FunDclK);
-//  compStmt = newStmtNode(CompndK);
-//  param = newStmtNode(ParamK);
-//  param->attr.name = copyString("arg");
-//  param->type = Integer;
-//  param->child[0] = newExpNode(IdK);
-//  param->child[0]->type = Integer;
-//  param->child[0]->attr.name = copyString("arg");
-//  compStmt->child[0] = NULL;      // no local var
-//  compStmt->child[1] = NULL;      // no stmt
-//  func->lineno = 0;
-//  func->type = Void;
-//  func->attr.name = copyString("output");
-//  func->child[0] = param;
-//  func->child[1] = compStmt;
-//  st_insert("output", -1, addLocation(), func);
-
-//}
 
 static void insertIOFunc(void)
 {
@@ -136,12 +97,12 @@ static void nullProc(TreeNode * t)
   else return;
 }
 
-static char* symbolError(TreeNode * t, char * message)
+static string symbolError(TreeNode * t, char * message)
 {
     string result = "Symbol error at line " + to_string(t->lineno) + ": " + message + "\n";
 //    fprintf(listing,"Symbol error at line %d: %s\n",t->lineno,message);
     Error = TRUE;
-    return const_cast<char*>(result.c_str());
+    return result;
 }
 
 /* Procedure insertNode inserts 
@@ -156,36 +117,22 @@ static void insertNode( TreeNode * t)
         case VarDclK:{
             char * name;
             if(t->child[0]->type == Void){
-                errorMessage = symbolError(t,"variable should have non-void type");
+                errorMessage += symbolError(t,"variable should have non-void type");
                 break;
             }
             if(st_lookup_top(t->attr.name)<0){
                 st_insert(t->attr.name, t->lineno, addLocation(), t);
             }else{
-                errorMessage = symbolError(t,"symbol already declared for current scope");
+                errorMessage += symbolError(t,"symbol already declared for current scope");
                 break;
             }
             break;
         }
         case FunDclK:{
             funcName = t->attr.name;
-//            if (st_lookup_top(funcName) >= 0) {
-//            /* already in table, so it's an error */
-//              symbolError(t,"function already declared");
-//              break;
-//            }
             st_insert(funcName,t->lineno,addLocation(),t);
             sc_push(sc_create(funcName));
             preserveLastScope = TRUE;
-//          switch (t->child[0]->attr.type){
-//          case INT:
-//            t->type = Integer;
-//            break;
-//          case VOID:
-//            default:
-//            t->type = Void;
-//            break;
-//          }
             break;
         }
         case CompndK:{
@@ -200,14 +147,10 @@ static void insertNode( TreeNode * t)
         }
         case ParamK:{
             if (t->child[0]->attr.type == VOID){
-                errorMessage =  symbolError(t->child[0],"void type parameter is not allowed");
+                errorMessage +=  symbolError(t->child[0],"void type parameter is not allowed");
             }
             if (st_lookup(t->attr.name) == -1) {
                 st_insert(t->attr.name,t->lineno,addLocation(),t);
-//                if (t->kind.param == NonArrParamK)
-//                    t->type = Integer;
-//                else
-//                    symbolError(t,"symbol already declared for current scope");
             }
             break;
         }
@@ -220,7 +163,7 @@ static void insertNode( TreeNode * t)
           case IdK:
               if (st_lookup(t->attr.name) == -1)
               /* not yet in table, error */
-                  symbolError(t, "undelcared symbol");
+                 errorMessage += symbolError(t, "undelcared symbol");
               else
               /* already in table, so ignore location,
                add line number of use only */
@@ -230,7 +173,7 @@ static void insertNode( TreeNode * t)
           case CallK:
               if (st_lookup(t->child[0]->attr.name) == -1)
               /* not yet in table, error */
-                  symbolError(t, "undelcared symbol");
+                  errorMessage += symbolError(t, "undelcared symbol");
               else
               /* already in table, so ignore location,
                add line number of use only */
@@ -244,6 +187,10 @@ static void insertNode( TreeNode * t)
       }
 }
 
+/**
+ * @brief afterInsertNode stack the last scope
+ * @param t
+ */
 static void afterInsertNode( TreeNode * t ){
     switch (t->nodekind){
     case StmtK:
@@ -282,6 +229,10 @@ static char * typeError(TreeNode * t, char * message){
     return const_cast<char*>(result.c_str());
 }
 
+/**
+ * @brief beforeCheckNode prepare for node check
+ * @param t
+ */
 static void beforeCheckNode(TreeNode * t){
     switch (t->nodekind){
     case StmtK:
@@ -321,26 +272,6 @@ static void checkNode(TreeNode * t){
             t->type = Integer;
             break;
         }
-//        case IdK:{
-//            const char *symbolName = t->attr.name;
-//            const BucketList bucket = st_bucket(const_cast<char*>(symbolName));
-//            TreeNode *symbolDecl = NULL;
-//            if (bucket == NULL) break;
-//            symbolDecl = bucket->treeNode;
-//            if (t->type == IntList) {
-//                if (symbolDecl->type != IntList && symbolDecl->kind.param != ArrParamK){
-//                    errorMessage += typeError(t,"expected array symbol");
-//                } else if (t->child[0]->type != Integer){
-//                    errorMessage += typeError(t,"index expression should have integer type");
-//                }else{
-//                    t->type = Integer;
-//                }
-//            } else {
-//                t->type = symbolDecl->type;
-//            }
-//            break;
-
-//        }
         case AssignK:
             if (t->child[0]->type == IntList || t->child[0]->type == Void){
                 errorMessage += typeError(t->child[0],"assignment of non-integer value");
@@ -348,53 +279,17 @@ static void checkNode(TreeNode * t){
                 t->type = t->child[0]->type;
             }
             break;
-//        case CallK:{
-//            const char *callingFuncName = t->attr.name;
-//            const TreeNode * funcDecl = st_bucket(const_cast<char*>(callingFuncName))->treeNode;
-//            TreeNode *arg;
-//            TreeNode *param;
-//            if (funcDecl == NULL)
-//                break;
-//            arg = t->child[0];
-//            param = funcDecl->child[1];
-//            if (funcDecl->kind.stmt != FunDclK){
-//                errorMessage += typeError(t,"expected function symbol");
-//                break;
-//            }
-//            while (arg != NULL) {
-//                if (param == NULL) /* the number of arguments does not match to that of parameters */
-//                    errorMessage += typeError(arg,"the number of parameters is wrong");
-//                else if (arg->type == Void)
-//                    errorMessage += typeError(arg,"void value cannot be passed as an argument");
-//                else {  // no problem!
-//                    arg = arg->sibling;
-//                    param = param->sibling;
-//                    continue;
-//                }
-//              /* any problem */
-//                break;
-//            }
-//            if (arg == NULL && param != NULL)  /* the number of arguments does not match to
-//               that of parameters */
-//                errorMessage += typeError(t->child[0],"the number of parameters is wrong");
-//            t->type = funcDecl->type;
-//        }break;
         default:
             break;
         }
         break;
     case StmtK:
          switch (t->kind.stmt){
-//         case IfK:
-//         case ReadK:
-//         case WriteK:
          case WhileK:{
              if (t->child[0]->type == Void)/* while test should be void function call */
                  errorMessage += typeError(t->child[0],"while test has void value");
              break;
          }
-//         case VarDclK:
-//         case FunDclK:
          case CompndK:{
              sc_pop();
              break;
@@ -411,21 +306,6 @@ static void checkNode(TreeNode * t){
              }
              break;
          }
-//         case ParamK:
-//         case ArgsK:
-
-//         case IfK:
-//            if (t->child[0]->type == Integer || t->child[0]->type == IntList)
-//                typeError(t->child[0],"if test is not Boolean");
-//            break;
-//         case WriteK:
-//            if (t->child[0]->type != Integer || t->child[0]->type != IntList)
-//                typeError(t->child[0],"write of non-integer value");
-//            break;
-//         case WhileK:
-//            if (t->child[0]->type == Integer || t->child[0]->type == IntList)
-//                typeError(t->child[0],"while test is not Boolean");
-//            break;
          default:
             break;
         }

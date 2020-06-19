@@ -1,11 +1,11 @@
-/****************************************************/
-/* File: cgen.c                                     */
-/* The code generator implementation                */
-/* for the TINY compiler                            */
-/* (generates code for the TM machine)              */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * CGEN.C
+  *
+  * @brief The code generator interface to the CMINUS compiler
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/6/5
+  */
 
 #include "SYMTAB.H"
 #include "CODE.H"
@@ -19,9 +19,9 @@ using namespace std;
 
 static char buffer[1000];
 
-#define ofpFO 0
-#define retFO -1
-#define initFO -2
+#define ofpFO 0//
+#define retFO -1 // return code skip
+#define initFO -2// init code skip
 
 /* tmpOffset is the memory offset for temps
    It is decremented each time a temp is
@@ -181,9 +181,6 @@ static void genStmt(TreeNode * tree)
             p2 = tree->child[1];//fun body
             isInFunc = TRUE;
 
-            // store func location
-//            loc = -(st_lookup(tree->attr.name));
-           //#####
             loc = (st_lookup(tree->attr.name));
 
             savedLoc1 = emitSkip(1);//fundec first skip
@@ -310,23 +307,8 @@ static void genExp(TreeNode * tree, int lhs)
         if(tree->child[1]!=NULL){
             p2 = tree->child[1];        //函数实参Args
 
-//            p2 = tree->child[1]->child[0];        //函数实参Args
-
             cGen(p2);
-//            int numOfArgs = 0;
-//            while (p2!=NULL) {
-//                if(p2->type==Integer || p2->type==Boolean){
-//                    genExp(p2, FALSE);
-//                }else if(p2->type==IntList)
-//                    genExp(p2, TRUE);
-//                else if(p2->nodekind==ExpK)
-//                    genExp(p2, FALSE);
 
-//                /* generate code to push argument value */
-//                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
-//                    "call: push argument");
-//                p2 = p2->sibling;
-//            }
         }
 
         if (strcmp(p1->attr.name, "input") == 0) {
@@ -545,7 +527,9 @@ static void cGen(TreeNode * tree)
 }
 
 
-
+/**
+ * @brief genMainCall manage the callind code of main function
+ */
 void genMainCall() {
     emitRM("LDC", ac, globalOffset, 0, "init: load globalOffset");
     emitRO("ADD", mp, mp, ac, "init: initialize mp with globalOffset");

@@ -6,6 +6,15 @@
 /* Kenneth C. Louden                                */
 /****************************************************/
 
+/**
+  * GlOBALS.H
+  *
+  * @brief Based on the TINY compiler file. Handling the global types and vars.
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/6/10
+  */
+
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
@@ -136,11 +145,11 @@ extern std::map<std::string, FunStruct> FunStructMap;
 
 typedef enum{
     VarDcl, FunDcl, VarFunDcl
-}VarFunDclType;
+}VarFunDclType;// declaration type
 
 typedef enum{
     InCompound, InFunDcl, GlobalVarDcl
-}ManageMapState;
+}ManageMapState;// node parsing status
 
 extern ManageMapState manageMapState;
 extern std::string lastDeclaredFunName;

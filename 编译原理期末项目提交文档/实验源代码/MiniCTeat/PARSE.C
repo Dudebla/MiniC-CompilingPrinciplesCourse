@@ -1,9 +1,11 @@
-/****************************************************/
-/* File: parse.c                                    */
-/* The parser implementation for the TINY compiler  */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * PARSE.C
+  *
+  * @brief The parser interface for the CMINUS compiler
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/5/11
+  */
 
 #include "GLOBALS.H"
 #include "UTIL.H"

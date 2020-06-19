@@ -40,19 +40,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="changeStyleButton">
-    <property name="geometry">
-     <rect>
-      <x>1060</x>
-      <y>10</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Change Style</string>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
@@ -84,6 +71,21 @@
        <widget class="QTextEdit" name="parserTextEdit"/>
       </item>
      </layout>
+    </widget>
+    <widget class="QWidget" name="assembly">
+     <attribute name="title">
+      <string>Page</string>
+     </attribute>
+     <widget class="QTextEdit" name="assemblyTextEdit">
+      <property name="geometry">
+       <rect>
+        <x>3</x>
+        <y>9</y>
+        <width>591</width>
+        <height>591</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QTextEdit" name="synerrorTextEdit">
@@ -125,9 +127,6 @@
    <addaction name="clearFile"/>
   </widget>
   <action name="lexicalFile">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="checked">
     <bool>false</bool>
    </property>

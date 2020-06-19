@@ -1,10 +1,15 @@
-/****************************************************/
-/* File: symtab.h                                   */
-/* Symbol table interface for the TINY compiler     */
-/* (allows only one symbol table)                   */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+  * SYMTAB.H
+  *
+  * @brief Symbol table implementation for the CMINUS compiler
+  * (allows only one symbol table)
+  * Symbol table is implemented as a chained
+  * hash table
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/5/16
+  */
+
 
 #ifndef _SYMTAB_H_
 #define _SYMTAB_H_

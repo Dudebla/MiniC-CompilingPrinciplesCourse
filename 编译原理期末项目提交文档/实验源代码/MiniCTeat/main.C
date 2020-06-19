@@ -1,3 +1,12 @@
+/**
+  * main.C
+  *
+  * @brief The main file..
+  * @version 1.0.0
+  * @authors PW. & Dudebla
+  * @date 2020/4/10
+  */
+
 #include "mainwindow.h"
 #include <QApplication>
 
