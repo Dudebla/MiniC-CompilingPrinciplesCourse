@@ -182,7 +182,10 @@ static void genStmt(TreeNode * tree)
             isInFunc = TRUE;
 
             // store func location
-            loc = -(st_lookup(tree->attr.name));
+//            loc = -(st_lookup(tree->attr.name));
+           //#####
+            loc = (st_lookup(tree->attr.name));
+
             savedLoc1 = emitSkip(1);//fundec first skip
             emitRM("ST", ac1, loc, gp, "func: store the location of func. entry");
             // decrease global offset by 1
@@ -258,13 +261,18 @@ static void genStmt(TreeNode * tree)
 
             if (TraceCode)  emitComment("<- return");
             break;
-//        case ParamK:
-//            if (TraceCode) emitComment("-> param");
-//            --localOffset;
-//            ++numOfParams;
+        case ParamK:
+            if (TraceCode){
+                char buffer[100];
+                sprintf(buffer, "-> param (%s)", tree->attr.name);
+                emitComment(buffer);
+            }
 
-//            if (TraceCode)  emitComment("<- param");
-//            break;
+            --localOffset;
+            ++numOfParams;
+
+            if (TraceCode)  emitComment("<- param");
+            break;
         default:
             break;
     }
@@ -300,23 +308,25 @@ static void genExp(TreeNode * tree, int lhs)
 
         p1 = tree->child[0];        //函数名ID
         if(tree->child[1]!=NULL){
-            p2 = tree->child[1]->child[0];        //函数实参Args
+            p2 = tree->child[1];        //函数实参Args
 
-    //        cGen(p2);
-            int numOfArgs = 0;
-            while (p2!=NULL) {
-                if(p2->type==Integer || p2->type==Boolean){
-                    genExp(p2, FALSE);
-                }else if(p2->type==IntList)
-                    genExp(p2, TRUE);
-                else if(p2->nodekind==ExpK)
-                    genExp(p2, FALSE);
+//            p2 = tree->child[1]->child[0];        //函数实参Args
 
-                /* generate code to push argument value */
-                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
-                    "call: push argument");
-                p2 = p2->sibling;
-            }
+            cGen(p2);
+//            int numOfArgs = 0;
+//            while (p2!=NULL) {
+//                if(p2->type==Integer || p2->type==Boolean){
+//                    genExp(p2, FALSE);
+//                }else if(p2->type==IntList)
+//                    genExp(p2, TRUE);
+//                else if(p2->nodekind==ExpK)
+//                    genExp(p2, FALSE);
+
+//                /* generate code to push argument value */
+//                emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
+//                    "call: push argument");
+//                p2 = p2->sibling;
+//            }
         }
 
         if (strcmp(p1->attr.name, "input") == 0) {
@@ -337,7 +347,7 @@ static void genExp(TreeNode * tree, int lhs)
             emitRM("LDA", ac, 1, pc, "call: save return in ac");
 
             /* generate code to relative-jump to function entry */
-            loc = -(st_lookup(p1->attr.name));      //返回函数名所在的位置？
+            loc = (st_lookup(p1->attr.name));      //返回函数名所在的位置？
             emitRM("LD", pc, loc, gp, "call: relative jump to function entry");
 
             /* generate code to pop current frame */
@@ -360,17 +370,16 @@ static void genExp(TreeNode * tree, int lhs)
             sprintf(buffer, "-> Id (%s)", tree->attr.name);
             emitComment(buffer);
         }
-//        loc = st_lookup(tree->attr.name);
-//        //从内存地址加载到寄存器ac
-//        emitRM("LD", ac, loc, gp, "load id value");
-//        if (TraceCode)  emitComment("<- Id");
-//        break; /* IdK */
+
         loc = st_lookup(tree->attr.name);
         int varOffset = 0;
         if(loc >=0)
             varOffset = initFO - loc;
         else
             varOffset = -(st_lookup(tree->attr.name));
+        //######
+        emitRM("LDA",ac1 ,0,mp,"");
+
         emitRM("LDC", ac, varOffset, 0, "id: load varOffset");
 
         if (tree->type == IntList) {/* kind of node is for array id */
@@ -384,15 +393,15 @@ static void genExp(TreeNode * tree, int lhs)
                 else /* symbol found in global scope */
                 emitRO("ADD", ac, gp, ac, "id: calculate the address");
             }
-        /* generate code to push localOffset */
-        emitRM("ST", ac, localOffset--, mp, "id: push base address");
+            /* generate code to push localOffset */
+            emitRM("ST", ac, localOffset--, mp, "id: push base address");
 
-        /* generate code for index expression */
-        p1 = tree->child[0];
-        cGen(p1);
-        /* gen code to get correct varOffset */
-        emitRM("LD", ac1, ++localOffset, mp, "id: pop base address");
-        emitRO("SUB", ac, ac1, ac, "id: calculate element address with index");
+            /* generate code for index expression */
+            p1 = tree->child[0];
+            cGen(p1);
+            /* gen code to get correct varOffset */
+            emitRM("LD", ac1, ++localOffset, mp, "id: pop base address");
+            emitRO("SUB", ac, ac1, ac, "id: calculate element address with index");
         } else { /* kind of node is for non-array id */
             /* generate code for address */
             if (loc >= 0) /* symbol found in current frame */
@@ -412,8 +421,8 @@ static void genExp(TreeNode * tree, int lhs)
 
     case OpK:
         if (TraceCode) emitComment("-> Op");
-        p1 = tree->child[0];
-        p2 = tree->child[1];
+        p1 = tree->child[0];        //运算符左边
+        p2 = tree->child[1];        //运算符右边
         /* gen code for ac = left arg */
         cGen(p1);
         /* gen code to push left operand */
@@ -422,6 +431,7 @@ static void genExp(TreeNode * tree, int lhs)
         cGen(p2);
         /* now load left operand */
         emitRM("LD", ac1, ++localOffset, mp, "op: load left");
+
         switch (tree->attr.op) {
         case PLUS:
             emitRO("ADD", ac, ac1, ac, "op +");
@@ -492,7 +502,11 @@ static void genExp(TreeNode * tree, int lhs)
         int numOfArgs = 0;
         p1 = tree->child[0];
         while (p1 != NULL) {
-            genExp(p1, TRUE);
+            if(p1->type == IntList){        //参数类型为数组
+                genExp(p1, TRUE);
+            }else{
+                genExp(p1, FALSE);
+            }
 
             /* generate code to push argument value */
             emitRM("ST", ac, localOffset + initFO - (numOfArgs++), mp,
@@ -572,9 +586,16 @@ void codeGen(TreeNode * syntaxTree, const char * codefile)
     emitComment((char*)str.c_str());
     /* generate standard prelude */
     emitComment("Standard prelude:");
-    emitRM("LD", mp, 0, ac, "load maxaddress from location 0");
-    emitRM("LDA",mp,0,gp,"copy gp to mp");
-    emitRM("ST", ac, 0, ac, "clear location 0");
+
+    //github的
+//    emitRM("LD",gp,0,ac,"load gp with maxaddress");
+//    emitRM("LDA",mp,0,gp,"copy gp to mp");
+
+    emitRM("LD",mp,0,ac,"load gp with maxaddress");
+    emitRM("LDC",gp,0,ac,"copy gp to mp");
+
+    emitRM("ST",ac,0,ac,"clear location 0");
+
     emitComment("End of standard prelude.");
     /* push global scope */
     sc_push(globalScope);

@@ -778,7 +778,6 @@ TreeNode * call(void){
 
 
 TreeNode * args(void){
-//    TreeNode * t = newStmtNode(ArgsK);
     TreeNode * t = newExpNode(ArgsK);
     TreeNode * p = expression();
     if(p != NULL){

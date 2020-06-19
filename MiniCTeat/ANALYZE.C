@@ -234,7 +234,7 @@ static void insertNode( TreeNode * t)
               else
               /* already in table, so ignore location,
                add line number of use only */
-                  st_add_lineno(t->attr.name,t->lineno);
+                  st_add_lineno(t->child[0]->attr.name,t->lineno);
               break;
           case ArgsK:
               break;

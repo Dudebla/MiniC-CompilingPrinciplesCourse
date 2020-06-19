@@ -101,12 +101,16 @@ void st_insert( char * name, int lineno, int loc, TreeNode * treeNode )
   */
 int st_lookup(char * name)
 {
-    int h = Hash(name);
-    BucketList l = hashTable[h];
-    while ((l != NULL) && (strcmp(name, l->name) != 0))
-        l = l->next;
-    if (l == NULL) return -1;
-    else return l->memloc;
+//    int h = Hash(name);
+//    BucketList l = hashTable[h];
+//    while ((l != NULL) && (strcmp(name, l->name) != 0))
+//        l = l->next;
+//    if (l == NULL) return -1;
+//    else return l->memloc;
+    BucketList l = st_bucket(name);
+    if (l != NULL) return l->memloc;
+    return -1;
+
 }
 
 int st_lookup_top (char * name)
