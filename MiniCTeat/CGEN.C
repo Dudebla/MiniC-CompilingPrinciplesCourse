@@ -172,8 +172,6 @@ static void genStmt(TreeNode * tree)
             }
             break;
         case FunDclK:
-//            if(tree->child[0]==NULL)
-//                break;
             if (TraceCode){
                 sprintf(buffer, "-> funDcl (%s)", tree->attr.name);
                 emitComment(buffer);
@@ -247,7 +245,7 @@ static void genStmt(TreeNode * tree)
             /* pop scope */
             sc_pop();
 
-            localOffset += size;
+            localOffset -= size;
 
             if (TraceCode)  emitComment("<- Compnd");
             break;
@@ -532,54 +530,6 @@ static void cGen(TreeNode * tree)
     }
 }
 
-static void insertIOFunc(void)
-{
-    TreeNode *func;
-    TreeNode *typeSpec;
-    TreeNode *param;
-    TreeNode *compStmt;
-
-    func = newStmtNode(FunDclK);
-
-    typeSpec = newStmtNode(FunDclK);
-    typeSpec->attr.type = INT;
-    func->type = Integer;
-
-    compStmt = newStmtNode(CompndK);
-    compStmt->child[0] = NULL;      // no local var
-    compStmt->child[1] = NULL;      // no stmt
-
-    func->lineno = 0;
-    func->attr.name = "input";
-    func->child[0] = typeSpec;
-    func->child[1] = NULL;          // no param
-    func->child[2] = compStmt;
-
-    st_insert("input", -1, addLocation(), func);
-
-    func = newStmtNode(FunDclK);
-
-    typeSpec = newStmtNode(FunDclK);
-    typeSpec->attr.type = VOID;
-    func->type = Void;
-
-    param = newStmtNode(ParamK);
-    param->attr.name = "arg";
-    param->child[0] = newStmtNode(FunDclK);
-    param->child[0]->attr.type = INT;
-
-    compStmt = newStmtNode(CompndK);
-    compStmt->child[0] = NULL;      // no local var
-    compStmt->child[1] = NULL;      // no stmt
-
-    func->lineno = 0;
-    func->attr.name = "output";
-    func->child[0] = typeSpec;
-    func->child[1] = param;
-    func->child[2] = compStmt;
-
-    st_insert("output", -1, addLocation(), func);
-}
 
 
 void genMainCall() {

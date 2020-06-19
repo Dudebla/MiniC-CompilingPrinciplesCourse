@@ -39,45 +39,92 @@ static void traverse( TreeNode * t,
   }
 }
 
+//static void insertIOFunc(void)
+//{ TreeNode *func;
+//  TreeNode *typeSpec;
+//  TreeNode *param;
+//  TreeNode *compStmt;
+
+
+//  func = newStmtNode(FunDclK);
+//  //int input(void)
+//  compStmt = newStmtNode(CompndK);
+//  compStmt->child[0] = NULL;      // no local var
+//  compStmt->child[1] = NULL;      // no stmt
+//  func->lineno = 0;
+//  func->type = Integer;
+//  func->attr.name = copyString("input");
+//  func->child[0] = NULL; //no param
+//  func->child[1] = compStmt;
+//  st_insert("input", -1, addLocation(), func);
+
+//  //void output(int)
+//  string paramName = "arg";
+//  func = newStmtNode(FunDclK);
+//  compStmt = newStmtNode(CompndK);
+//  param = newStmtNode(ParamK);
+//  param->attr.name = copyString("arg");
+//  param->type = Integer;
+//  param->child[0] = newExpNode(IdK);
+//  param->child[0]->type = Integer;
+//  param->child[0]->attr.name = copyString("arg");
+//  compStmt->child[0] = NULL;      // no local var
+//  compStmt->child[1] = NULL;      // no stmt
+//  func->lineno = 0;
+//  func->type = Void;
+//  func->attr.name = copyString("output");
+//  func->child[0] = param;
+//  func->child[1] = compStmt;
+//  st_insert("output", -1, addLocation(), func);
+
+//}
+
 static void insertIOFunc(void)
-{ TreeNode *func;
-  TreeNode *typeSpec;
-  TreeNode *param;
-  TreeNode *compStmt;
+{
+    TreeNode *func;
+    TreeNode *typeSpec;
+    TreeNode *param;
+    TreeNode *compStmt;
 
+    func = newStmtNode(FunDclK);
 
-  func = newStmtNode(FunDclK);
-  //int input(void)
-  compStmt = newStmtNode(CompndK);
-  compStmt->child[0] = NULL;      // no local var
-  compStmt->child[1] = NULL;      // no stmt
-  func->lineno = 0;
-  func->type = Integer;
-  func->attr.name = copyString("input");
-  func->child[0] = NULL; //no param
-  func->child[1] = compStmt;
-  st_insert("input", -1, addLocation(), func);
+    typeSpec = newStmtNode(FunDclK);
+    typeSpec->attr.type = INT;
+    func->type = Integer;
 
-  //void output(int)
-  string paramName = "arg";
-  func = newStmtNode(FunDclK);
-  compStmt = newStmtNode(CompndK);
-  param = newStmtNode(ParamK);
-  param->attr.name = copyString("arg");
-  param->type = Integer;
-  param->child[0] = newExpNode(IdK);
-  param->child[0]->type = Integer;
-  param->child[0]->attr.name = copyString("arg");
-  compStmt->child[0] = NULL;      // no local var
-  compStmt->child[1] = NULL;      // no stmt
-  func->lineno = 0;
-  func->type = Void;
-  func->attr.name = copyString("output");
-  func->child[0] = param;
-  func->child[1] = compStmt;
-  st_insert("output", -1, addLocation(), func);
+    compStmt = newStmtNode(CompndK);
+    compStmt->child[0] = NULL;      // no local var
+    compStmt->child[1] = NULL;      // no stmt
 
+    func->lineno = 0;
+    func->attr.name = "input";
+    func->type = Integer;
+    func->child[0] = NULL ;              //无参数
+    func->child[1] = compStmt;
+
+    st_insert("input", -1, addLocation(), func);
+
+    func = newStmtNode(FunDclK);
+
+    typeSpec = newStmtNode(FunDclK);
+    func->type = Void;
+
+    param = newExpNode(IdK);
+    param->attr.name = "arg";
+    param->type = Integer;
+
+    compStmt = newStmtNode(CompndK);
+    compStmt->child[0] = NULL;      // no local var
+    compStmt->child[1] = NULL;      // no stmt
+
+    func->lineno = 0;
+    func->attr.name = "output";
+    func->child[0] = param;
+    func->child[1] = compStmt;
+
+    st_insert("output", -1, addLocation(), func);
 }
+
 
 
 /* nullProc is a do-nothing procedure to 

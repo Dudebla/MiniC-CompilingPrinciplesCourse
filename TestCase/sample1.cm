@@ -1,5 +1,5 @@
 * MiniC Compilation to CM Code
-* File: /home/dude/Desktop/class/Compiling/MiniC-CompilingPrinciplesCourse/TestCase/sample1.cm
+* File: C:/Users/Pietra/Desktop/sample1.cm
 * Standard prelude:
   0:     LD  6,0(0) 	load maxaddress from location 0
   1:    LDA  6,0(5) 	copy gp to mp

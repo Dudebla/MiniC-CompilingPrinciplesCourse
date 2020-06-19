@@ -263,11 +263,7 @@ TreeNode * compound_stmt(void){
     manageMapState = InCompound;
     if(t!=NULL) t->child[0] = local_declarations();
     if(t!=NULL){
-//        if(t->child[0]!=NULL){
         t->child[1] = statement_list();
-//        }else{
-//            t->child[0] = statement_list();
-//        }
     }
     match(RBRACE);   //'}'
     manageMapState = beforeState;
@@ -291,10 +287,6 @@ TreeNode * params(void){
         }
     }
     if(token == VOID){  //函数参数为空
-//        t = newStmtNode(VarDclK);
-//        t->attr.name = copyString(tokenString);
-//        t->type = Void;
-
         match(VOID);
     }
 
