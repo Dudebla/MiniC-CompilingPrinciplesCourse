@@ -278,33 +278,35 @@ void main(void)
    ![mainwindow](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\mainwindow.jpg "screenshot mainwindow")
 
 * ### sample1
-
+<!-- 
 ![sample1_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_lexical.jpg "screenshot sample1_lexical")
 
-![sample1_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_parse.jpg "screenshot sample1_parse")
-<!-- ![sample1_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_lexical.jpg "screenshot sample1_lexical")
-![sample1_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample1_parse") -->
 
-![sample1_code](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_code.jpg "screenshot sample1_code")
+![sample1_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_parse.jpg "screenshot sample1_parse") -->
+![sample1_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_lexical.jpg "screenshot sample1_lexical")
+![sample1_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample1_parse")
 
-![sample1_result](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_result.jpg "screenshot sample1_result")
+<!-- ![sample1_code](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_code.jpg "screenshot sample1_code")
+
+![sample1_result](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample1_result.jpg "screenshot sample1_result") -->
+
+![sample1_code](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_code.jpg "screenshot sample1_code")
+![sample1_result](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_result.jpg "screenshot sample1_result")
 
 
 * ### sample2
+<!-- ![sample2_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_lexical.jpg "screenshot sample2_lexical")
+![sample2_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_parse.jpg "screenshot sample2_parse") -->
+<!-- ![sample2_code](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_code.jpg "screenshot sample2_code")
+![sample2_result](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_result.jpg "screenshot sample2_result") -->
 
-![sample2_lexical](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_lexical.jpg "screenshot sample2_lexical")
+![sample2_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample2_lexical.jpg "screenshot sample2_lexical")
 
-![sample2_parse](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_parse.jpg "screenshot sample2_parse")
+![sample2_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample2_parse")
 
-![sample2_code](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_code.jpg "screenshot sample2_code")
+![sample2_code](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample2_code.jpg "screenshot sample2_code")
 
-
-![sample2_result](https://github.com/Dudebla/MiniC-CompilingPrinciplesCourse/blob/master/ScreenShot/sample2_result.jpg "screenshot sample2_result")
-
-
-
-<!-- ![sample2_lexical](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample2_lexical.jpg "screenshot sample2_lexical")
-![sample2_parse](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample1_parse.jpg "screenshot sample2_parse") -->
+![sample2_result](E:\MiniC-CompilingPrinciplesCourse\ScreenShot\sample2_result.jpg "screenshot sample2_result")
 
 
 ## 下载
